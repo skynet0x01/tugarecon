@@ -13,5 +13,5 @@ TugaRecon, tribute to Portuguese explorers reminding glorious past of this count
 
 # Installation
 
-https://github.com/LordNeoStark/tugarecon.git
+git clone https://github.com/LordNeoStark/tugarecon.git
 
