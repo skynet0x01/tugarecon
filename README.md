@@ -9,7 +9,7 @@ During the development phase, we would like to invite users to help test the bet
 
 More modules will be added!
 New features!
-And much more...
+And much more... :)
 
 # Screenshots
 
