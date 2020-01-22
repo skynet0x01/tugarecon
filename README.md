@@ -5,6 +5,10 @@ TugaRecon, tribute to Portuguese explorers reminding glorious past of this count
 # Version
 0.1 beta 
 
+During the development phase, we would like to invite users to help test the beta version of the application.
+More modules will be added!
+New features!
+
 # Screenshots
 
 ![tugarecon](https://user-images.githubusercontent.com/39160972/72820884-98bc5980-3c67-11ea-87bf-a4bbcb388e48.png)
