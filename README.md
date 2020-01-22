@@ -6,8 +6,10 @@ TugaRecon, tribute to Portuguese explorers reminding glorious past of this count
 0.1 beta 
 
 During the development phase, we would like to invite users to help test the beta version of the application.
+
 More modules will be added!
 New features!
+And much more...
 
 # Screenshots
 
