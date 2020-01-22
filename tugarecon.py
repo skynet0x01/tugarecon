@@ -10,7 +10,9 @@ import sys
 
 import urllib3
 
-from modules import crtsearch
+# Import internal modules
+from modules import certspotter
+from modules import crt
 
 
 # Banner, Tuga or portuguese, is the same ;)
@@ -50,9 +52,11 @@ def parse_args():
     parser.add_argument('-o', '--output', help='Save the results to text file')
     return parser.parse_args()
 
+
 def useragent():
-	user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
-	return user_agent
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
+    return user_agent
+
 
 # parse host from scheme, to use for certificate transparency abuse
 def parse_url(url):
@@ -63,15 +67,6 @@ def parse_url(url):
         sys.exit(1)
     return host
 
-
-# write subdomains to a file
-def write_file(subdomains, output_file):
-    # saving subdomains results to output file
-    with open(output_file, 'a') as fp:
-        fp.write(subdomains + '\n')
-        fp.close()
-
-
 def main():
     banner()
 
@@ -79,35 +74,14 @@ def main():
     target = parse_url(args.domain)
     output = args.output
 
-    # default search crt.sh
+    # default search
     if target:
-        crtsearch.CRTsearch(target, output)
+        crt.CRT(target, output)
+        input("Press Enter to continue...")
+        certspotter.Certspotter(target, output)
+
 
 if __name__ == "__main__":
     main()
 
 #####################################################################################################
-'''
-# the domain to scan for subdomains
-domain = "sapo.pt"
-
-# read all subdomains in file
-file = open("subdomains.txt")
-# read all content
-content = file.read()
-# split by new lines
-subdomains = content.splitlines()
-
-for subdomain in subdomains:
-    # construct the url
-    url = f"http://{subdomain}.{domain}"
-    try:
-        # if this raises an ERROR, that means the subdomain does not exist
-        requests.get(url)
-    except requests.ConnectionError:
-        # if the subdomain does not exist, just pass, print nothing
-        # pass
-        print("ERROR: ", url)
-    else:
-        print("[+] Discovered subdomain:", url)
-'''
