@@ -5,7 +5,7 @@ import requests
 
 from functions import useragent
 from functions import write_file
-
+from functions import G,W
 
 class Virustotal:
 
@@ -18,7 +18,7 @@ class Virustotal:
         self.module_name = "VirusTotal"
         self.engine = "virustotal"
 
-        print(f"VirusTotal: Enumerating subdomains now for {target} \n")
+        print(G + f"VirusTotal: Enumerating subdomains now for {target} \n" + W)
 
         url = f'https://www.virustotal.com/ui/domains/{target}/subdomains?limit=40'
 
@@ -37,7 +37,7 @@ class Virustotal:
             if output:
                 print(f"\nSaving result... {self.engine +output}")
 
-            print(f"\n[**] TugaRecon is complete. CertSpotter: {count} subdomains have been found in %s seconds" % (
+            print(f"\n[**] TugaRecon is complete. VirusTotal: {count} subdomains have been found in %s seconds" % (
                     time.time() - start_time))
 
             if not subdomains:
