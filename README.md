@@ -3,6 +3,7 @@
 TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 
 # Version
+New version: 0.11 beta
 0.1 beta 
 
 During the development phase, we would like to invite all of you, to help test the beta version of the application.
