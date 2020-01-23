@@ -46,8 +46,8 @@ class CRT:
                 if output:
                     print(f"\nSaving result... {self.engine +output}")
 
-                print(f"\n[**] TugaRecon is complete. CRT: {count} subdomains have been found in %s seconds" % (
-                        time.time() - start_time))
+                print(G + f"\n[**] TugaRecon is complete. CRT: {count} subdomains have been found in %s seconds" % (
+                        time.time() - start_time) + W)
 
             elif not data:
                 print(f"[x] No data found for {target} using crtsh.")

@@ -37,8 +37,8 @@ class Certspotter:
             if output:
                 print(f"\nSaving result... {self.engine +output}")
 
-            print(f"\n[**] TugaRecon is complete. CertSpotter: {count} subdomains have been found in %s seconds" % (
-                    time.time() - start_time))
+            print(G + f"\n[**] TugaRecon is complete. CertSpotter: {count} subdomains have been found in %s seconds" % (
+                    time.time() - start_time) + W)
 
             if not subdomains:
                 print(f"[x] No data found for {target} using CertSpotter.")
