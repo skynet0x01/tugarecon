@@ -5,7 +5,7 @@ TugaRecon, tribute to Portuguese explorers reminding glorious past of this count
 # Version
 0.1 beta 
 
-During the development phase, we would like to invite users to help test the beta version of the application.
+During the development phase, we would like to invite all of you, to help test the beta version of the application.
 
 More modules will be added!
 New features!
@@ -21,3 +21,8 @@ And much more... :)
 
 git clone https://github.com/LordNeoStark/tugarecon.git
 
+# News
+
+* add new module
+* add new folder /results
+* Bruteforce is not yet implemented
