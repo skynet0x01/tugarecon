@@ -6,8 +6,7 @@ import requests
 
 from functions import useragent
 from functions import write_file
-
-
+from functions import G,W
 class CRT:
 
     def __init__(self, target, output):
@@ -18,7 +17,7 @@ class CRT:
         self.module_name = "SSL Certificates"
         self.engine = "crt"
 
-        print(f"CRT: Enumerating subdomains now for {target} \n")
+        print(G + f"CRT: Enumerating subdomains now for {target} \n" + W)
 
         # target = target.replace("*", "%25")
         url = f"https://crt.sh/?q={target}&output=json"

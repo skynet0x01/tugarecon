@@ -2,6 +2,7 @@
 
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
+# Coded By LordNeoStark
 
 # import go here :)
 
@@ -14,6 +15,7 @@ import urllib3
 from modules import certspotter
 from modules import crt
 from modules import virustotal
+
 
 # Banner, Tuga or portuguese, is the same ;)
 def banner():

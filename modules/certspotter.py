@@ -5,7 +5,7 @@ import requests
 
 from functions import useragent
 from functions import write_file
-
+from functions import G,W
 
 class Certspotter:
 
@@ -18,7 +18,7 @@ class Certspotter:
         self.module_name = "CertSpotter"
         self.engine = "certspotter"
 
-        print(f"CertSpotter: Enumerating subdomains now for {target} \n")
+        print(G + f"CertSpotter: Enumerating subdomains now for {target} \n" + W)
 
         url = f'https://api.certspotter.com/v1/issuances?domain={target}&include_subdomains=true&expand=dns_names'
 
