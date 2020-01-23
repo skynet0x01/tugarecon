@@ -15,6 +15,7 @@ import urllib3
 from modules import certspotter
 from modules import crt
 from modules import virustotal
+from modules import threatcrowd
 
 
 # Banner, Tuga or portuguese, is the same ;)
@@ -78,7 +79,8 @@ def main():
         certspotter.Certspotter(target, output)
         input("\nPress Enter to continue...")
         virustotal.Virustotal(target, output)
-
+        input("|nPress Enter to continue...")
+        threatcrowd.Threatcrowd(target, output)
 
 if __name__ == "__main__":
     main()
