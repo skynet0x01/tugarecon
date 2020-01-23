@@ -13,7 +13,7 @@ import urllib3
 # Import internal modules
 from modules import certspotter
 from modules import crt
-
+from modules import virustotal
 
 # Banner, Tuga or portuguese, is the same ;)
 def banner():
@@ -22,7 +22,7 @@ def banner():
           "            /_  __/_  ______ _____ _/ __ \___  _________  ____ \n"
           "             / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \                \n"
           "            / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               \n"
-          "           /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  V: 0.1b               \n"
+          "           /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  V: 0.11b               \n"
           "                     /____/                                    \n"
           "\n"
           "                        # Coded By LordNeoStark #\n"
@@ -46,6 +46,9 @@ def parse_args():
     parser.add_argument('-p', '--ports', help='Scan the found subdomains against specified tcp ports')
     parser.add_argument('-v', '--verbose', help='Enable Verbosity and display results in realtime', nargs='?',
                         default=False)
+    parser.add_argument('-t', '--threads', help='Number of threads to use for subbrute bruteforce', type=int,
+                        default=30)
+    parser.add_argument('-e', '--engines', help='Specify a comma-separated list of search engines')
     parser.add_argument('-o', '--output', help='Save the results to text file')
     return parser.parse_args()
 
@@ -74,8 +77,10 @@ def main():
     # default search
     if target:
         crt.CRT(target, output)
-        input("Press Enter to continue...")
+        input("\nPress Enter to continue...")
         certspotter.Certspotter(target, output)
+        input("\nPress Enter to continue...")
+        virustotal.Virustotal(target, output)
 
 
 if __name__ == "__main__":

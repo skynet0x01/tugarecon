@@ -1,4 +1,4 @@
-# TugaRecon - certspotter, write by LordNeoStark
+# TugaRecon - virustotal, write by LordNeoStark
 # import modules
 import time
 import requests
@@ -7,7 +7,7 @@ from functions import useragent
 from functions import write_file
 
 
-class Certspotter:
+class Virustotal:
 
     def __init__(self, target, output):
 
@@ -15,18 +15,18 @@ class Certspotter:
         count = 0
         subdomainscount = 0
         start_time = time.time()
-        self.module_name = "CertSpotter"
-        self.engine = "certspotter"
+        self.module_name = "VirusTotal"
+        self.engine = "virustotal"
 
-        print(f"CertSpotter: Enumerating subdomains now for {target} \n")
+        print(f"VirusTotal: Enumerating subdomains now for {target} \n")
 
-        url = f'https://api.certspotter.com/v1/issuances?domain={target}&include_subdomains=true&expand=dns_names'
+        url = f'https://www.virustotal.com/ui/domains/{target}/subdomains?limit=40'
 
         try:
             response = requests.get(url, headers={'User-Agent': useragent()})
 
-            while subdomainscount < 100:
-                subdomains = response.json()[subdomainscount]["dns_names"][0]
+            while subdomainscount < 40:
+                subdomains = response.json()["data"][subdomainscount]["id"]
                 subdomainscount = subdomainscount + 1
                 count = count + 1
                 print(f"[*] {subdomains}")
@@ -41,7 +41,7 @@ class Certspotter:
                     time.time() - start_time))
 
             if not subdomains:
-                print(f"[x] No data found for {target} using CertSpotter.")
+                print(f"[x] No data found for {target} using VirusTotal.")
 
         except ValueError:
             pass

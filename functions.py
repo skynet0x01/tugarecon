@@ -20,10 +20,13 @@ def parse_url(url):
 # write subdomains to a file
 def write_file(subdomains, output_file):
     # saving subdomains results to output file
-    with open(output_file, 'a') as fp:
+    with open("results/" + output_file, 'a') as fp:
         fp.write(subdomains + '\n')
         fp.close()
 
+
+# Future implementation
+'''
 def merge_files(certfile, certspotterfile, host):
     aliases = {}
     with open(certfile) as f:
@@ -37,3 +40,4 @@ def merge_files(certfile, certspotterfile, host):
     with open("merge"+host+".txt", "w") as f:
         for key, val in aliases.items():
             f.write("{} {}\n".format(key, val))
+'''
