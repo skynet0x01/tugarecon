@@ -1,26 +1,35 @@
 # TugaRecon - virustotal, write by LordNeoStark
 # import modules
+
 import time
 import requests
 
 from functions import useragent
 from functions import write_file
-from functions import G,W
+from functions import G, W
 
 class Virustotal:
 
     def __init__(self, target, output):
 
-        subdomains = set()
-        count = 0
-        subdomainscount = 0
-        start_time = time.time()
+        self.target = target
+        self.output = output
         self.module_name = "VirusTotal"
-        self.engine = "virustotal"
+        self.engine = "Virustotal"
 
         print(G + f"VirusTotal: Enumerating subdomains now for {target} \n" + W)
 
-        url = f'https://www.virustotal.com/ui/domains/{target}/subdomains?limit=40'
+        url = self.subdomains_list()
+        self.enumerate(url, output)
+
+    def subdomains_list(self):
+        url = f'https://www.virustotal.com/ui/domains/{self.target}/subdomains?limit=40'
+        return url
+
+    def enumerate(self, url, output):
+        subdomains = set()
+        subdomainscount = 0
+        start_time = time.time()
 
         try:
             response = requests.get(url, headers={'User-Agent': useragent()})
@@ -28,20 +37,19 @@ class Virustotal:
             while subdomainscount < 40:
                 subdomains = response.json()["data"][subdomainscount]["id"]
                 subdomainscount = subdomainscount + 1
-                count = count + 1
                 print(f"[*] {subdomains}")
 
-                if output is not None:
-                    write_file(subdomains, self.engine +output)
+                if self.output is not None:
+                    write_file(subdomains, self.engine + self.output)
 
-            if output:
-                print(f"\nSaving result... {self.engine +output}")
+            if self.output:
+                print(f"\nSaving result... {self.engine + self.output}")
 
-            print(G + f"\n[**] TugaRecon is complete. VirusTotal: {count} subdomains have been found in %s seconds" % (
+        except IndexError:
+            pass
+
+        print(G + f"\n[**] TugaRecon is complete. VirusTotal: {subdomainscount} subdomains have been found in %s seconds" % (
                     time.time() - start_time) + W)
 
-            if not subdomains:
-                print(f"[x] No data found for {target} using VirusTotal.")
-
-        except ValueError:
-            pass
+        if not subdomains:
+            print(f"[x] No data found for {target} using VirusTotal.")
