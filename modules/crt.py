@@ -1,26 +1,38 @@
 ## TugaRecon - crt module, write by LordNeoStark
 # import modules
-import re
+
 import time
 import requests
+import re
 
 from functions import useragent
 from functions import write_file
-from functions import G,W
+from functions import G, W
+
 class CRT:
 
     def __init__(self, target, output):
 
-        subdomains = set()
-        count = 0
-        start_time = time.time()
+        self.target = target
+        self.output = output
+        self.count = 0
         self.module_name = "SSL Certificates"
         self.engine = "crt"
 
-        print(G + f"CRT: Enumerating subdomains now for {target} \n" + W)
+        print(G + f"SSL Certificates: Enumerating subdomains now for {target} \n" + W)
 
+        url = self.subdomains_list()
+        self.enumerate(url, output)
+
+    def subdomains_list(self):
         # target = target.replace("*", "%25")
-        url = f"https://crt.sh/?q={target}&output=json"
+        url = f"https://crt.sh/?q={self.target}&output=json"
+        return url
+
+    def enumerate(self, url, output):
+        subdomains = set()
+        subdomainscount = 0
+        start_time = time.time()
 
         try:
             response = requests.get(url, headers={'User-Agent': useragent()})
@@ -38,19 +50,19 @@ class CRT:
 
                 for s in subs:
                     if "@" not in s:  # filter for emails
-                        count = count + 1
+                        self.count = self.count + 1
                         print(f"[*] {s}")
                         if output is not None:
-                            write_file(s, self.engine +output)
+                            write_file(s, self.engine + output)
 
                 if output:
-                    print(f"\nSaving result... {self.engine +output}")
+                    print(f"\nSaving result... {self.engine + output}")
 
-                print(G + f"\n[**] TugaRecon is complete. CRT: {count} subdomains have been found in %s seconds" % (
-                        time.time() - start_time) + W)
-
-            elif not data:
-                print(f"[x] No data found for {target} using crtsh.")
-
-        except ValueError:
+        except IndexError:
             pass
+
+        print(G + f"\n[**] TugaRecon is complete. SSL Certificates: {self.count} subdomains have been found in %s seconds" % (
+                    time.time() - start_time) + W)
+
+        if not subdomains:
+            print(f"[x] No data found for {self.target} using SSL Certificates.")
