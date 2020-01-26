@@ -8,6 +8,7 @@
 
 import argparse  # parse arguments
 import sys
+import time
 
 import urllib3
 
@@ -16,6 +17,7 @@ from modules import certspotter
 from modules import crt
 from modules import virustotal
 from modules import threatcrowd
+from functions import R, W
 
 
 # Banner, Tuga or portuguese, is the same ;)
@@ -65,6 +67,13 @@ def parse_url(url):
         sys.exit(1)
     return host
 
+def queries(target):
+    print(R + "Querying SSL Certificates for " + target + " subdomains" + W)
+    print(R + "Querying CertsPotter for " + target + " subdomains" + W)
+    print(R + "Querying Virustotal for " + target + " subdomains" + W)
+    print(R + "Querying ThreatCrowd for " + target + " subdomains\n" + W)
+    time.sleep(2)
+
 def main():
     banner()
 
@@ -74,6 +83,7 @@ def main():
 
     # default search
     if target:
+        queries(target)
         crt.CRT(target, output)
         input("\nPress Enter to continue...")
         certspotter.Certspotter(target, output)
