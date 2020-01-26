@@ -74,6 +74,7 @@ def queries(target):
     print(R + "Querying CertsPotter for " + target + " subdomains" + W)
     print(R + "Querying Virustotal for " + target + " subdomains" + W)
     print(R + "Querying ThreatCrowd for " + target + " subdomains\n" + W)
+    print(R + "Mapping the " + target + " and save image \n" + W)
     time.sleep(2)
 
 def main():
@@ -84,19 +85,23 @@ def main():
     output = args.output
 
     # default search
-    if target:
-        queries(target)
-        crt.CRT(target, output)
-        input("\nPress Enter to continue...")
-        certspotter.Certspotter(target, output)
-        input("\nPress Enter to continue...")
-        virustotal.Virustotal(target, output)
-        input("|nPress Enter to continue...")
-        threatcrowd.Threatcrowd(target, output)
-        print("\nMapping the domain... save /results folder")
-        mapping_domain(target)
-        webbrowser.open(f"results/{target}.png")
 
+    if target:
+
+        try:
+            queries(target)
+            crt.CRT(target, output)
+            input("\nPress Enter to continue...")
+            certspotter.Certspotter(target, output)
+            input("\nPress Enter to continue...")
+            virustotal.Virustotal(target, output)
+            input("|nPress Enter to continue...")
+            threatcrowd.Threatcrowd(target, output)
+            print("\nMapping the domain... save /results folder")
+            mapping_domain(target)
+            webbrowser.open(f"results/{target}.png")
+        except KeyboardInterrupt:
+            print("\nTugaRecon interrupted by user\n")
 if __name__ == "__main__":
     main()
 
