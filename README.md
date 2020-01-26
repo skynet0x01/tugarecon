@@ -23,7 +23,7 @@ And much more... :)
 git clone https://github.com/LordNeoStark/tugarecon.git
 
 # News
-
+* Mapping the domain and save image results/target.png
 * add new module
 * add new folder /results
 * Bruteforce is not yet implemented
