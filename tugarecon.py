@@ -9,15 +9,17 @@
 import argparse  # parse arguments
 import sys
 import time
+import webbrowser
 
 import urllib3
 
+from functions import R, W
+from functions import mapping_domain
 # Import internal modules
 from modules import certspotter
 from modules import crt
-from modules import virustotal
 from modules import threatcrowd
-from functions import R, W
+from modules import virustotal
 
 
 # Banner, Tuga or portuguese, is the same ;)
@@ -91,6 +93,9 @@ def main():
         virustotal.Virustotal(target, output)
         input("|nPress Enter to continue...")
         threatcrowd.Threatcrowd(target, output)
+        print("\nMapping the domain... save /results folder")
+        mapping_domain(target)
+        webbrowser.open(f"results/{target}.png")
 
 if __name__ == "__main__":
     main()

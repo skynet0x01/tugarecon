@@ -1,6 +1,10 @@
 # TugaRecon - funcions, write by LordNeoStark
 
 import sys
+import urllib3
+import urllib.request
+
+import requests
 
 # Colors
 global G, Y, B, R, W
@@ -33,6 +37,8 @@ def write_file(subdomains, output_file):
         fp.write(subdomains + '\n')
         fp.close()
 
+def mapping_domain(target):
+    urllib.request.urlretrieve(f"https://dnsdumpster.com/static/map/{target}" + ".png", f"results/{target}.png")
 
 # Future implementation
 '''
