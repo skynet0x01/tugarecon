@@ -9,10 +9,9 @@
 import argparse  # parse arguments
 import sys
 import time
-import webbrowser
 
 import urllib3
-
+# Import internal functions
 from functions import R, W
 from functions import mapping_domain
 # Import internal modules
@@ -99,7 +98,6 @@ def main():
             threatcrowd.Threatcrowd(target, output)
             print("\nMapping the domain... save /results folder")
             mapping_domain(target)
-            webbrowser.open(f"results/{target}.png")
         except KeyboardInterrupt:
             print("\nTugaRecon interrupted by user\n")
 if __name__ == "__main__":

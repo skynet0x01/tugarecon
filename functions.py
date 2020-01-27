@@ -3,6 +3,7 @@
 import sys
 import urllib3
 import urllib.request
+import webbrowser
 
 import requests
 
@@ -38,7 +39,11 @@ def write_file(subdomains, output_file):
         fp.close()
 
 def mapping_domain(target):
-    urllib.request.urlretrieve(f"https://dnsdumpster.com/static/map/{target}" + ".png", f"results/{target}.png")
+    try:
+        urllib.request.urlretrieve(f"https://dnsdumpster.com/static/map/{target}" + ".png", f"results/{target}.png")
+        webbrowser.open(f"results/{target}.png")
+    except PermissionError:
+        print("You dont have permission to save a file, use sudo su")
 
 # Future implementation
 '''
