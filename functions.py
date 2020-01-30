@@ -3,9 +3,9 @@
 import sys
 import urllib.request
 import webbrowser
-
+import urllib.error
 import urllib3
-
+from pathlib import Path
 # Colors
 global G, Y, B, R, W
 
@@ -41,8 +41,15 @@ def write_file(subdomains, output_file):
 
 def mapping_domain(target):
     try:
-        urllib.request.urlretrieve(f"https://dnsdumpster.com/static/map/{target}" + ".png", f"results/{target}.png")
-        webbrowser.open(f"results/{target}.png")
+        try:
+            urllib.request.urlretrieve(f"https://dnsdumpster.com/static/map/{target}" + ".png", f"results/{target}.png")
+        except urllib.error.URLError as e:
+            print("", e.reason)
+        my_file = Path(f"results/{target}.png")
+        if my_file.is_file():
+            webbrowser.open(f"results/{target}.png")
+        else:
+            print(Y + "\nOops! The map file was not generated. Try again...\n" + W)
     except PermissionError:
         print("You dont have permission to save a file, use sudo su")
 
