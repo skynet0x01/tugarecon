@@ -45,6 +45,13 @@ def mapping_domain(target):
     except PermissionError:
         print("You dont have permission to save a file, use sudo su")
 
+
+def Convert(subdomains):
+    subdomains_list = list(subdomains.split(","))
+    return subdomains_list
+
+
+
 # Future implementation
 '''
 def merge_files(certfile, certspotterfile, host):
