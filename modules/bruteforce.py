@@ -46,3 +46,44 @@ for subdomain in subdomains:
         print("ERROR: ", url)
     else:
         print("[+] Discovered subdomain:", url)
+###################################################################################
+
+import sys
+import os
+import dns.resolver
+
+#################
+## PREPARATION ##
+#################
+
+temp = ".temp.txt"
+arguments = sys.argv
+
+# read from argv
+try:
+    domain = arguments[1]
+    list_path = arguments[2]
+except:
+    print("Need more arguments")
+    sys.exit(1)
+
+# open wordlist
+try:
+    list_file = open(list_path)
+    lines = list_file.read().splitlines()
+except:
+    print("File {} not found".format(list_path))
+    sys.exit(1)
+
+#################
+## BRUTE FORCE ##
+#################
+
+for line in lines:
+    subdomain = line + "." + domain
+    try:
+        answers = dns.resolver.query(subdomain, 'a')
+        for result in answers:
+            print("[+] {} {}".format(subdomain, result))
+    except:
+        pass

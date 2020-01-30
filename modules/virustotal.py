@@ -52,4 +52,4 @@ class Virustotal:
                     time.time() - start_time) + W)
 
         if not subdomains:
-            print(f"[x] No data found for {target} using VirusTotal.")
+            print(f"[x] No data found for {self.target} using VirusTotal.")

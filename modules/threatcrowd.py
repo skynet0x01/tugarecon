@@ -53,4 +53,4 @@ class Threatcrowd:
                     time.time() - start_time) + W)
 
         if not subdomains:
-            print(f"[x] No data found for {target} using Threat Crowd.")
+            print(f"[x] No data found for {self.target} using Threat Crowd.")
