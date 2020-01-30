@@ -15,7 +15,7 @@ import time
 import urllib3
 
 # Import internal functions
-from functions import R, W
+from functions import R, W, Y
 from functions import mapping_domain
 
 # Import internal modules
@@ -65,8 +65,9 @@ def parse_args():
     parser.add_argument('-o', '--output', help='Save the results to text file')
     parser.add_argument('-s', '--savemap', help='Save image map domain', action='store_true')
     # parser.add_argument('--bruteforce', help='Enable the subbrute bruteforce module', nargs='?', default=False)
-    parser.add_argument('--enum',nargs='*', help = '<Module required> Perform enumerations and network mapping')
+    parser.add_argument('--enum', nargs='*', help='<Module required> Perform enumerations and network mapping')
     return parser.parse_args()
+
 
 def useragent():
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
@@ -84,11 +85,11 @@ def parse_url(url):
 
 
 def queries(target):
+    print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country\n" + W)
     print(R + "Querying SSL Certificates for " + target + " subdomains" + W)
     print(R + "Querying CertsPotter for " + target + " subdomains" + W)
     print(R + "Querying Virustotal for " + target + " subdomains" + W)
     print(R + "Querying ThreatCrowd for " + target + " subdomains\n" + W)
-    print(R + "Mapping the " + target + " and save image \n" + W)
     time.sleep(2)
 
 
@@ -106,6 +107,7 @@ def main(target, output, port, savemap, enum):
     chosenEnums = []
 
     if enum is None:
+        queries(target)
         chosenEnums = [certspotter.Certspotter, hackertarget.Hackertarget, virustotal.Virustotal,
                        threatcrowd.Threatcrowd, crt.CRT]
     else:
@@ -114,11 +116,12 @@ def main(target, output, port, savemap, enum):
             if engine.lower() in supported_engines:
                 chosenEnums.append(supported_engines[engine.lower()])
 
-# Start the enumeration
+    # Start the enumeration
 
     enums = [indicate(target, output) for indicate in chosenEnums]
     if savemap is not False:
         mapping_domain(target)
+
 
 def menu():
     banner()
