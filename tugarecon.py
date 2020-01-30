@@ -9,21 +9,22 @@
 import argparse  # parse arguments
 import sys
 import time
-# import thread
-# import threading
 
 import urllib3
 
 # Import internal functions
 from functions import R, W, Y
 from functions import mapping_domain
-
 # Import internal modules
 from modules import certspotter
 from modules import crt
+from modules import hackertarget
 from modules import threatcrowd
 from modules import virustotal
-from modules import hackertarget
+
+
+# import thread
+# import threading
 
 
 # Banner, Tuga or portuguese, is the same ;)
@@ -95,33 +96,36 @@ def queries(target):
 
 def main(target, output, port, savemap, enum):
     # search_list = set()
+    try:
 
-    # <Module required> Perform enumerations and network mapping
+        # <Module required> Perform enumerations and network mapping
 
-    supported_engines = {'certspotter': certspotter.Certspotter,
-                         'hackertarget': hackertarget.Hackertarget,
-                         'virustotal': virustotal.Virustotal,
-                         'threatcrowd': threatcrowd.Threatcrowd,
-                         'ssl': crt.CRT
-                         }
-    chosenEnums = []
+        supported_engines = {'certspotter': certspotter.Certspotter,
+                             'hackertarget': hackertarget.Hackertarget,
+                             'virustotal': virustotal.Virustotal,
+                             'threatcrowd': threatcrowd.Threatcrowd,
+                             'ssl': crt.CRT
+                             }
+        chosenEnums = []
 
-    if enum is None:
-        queries(target)
-        chosenEnums = [certspotter.Certspotter, hackertarget.Hackertarget, virustotal.Virustotal,
+        if enum is None:
+            queries(target)
+            chosenEnums = [certspotter.Certspotter, hackertarget.Hackertarget, virustotal.Virustotal,
                        threatcrowd.Threatcrowd, crt.CRT]
-    else:
+        else:
 
-        for engine in enum:
-            if engine.lower() in supported_engines:
-                chosenEnums.append(supported_engines[engine.lower()])
+            for engine in enum:
+                if engine.lower() in supported_engines:
+                    chosenEnums.append(supported_engines[engine.lower()])
 
-    # Start the enumeration
+        # Start the enumeration
 
-    enums = [indicate(target, output) for indicate in chosenEnums]
-    if savemap is not False:
-        mapping_domain(target)
-
+        enums = [indicate(target, output) for indicate in chosenEnums]
+        if savemap is not False:
+            mapping_domain(target)
+    except KeyboardInterrupt:
+        print("\nTugaRecon interrupted by user\n")
+        sys.exit()
 
 def menu():
     banner()

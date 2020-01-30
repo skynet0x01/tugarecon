@@ -1,11 +1,10 @@
 # TugaRecon - funcions, write by LordNeoStark
 
 import sys
-import urllib3
 import urllib.request
 import webbrowser
 
-import requests
+import urllib3
 
 # Colors
 global G, Y, B, R, W
@@ -14,7 +13,8 @@ G = '\033[92m'  # green
 Y = '\033[93m'  # yellow
 B = '\033[94m'  # blue
 R = '\033[91m'  # red
-W = '\033[0m'   # white
+W = '\033[0m'  # white
+
 
 def useragent():
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
@@ -38,6 +38,7 @@ def write_file(subdomains, output_file):
         fp.write(subdomains + '\n')
         fp.close()
 
+
 def mapping_domain(target):
     try:
         urllib.request.urlretrieve(f"https://dnsdumpster.com/static/map/{target}" + ".png", f"results/{target}.png")
@@ -49,7 +50,6 @@ def mapping_domain(target):
 def Convert(subdomains):
     subdomains_list = list(subdomains.split(","))
     return subdomains_list
-
 
 
 # Future implementation
