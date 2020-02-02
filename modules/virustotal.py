@@ -1,12 +1,17 @@
 # TugaRecon - virustotal, write by LordNeoStark
+# TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
+# Bug Bounty Recon, search for subdomains and save in to a file
+# Coded By LordNeoStark | https://twitter.com/LordNeoStark | https://github.com/LordNeoStark
 # import modules
 
 import time
+
 import requests
 
+from functions import G, W
 from functions import useragent
 from functions import write_file
-from functions import G, W
+
 
 class Virustotal:
 
@@ -48,7 +53,8 @@ class Virustotal:
         except IndexError:
             pass
 
-        print(G + f"\n[**] TugaRecon is complete. VirusTotal: {subdomainscount} subdomains have been found in %s seconds" % (
+        print(
+            G + f"\n[**] TugaRecon is complete. VirusTotal: {subdomainscount} subdomains have been found in %s seconds" % (
                     time.time() - start_time) + W)
 
         if not subdomains:

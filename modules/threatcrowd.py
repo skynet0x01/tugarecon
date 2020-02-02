@@ -1,4 +1,7 @@
 # TugaRecon - threatcrowd, write by LordNeoStark
+# TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
+# Bug Bounty Recon, search for subdomains and save in to a file
+# Coded By LordNeoStark | https://twitter.com/LordNeoStark | https://github.com/LordNeoStark
 # import modules
 
 
