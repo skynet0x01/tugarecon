@@ -32,7 +32,7 @@ def scan_subdomains(domain):
         url = f"http://{subdomain}.{domain}"
 
         try:
-            requests.get(url)
+            requests.get(url, allow_redirects=False)
         except requests.ConnectionError:
             pass
         else:
