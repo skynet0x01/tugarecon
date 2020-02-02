@@ -7,8 +7,13 @@
 import requests
 import signal
 import os
+import sys
+import time
 from threading import Thread  # Thread-based parallelism
 from queue import Queue  # A synchronized queue class
+
+# internal functions
+from functions import G, W
 
 queue = Queue()
 
@@ -19,8 +24,13 @@ def scan_subdomains(domain):
     while True:
         # get the subdomain from the queue
         subdomain = queue.get()
-        # scan the subdomain
+        # scan the subdomain from txt file
+        sys.stdout.write(G + 'Testing subdomains: '+ str(subdomain) +'                                       \r' +W)
+        #print(str(subdomain), end="\r", flush=True)
+        sys.stdout.flush()
+
         url = f"http://{subdomain}.{domain}"
+
         try:
             requests.get(url)
         except requests.ConnectionError:
