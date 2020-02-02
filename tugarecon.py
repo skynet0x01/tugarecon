@@ -59,8 +59,8 @@ def parse_args():
         python3 {sys.argv[0]} -d google.com --enum certspotter --savemap
         python3 {sys.argv[0]} -d google.com -o google.txt
         python3 {sys.argv[0]} -d google.com -savemap
-        python3 {sys.argv[0]} -d google.com ---bruteforce (default)
-        python3 {sys.argv[0]} -d google.com ---bruteforce -l wordlist/subdomains-10000.txt
+        python3 {sys.argv[0]} -d google.com --bruteforce (default)
+        python3 {sys.argv[0]} -d google.com --bruteforce -l wordlist/subdomains-10000.txt
         \nmodules: certspotter, hackertarget, virustotal, threatcrowd, ssl\n
         '''
     parser = argparse.ArgumentParser(epilog=example_text, formatter_class=argparse.RawDescriptionHelpFormatter)
