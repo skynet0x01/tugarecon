@@ -8,6 +8,8 @@
 import time
 import requests
 
+# Import internal
+
 from functions import write_file
 from functions import G, W
 
@@ -48,10 +50,10 @@ class Hackertarget:
 
                 # Write  to a file
                 if self.output is not None:
-                    write_file(subdomains[subdomainscount], self.engine + self.output)
+                    write_file(subdomains[subdomainscount], self.engine + '_' + self.output)
 
             if self.output:
-                print(f"\nSaving result... {self.engine + self.output}")
+                print(f"\nSaving result... {self.engine + '_' + self.output}")
 
         except IndexError:
             pass

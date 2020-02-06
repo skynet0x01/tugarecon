@@ -42,10 +42,10 @@ class Certspotter:
                 print(f"[*] {subdomains}")
 
                 if self.output is not None:
-                    write_file(subdomains, self.engine + self.output)
+                    write_file(subdomains, self.engine + '_' + self.output)
 
             if self.output:
-                print(f"\nSaving result... {self.engine + self.output}")
+                print(f"\nSaving result... {self.engine + '_' + self.output}")
 
         except IndexError:
             pass
