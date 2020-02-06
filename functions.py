@@ -1,4 +1,7 @@
 # TugaRecon - funcions, write by LordNeoStark
+# TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
+# Bug Bounty Recon, search for subdomains and save in to a file
+# Coded By LordNeoStark | https://twitter.com/LordNeoStark | https://github.com/LordNeoStark
 
 import sys
 import urllib.request
@@ -6,7 +9,9 @@ import webbrowser
 import urllib.error
 import urllib3
 from pathlib import Path
+
 # Colors
+
 global G, Y, B, R, W
 
 G = '\033[92m'  # green
