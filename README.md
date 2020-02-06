@@ -24,6 +24,16 @@ And much more... :)
 
 git clone https://github.com/LordNeoStark/tugarecon.git
 
+# Useage
+
+        python3 tugarecon.py -d google.com
+        python3 tugarecon.py -d google.com --enum ssl
+        python3 tugarecon.py -d google.com --enum certspotter --savemap
+        python3 tugarecon.py -d google.com -o google.txt
+        python3 tugarecon.py -d google.com -savemap
+        python3 tugarecon.py -d google.com --bruteforce
+
+
 # News
 * Fast enumerate BruteForce scan upgrade
 * Mapping the domain and save image results/target.png
