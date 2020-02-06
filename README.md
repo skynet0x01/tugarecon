@@ -24,7 +24,7 @@ And much more... :)
 
 git clone https://github.com/LordNeoStark/tugarecon.git
 
-# Useage
+# Usage
 
         python3 tugarecon.py -d google.com
         python3 tugarecon.py -d google.com --enum ssl
