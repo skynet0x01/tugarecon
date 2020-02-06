@@ -25,7 +25,7 @@ And much more... :)
 git clone https://github.com/LordNeoStark/tugarecon.git
 
 # News
-* BruteForce scan upgrade
+* Fast enumerate BruteForce scan upgrade
 * Mapping the domain and save image results/target.png
 * add new module
 * add new folder /results
