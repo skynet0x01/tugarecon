@@ -14,7 +14,7 @@ And much more... :)
 
 # Screenshots
 
-![tugarecon](https://user-images.githubusercontent.com/39160972/72820884-98bc5980-3c67-11ea-87bf-a4bbcb388e48.png)
+![Screenshot from 2020-02-06 19-29-27](https://user-images.githubusercontent.com/39160972/73971658-2f02a780-4917-11ea-9c5f-ad37c43facb6.png)
 
 ![tugarecon1](https://user-images.githubusercontent.com/39160972/72821211-1da77300-3c68-11ea-80a9-db8ea6716e4b.png)
 
