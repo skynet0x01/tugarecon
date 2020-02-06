@@ -13,7 +13,7 @@ import time
 import urllib3
 
 # Import internal functions
-from functions import R, W, Y
+from functions import R, W, Y, G
 from functions import mapping_domain
 
 # Import internal modules
@@ -22,9 +22,9 @@ from modules import crt
 from modules import hackertarget
 from modules import threatcrowd
 from modules import virustotal
-from modules import tugamod  # bruteforce scan subdomains
-from modules import scan
-
+# from modules import tugamod  # bruteforce scan subdomains
+# from modules import scan
+from tugascan import SubNameBrute
 
 # import thread
 # import threading
@@ -32,16 +32,16 @@ from modules import scan
 
 # Banner, Tuga or portuguese, is the same ;)
 def banner():
-    print("        \n"
+    print(R +"        \n"
           "             ______                  ____                      \n"
           "            /_  __/_  ______ _____ _/ __ \___  _________  ____ \n"
           "             / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \                \n"
           "            / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               \n"
-          "           /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  V: 0.25b               \n"
+          "           /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  V: 0.3b               \n"
           "                     /____/                                    \n"
           "\n"
           "                        # Coded By LordNeoStark #\n"
-          "    ")
+          "    " + W)
 
 
 # parser error
@@ -53,29 +53,32 @@ def parser_error(errmsg):
 
 # parse the arguments
 def parse_args():
-    example_text = f'''Examples:
+    example_text = f'''\nmodules: certspotter, hackertarget, virustotal, threatcrowd, ssl\n
+        Examples:
         python3 {sys.argv[0]} -d google.com
         python3 {sys.argv[0]} -d google.com --enum ssl
         python3 {sys.argv[0]} -d google.com --enum certspotter --savemap
         python3 {sys.argv[0]} -d google.com -o google.txt
         python3 {sys.argv[0]} -d google.com -savemap
-        python3 {sys.argv[0]} -d google.com --bruteforce (default)
-        python3 {sys.argv[0]} -d google.com --bruteforce -l wordlist/subdomains-10000.txt
-        \nmodules: certspotter, hackertarget, virustotal, threatcrowd, ssl\n
+        python3 {sys.argv[0]} -d google.com --bruteforce
         '''
     parser = argparse.ArgumentParser(epilog=example_text, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.error = parser_error
     parser._optionals.title = "OPTIONS"
     parser.add_argument('-d', '--domain', type=str, help="Domain name to enumerate it's subdomains", required=True)
-    parser.add_argument('-p', '--ports', help='Scan the found subdomains against specified tcp ports')
+    #parser.add_argument('-p', '--ports', help='Scan the found subdomains against specified tcp ports')
+    parser.add_argument('-s', '--savemap', help='Save subdomains image map', action='store_true')
+
+    parser.add_argument('-b', '--bruteforce', help='Enable the bruteforce scan', action='store_true')
+    parser.add_argument('-f', dest='file', default='subdomains.txt',
+                      help='A file contains new line delimited subs, default is subnames.txt.')
+    parser.add_argument('--full', dest='full_scan', default=False, action='store_true',
+                      help='Full scan, NAMES FILE subdomains_full.txt will be used to brute')
+    parser.add_argument('-i', '--ignore', dest='i', default=False, action='store_true',
+                      help='Ignore domains pointed to private IPs')
+    parser.add_argument("-t", "--threads", help="Number of threads to use to scan the domain. Default is 200",
+                        default=200, type=int)
     parser.add_argument('-o', '--output', help='Save the results to text file')
-    parser.add_argument('-s', '--savemap', help='Save image map domain', action='store_true')
-    parser.add_argument('-b', '--bruteforce', help='Enable the bruteforce module', action='store_true')
-    parser.add_argument("-t", "--threads", help="Number of threads to use to scan the domain. Default is 10",
-                        default=10, type=int)
-    parser.add_argument("-l", "--wordlist",
-                        help="File that contains all subdomains to scan, line by line. Default is subdomains.txt",
-                        default="wordlist/subdomains.txt")
     parser.add_argument('--enum', nargs='*', help='<Module required> Perform enumerations and network mapping')
     return parser.parse_args()
 
@@ -104,14 +107,15 @@ def queries(target):
     time.sleep(2)
 
 
-def main(target, output, port, savemap, enum, wordlist, threads, bruteforce):
-
-    # bruteforce scan
+def main(target, output, savemap, enum, threads, bruteforce, args):
+    # bruteforce fast scan
     if bruteforce:
-        sublist= open(wordlist).read().splitlines()
-        scan.main(target, threads, sublist)
+        d = SubNameBrute(target, options=args)
+        d.run()
+        d.outfile.flush()
+        d.outfile.close()
+
         sys.exit()
-    # search_list = set()
 
     try:
 
@@ -129,8 +133,8 @@ def main(target, output, port, savemap, enum, wordlist, threads, bruteforce):
             queries(target)
             chosenEnums = [certspotter.Certspotter, hackertarget.Hackertarget, virustotal.Virustotal,
                            threatcrowd.Threatcrowd, crt.CRT]
-            # Start the enumeration
 
+            # Start super fast enumeration
             enums = [indicate(target, output) for indicate in chosenEnums]
 
         else:
@@ -142,7 +146,7 @@ def main(target, output, port, savemap, enum, wordlist, threads, bruteforce):
 
                     enums = [indicate(target, output) for indicate in chosenEnums]
 
-        # Save map domain
+        # Save map domain (png file)
 
         if savemap is not False:
             mapping_domain(target)
@@ -157,14 +161,13 @@ def menu():
     args = parse_args()  # args = parser.parse_args()
     target = parse_url(args.domain)
     output = args.output
-    port = args.ports
+    #port = args.ports
     savemap = args.savemap
     enum = args.enum
-    wordlist = args.wordlist
     threads = args.threads
     bruteforce = args.bruteforce
 
-    main(target, output, port, savemap, enum, wordlist, threads, bruteforce)
+    main(target, output, savemap, enum, threads, bruteforce, args)
 
 
 if __name__ == "__main__":
