@@ -43,11 +43,13 @@ class CRT:
             while subdomainscount < 10000:
                 subdomains = response.json()[subdomainscount]["name_value"]
                 subdomainscount = subdomainscount + 1
-                if "@" not in subdomains:  # filter for emails
+                if "@" in subdomains:  # filter for emails
+                    pass
+                else:
                     print(f"[*] {subdomains}")
 
-                if self.output is not None:
-                    write_file(subdomains, self.engine + '_' + self.output)
+                    if self.output is not None:
+                        write_file(subdomains, self.engine + '_' + self.output)
 
             if self.output:
                 print(f"\nSaving result... {self.engine + '_'+ self.output}")
