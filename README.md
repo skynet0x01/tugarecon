@@ -37,9 +37,9 @@ git clone https://github.com/LordNeoStark/tugarecon.git
 
 Donations are welcome. This will help fascilitate improved features, frequent updates and better overall support.
 
-BTC   1C1q8c2bpSvRBpupD43p1CAV98YXkNnnDx
+BTC:   1C1q8c2bpSvRBpupD43p1CAV98YXkNnnDx
 
-Doge  DRU62QbterkCpMHEG7ZMSZXEJQzyR13CRB
+Doge:  DRU62QbterkCpMHEG7ZMSZXEJQzyR13CRB
 
 # News
 * Fast enumerate BruteForce scan upgrade
