@@ -1,3 +1,5 @@
+{alphnum}
+{alphnum}{alphnum}
 test
 test2
 t
