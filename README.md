@@ -33,6 +33,12 @@ git clone https://github.com/LordNeoStark/tugarecon.git
         python3 tugarecon.py -d google.com -savemap
         python3 tugarecon.py -d google.com --bruteforce
 
+# DONATIONS:
+
+Donations are welcome. This will help fascilitate improved features, frequent updates and better overall support.
+
+BTC   1C1q8c2bpSvRBpupD43p1CAV98YXkNnnDx
+Doge  DRU62QbterkCpMHEG7ZMSZXEJQzyR13CRB
 
 # News
 * Fast enumerate BruteForce scan upgrade
