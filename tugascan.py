@@ -11,6 +11,7 @@ import threading  # Thread-based parallelism
 import time  # Time access and conversions
 import re  # Regular expression operations
 import os  # Miscellaneous operating system interfaces
+from dns import reversename
 
 # Import internal
 
@@ -33,6 +34,7 @@ class SubNameBrute:
         self.msg_queue = queue.Queue()
         self.STOP_SCAN = False
         threading.Thread(target=self._print_msg).start()
+        self.dns_queries()
         self._load_dns_servers()
         # set resolver
         self.resolvers = [dns.resolver.Resolver() for _ in range(options.threads)]
@@ -48,7 +50,7 @@ class SubNameBrute:
         if options.output:
             outfile = options.output
         else:
-            outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else target + '_full.txt'
+            outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else 'results/' + target + '_tugascan_full.txt'
         self.outfile = open(outfile, 'w')
         # ip_dict: save ip ,dns.
         self.ip_dict = {}
@@ -59,7 +61,6 @@ class SubNameBrute:
     ###############################################################################################
 
     def _load_dns_servers(self):
-        print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country\n" + W)
         # dns_servers.txt
         print(G + '[+] Initializing, validate DNS servers ...')
         self.dns_servers = []
@@ -85,6 +86,18 @@ class SubNameBrute:
             print('[ERROR] Oops! No DNS Servers available.')
             self.STOP_SCAN = True
             sys.exit(-1)
+
+    ###############################################################################################
+
+    def dns_queries(self):
+        print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country\n" + W)
+        print(Y + "\n[+] DNS queries...\n" + W)
+        print(Y + "**********************************************************\n" + W)
+        for qtype in 'A', 'AAAA', 'MX', 'NS', 'TXT', 'SOA', 'CNAME', 'CERT':
+            answer = dns.resolver.query(self.target, qtype, raise_on_no_answer=False)
+            if answer.rrset is not None:
+                print(answer.rrset, '\n')
+        print(Y + "**********************************************************\n" + W)
 
     ###############################################################################################
 
