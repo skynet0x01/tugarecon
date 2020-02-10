@@ -34,7 +34,7 @@ class SubNameBrute:
         self.msg_queue = queue.Queue()
         self.STOP_SCAN = False
         threading.Thread(target=self._print_msg).start()
-        self.dns_queries()
+        self._dns_queries()
         self._load_dns_servers()
         # set resolver
         self.resolvers = [dns.resolver.Resolver() for _ in range(options.threads)]
@@ -89,15 +89,15 @@ class SubNameBrute:
 
     ###############################################################################################
 
-    def dns_queries(self):
+    def _dns_queries(self):
         print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country\n" + W)
-        print(Y + "\n[+] DNS queries...\n" + W)
-        print(Y + "**********************************************************\n" + W)
-        for qtype in 'A', 'AAAA', 'MX', 'NS', 'TXT', 'SOA', 'CNAME', 'CERT':
+        print(G + "\n[+] DNS queries...\n" + W)
+        print(G + "**************************************************************\n" + W)
+        for qtype in 'A', 'AAAA', 'MX', 'NS', 'TXT', 'SOA', 'CERT', 'HINFO', 'MINFO', 'TLSA':
             answer = dns.resolver.query(self.target, qtype, raise_on_no_answer=False)
             if answer.rrset is not None:
                 print(answer.rrset, '\n')
-        print(Y + "**********************************************************\n" + W)
+        print(G + "**************************************************************\n" + W)
 
     ###############################################################################################
 
