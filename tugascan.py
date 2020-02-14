@@ -383,7 +383,7 @@ class SubNameBrute:
             try:
                 time.sleep(1.0)
             except KeyboardInterrupt as e:
-                msg = (R + '[WARNING] User aborted, wait all slave threads to exit...')
+                msg = (R + '[WARNING] User aborted, wait all slave threads to exit...' + W)
                 sys.stdout.write('\r' + msg + ' ' * (self.console_width - len(msg)) + '\n\r')
                 sys.stdout.flush()
                 self.STOP_SCAN = True
