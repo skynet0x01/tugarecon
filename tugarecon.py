@@ -61,6 +61,7 @@ def parse_args():
         python3 {sys.argv[0]} -d google.com -o google.txt
         python3 {sys.argv[0]} -d google.com -savemap
         python3 {sys.argv[0]} -d google.com --bruteforce
+        python3 {sys.argv[0]} -d google.com -b --full
         '''
     parser = argparse.ArgumentParser(epilog=example_text, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.error = parser_error
@@ -71,7 +72,7 @@ def parse_args():
 
     parser.add_argument('-b', '--bruteforce', help='Enable the bruteforce scan', action='store_true')
     parser.add_argument('-f', dest='file', default='subdomains.txt',
-                      help='A file contains new line delimited subs, default is subnames.txt.')
+                      help='A file contains new line delimited subs, default is subdomains.txt.')
     parser.add_argument('--full', dest='full_scan', default=False, action='store_true',
                       help='Full scan, NAMES FILE subdomains_full.txt will be used to brute')
     parser.add_argument('-i', '--ignore', dest='i', default=False, action='store_true',
