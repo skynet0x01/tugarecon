@@ -59,7 +59,7 @@ def parse_args():
         python3 {sys.argv[0]} -d google.com --enum ssl
         python3 {sys.argv[0]} -d google.com --enum certspotter --savemap
         python3 {sys.argv[0]} -d google.com -o google.txt
-        python3 {sys.argv[0]} -d google.com -savemap
+        python3 {sys.argv[0]} -d google.com --savemap
         python3 {sys.argv[0]} -d google.com --bruteforce
         python3 {sys.argv[0]} -d google.com -b --full
         '''
