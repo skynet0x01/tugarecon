@@ -1,6 +1,8 @@
 # TugaRecon
   tugarecon is a python tool designed to enumerate subdomains using modules. It helps penetration testers and bug hunters collect and gather subdomains for the domain they are targeting.  Bruteforce was integrated was a module to increase the possibility of finding more subdomains using bruteforce with an improved wordlist.
-TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
+TugaRecon, tribute to Portuguese explorers reminding glorious past of this country.
+
+During the 15th and 16th centuries, Portuguese explorers were at the forefront of European overseas exploration, which led them to reach India, establish multiple trading posts in Asia and Africa, and settle what would become Brazil, creating one of the most powerful empires.
 
 # Version
 0.30 beta
