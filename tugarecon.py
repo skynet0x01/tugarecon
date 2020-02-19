@@ -22,8 +22,8 @@ from modules import crt
 from modules import hackertarget
 from modules import threatcrowd
 from modules import virustotal
-# from modules import tugamod  # bruteforce scan subdomains
-# from modules import scan
+
+# Import BruteForce tugascan
 from tugascan import SubNameBrute
 
 # import thread
@@ -77,8 +77,8 @@ def parse_args():
                       help='Full scan, NAMES FILE subdomains_full.txt will be used to brute')
     parser.add_argument('-i', '--ignore', dest='i', default=False, action='store_true',
                       help='Ignore domains pointed to private IPs')
-    parser.add_argument("-t", "--threads", help="Number of threads to use to scan the domain. Default is 200",
-                        default=200, type=int)
+    parser.add_argument("-t", "--threads", help="Number of threads to use to scan the domain. Default is 300",
+                        default=300, type=int)
     parser.add_argument('-o', '--output', help='Save the results to text file')
     parser.add_argument('--enum', nargs='*', help='<Module required> Perform enumerations and network mapping')
     return parser.parse_args()
@@ -115,7 +115,6 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
         d.run()
         d.outfile.flush()
         d.outfile.close()
-
         sys.exit()
 
     try:
