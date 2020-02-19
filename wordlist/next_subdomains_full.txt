@@ -1,3 +1,5 @@
 {alphnum}
 {alphnum}{alphnum}
 {alphnum}{alphnum}{alphnum}
+alfa
+beta
