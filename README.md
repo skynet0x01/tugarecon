@@ -35,6 +35,10 @@ git clone https://github.com/LordNeoStark/tugarecon.git
         python3 tugarecon.py -d google.com --savemap
         python3 tugarecon.py -d google.com --bruteforce
 
+# Dependencies
+You need to install [dnspython](http://www.dnspython.org) to do DNS query
+pip install dnspython
+
 # DONATIONS:
 
 Donations are welcome. This will help improved features, frequent updates and better overall support.
