@@ -4,29 +4,30 @@
 
 # import go here
 
+import os  # Miscellaneous operating system interfaces
 import queue  # A synchronized queue class
+import re  # Regular expression operations
 import sys  # System-specific parameters and functions
-import dns.resolver  # dnspython
 import threading  # Thread-based parallelism
 import time  # Time access and conversions
-import re  # Regular expression operations
-import os  # Miscellaneous operating system interfaces
-from dns import reversename
+
+import dns.resolver  # dnspython
 
 # Import internal
 
-from lib.console_terminal import getTerminalSize
 from functions import G, W, R, Y
+from lib.console_terminal import getTerminalSize
+
 
 ##################################################################################################
 
 class SubNameBrute:
     def __init__(self, target, options):
 
-        self.target = target.strip()
-        self.options = options
-        self.ignore_intranet = options.i
-        # set threads
+        self.target = target
+        self.options = options # default threads 300
+        self.ignore_intranet = options.i  # need more options... not complete
+        # set threads, count system
         self.thread_count = self.scan_count = self.found_count = 0
         self.lock = threading.Lock()
         # Resize console
@@ -35,8 +36,8 @@ class SubNameBrute:
         self.STOP_SCAN = False
         threading.Thread(target=self._print_msg).start()
         self._dns_queries()
-        self._load_dns_servers()
-        # set resolver
+        self._load_dns_servers()  # load DNS servers from a list
+        # set resolver from dns.resolver
         self.resolvers = [dns.resolver.Resolver() for _ in range(options.threads)]
         for _ in self.resolvers:
             _.lifetime = _.timeout = 6.0
@@ -93,10 +94,12 @@ class SubNameBrute:
         print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country\n" + W)
         print(G + "\n[+] DNS queries...\n" + W)
         print(G + "**************************************************************\n" + W)
-        for qtype in 'A', 'AAAA', 'MX', 'NS', 'TXT', 'SOA', 'CERT', 'HINFO', 'MINFO', 'TLSA':
+        for qtype in 'A', 'AAAA', 'MX', 'NS', 'TXT', 'SOA', 'CERT', 'HINFO', 'MINFO', 'TLSA', 'SPF':
             answer = dns.resolver.query(self.target, qtype, raise_on_no_answer=False)
             if answer.rrset is not None:
                 print(answer.rrset, '\n')
+            else:
+                pass
         print(G + "**************************************************************\n" + W)
 
     ###############################################################################################
@@ -147,6 +150,7 @@ class SubNameBrute:
                 if not sub or sub in lines:
                     continue
                 lines.add(sub)
+                #print(lines) # linha para testes e debug, remover linha no final
 
                 if sub.find('{alphnum}') >= 0 or sub.find('{alpha}') >= 0 or sub.find('{num}') >= 0:
                     wildcard_lines.append(sub)
@@ -156,6 +160,7 @@ class SubNameBrute:
                     if sub not in wildcard_list:
                         wildcard_list.append(sub)
                         regex_list.append('^' + sub + '$')
+                        #print("teste", regex_list.append('^' + sub + '$'))
                 else:
                     normal_lines.append(sub)
         pattern = '|'.join(regex_list)
@@ -390,6 +395,3 @@ class SubNameBrute:
         self.STOP_SCAN = True
 
 ###############################################################################################
-
-
-
