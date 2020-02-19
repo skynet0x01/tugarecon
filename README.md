@@ -37,7 +37,8 @@ git clone https://github.com/LordNeoStark/tugarecon.git
 
 # Dependencies
 You need to install [dnspython](http://www.dnspython.org) to do DNS query
-pip install dnspython
+
+        pip install dnspython
 
 # DONATIONS:
 
@@ -48,7 +49,7 @@ BTC:   1C1q8c2bpSvRBpupD43p1CAV98YXkNnnDx
 Doge:  DRU62QbterkCpMHEG7ZMSZXEJQzyR13CRB
 
 # News
-* Fast enumerate BruteForce scan upgrade
-* Mapping the domain and save image results/target.png
-* add new module
-* add new folder /results
+- [x] Fast enumerate BruteForce scan upgrade
+- [x] Mapping the domain and save image results/target.png
+- [x] add new module
+- [x] add new folder /results
