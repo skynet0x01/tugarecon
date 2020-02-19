@@ -34,6 +34,8 @@ git clone https://github.com/LordNeoStark/tugarecon.git
         python3 tugarecon.py -d google.com -o google.txt
         python3 tugarecon.py -d google.com --savemap
         python3 tugarecon.py -d google.com --bruteforce
+        python3 tugarecon.py -d google.com --bruteforce --full
+        python3 tugarecon.py -d google.com -b --full
 
 # Dependencies
 You need to install [dnspython](http://www.dnspython.org) to do DNS query
