@@ -21,7 +21,7 @@ from lib.console_terminal import getTerminalSize
 
 ##################################################################################################
 
-class SubNameBrute:
+class TugaBruteScan:
     def __init__(self, target, options):
 
         self.target = target
@@ -31,14 +31,14 @@ class SubNameBrute:
         self.thread_count = self.scan_count = self.found_count = 0
         self.lock = threading.Lock()
         # Resize console
-        self.console_width = getTerminalSize()[0] - 2
+        self.console_width = getTerminalSize()[0] - 2 # thanks guys
         self.msg_queue = queue.Queue()
         self.STOP_SCAN = False
         threading.Thread(target=self._print_msg).start()
         self._dns_queries()
         self._load_dns_servers()  # load DNS servers from a list
         # set resolver from dns.resolver
-        self.resolvers = [dns.resolver.Resolver() for _ in range(options.threads)]
+        self.resolvers = [dns.resolver.Resolver(configure=False) for _ in range(options.threads)]
         for _ in self.resolvers:
             _.lifetime = _.timeout = 6.0
         self._load_next_sub()
@@ -56,7 +56,7 @@ class SubNameBrute:
         # ip_dict: save ip ,dns.
         self.ip_dict = {}
         self.last_scanned = time.time()
-        self.ex_resolver = dns.resolver.Resolver()
+        self.ex_resolver = dns.resolver.Resolver(configure=False)
         self.start_time = None
 
     ###############################################################################################
@@ -80,7 +80,7 @@ class SubNameBrute:
 
         while threading.activeCount() > 2:
             time.sleep(0.1)
-        self.dns_count = len(self.dns_servers)
+        self.dns_count = len(self.dns_servers) # count the number of DNS servers
         sys.stdout.write('\n')
         print('[+] Found %s available DNS Servers' % self.dns_count)
         if self.dns_count == 0:
@@ -106,7 +106,7 @@ class SubNameBrute:
 
     def _test_server(self, server):
         resolver = dns.resolver.Resolver()
-        resolver.lifetime = resolver.timeout = 20.0
+        resolver.lifetime = resolver.timeout = 10.0
         try:
             resolver.nameservers = [server]
             answers = resolver.query('s-coco-ns01.co-co.nl')  # test lookup a existed domain
@@ -126,7 +126,7 @@ class SubNameBrute:
     ###############################################################################################
 
     def _load_sub_names(self):
-        self.msg_queue.put('[+] Load subdomains names ...\n' + W)
+        self.msg_queue.put('[+] Load first list...\n' + W)
         if self.options.full_scan and self.options.file == 'subdomains.txt':
             _file = 'wordlist/subdomains_full.txt'
         else:
@@ -208,9 +208,11 @@ class SubNameBrute:
     ###############################################################################################
 
     def _load_next_sub(self):
-        self.msg_queue.put('[+] Load subdomains names next level...')
+        self.msg_queue.put('[+] Load second list ...')
         next_subs = []
+
         _file = 'wordlist/next_subdomains.txt' if not self.options.full_scan else 'wordlist/next_subdomains_full.txt'
+
         with open(_file) as f:
             for line in f:
                 sub = line.strip()
@@ -253,7 +255,7 @@ class SubNameBrute:
                 continue
 
             if _msg == 'status':
-                msg = '%s Found| %s groups| %s scanned in %.1f seconds| %s threads' % (
+                msg = 'Found %s subdomains | %s groups left | %s scanned in %.1f seconds| %s threads' % (
                     self.found_count, self.queue.qsize(), self.scan_count, time.time() - self.start_time,
                     self.thread_count)
                 sys.stdout.write('\r' + ' ' * (self.console_width - len(msg)) + msg)
@@ -332,7 +334,7 @@ class SubNameBrute:
                         if is_wildcard_record:
                             break
 
-                        if (not self.ignore_intranet) or (not SubNameBrute.is_intranet(answers[0].address)):
+                        if (not self.ignore_intranet) or (not TugaBruteScan.is_intranet(answers[0].address)):
                             self._update_found_count()
                             msg = cur_sub_domain.ljust(30) + ips
                             self.msg_queue.put(msg)

@@ -24,7 +24,7 @@ from modules import threatcrowd
 from modules import virustotal
 
 # Import BruteForce tugascan
-from tugascan import SubNameBrute
+from tugascan import TugaBruteScan
 
 # import thread
 # import threading
@@ -43,6 +43,7 @@ def banner():
           "                        # Coded By LordNeoStark #\n"
           "    " + W)
 
+################################################################################
 
 # parser error
 def parser_error(errmsg):
@@ -50,6 +51,7 @@ def parser_error(errmsg):
     print("Error: " + errmsg)
     sys.exit(1)
 
+################################################################################
 
 # parse the arguments
 def parse_args():
@@ -77,17 +79,19 @@ def parse_args():
                       help='Full scan, NAMES FILE subdomains_full.txt will be used to brute')
     parser.add_argument('-i', '--ignore', dest='i', default=False, action='store_true',
                       help='Ignore domains pointed to private IPs')
-    parser.add_argument("-t", "--threads", help="Number of threads to use to scan the domain. Default is 300",
-                        default=300, type=int)
+    parser.add_argument("-t", "--threads", help="Number of threads to use to scan the domain. Default is 200",
+                        default=200, type=int)
     parser.add_argument('-o', '--output', help='Save the results to text file')
     parser.add_argument('--enum', nargs='*', help='<Module required> Perform enumerations and network mapping')
     return parser.parse_args()
 
+################################################################################
 
 def useragent():
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
     return user_agent
 
+################################################################################
 
 # parse host from scheme, to use for certificate transparency abuse
 def parse_url(url):
@@ -98,6 +102,7 @@ def parse_url(url):
         sys.exit(1)
     return host
 
+################################################################################
 
 def queries(target):
     print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country\n" + W)
@@ -107,11 +112,12 @@ def queries(target):
     print(R + "Querying ThreatCrowd for " + target + " subdomains\n" + W)
     time.sleep(2)
 
+################################################################################
 
 def main(target, output, savemap, enum, threads, bruteforce, args):
     # bruteforce fast scan
     if bruteforce:
-        d = SubNameBrute(target, options=args)
+        d = TugaBruteScan(target, options=args)
         d.run()
         d.outfile.flush()
         d.outfile.close()
@@ -154,6 +160,7 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
         print("\nTugaRecon interrupted by user\n")
         sys.exit()
 
+################################################################################
 
 def menu():
     banner()
@@ -173,4 +180,4 @@ def menu():
 if __name__ == "__main__":
     menu()
 
-#####################################################################################################
+################################################################################
