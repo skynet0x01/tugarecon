@@ -5,7 +5,7 @@ TugaRecon, tribute to Portuguese explorers reminding glorious past of this count
 During the 15th and 16th centuries, Portuguese explorers were at the forefront of European overseas exploration, which led them to reach India, establish multiple trading posts in Asia and Africa, and settle what would become Brazil, creating one of the most powerful empires.
 
 # Version
-0.30 beta
+0.40 beta
 
 
 During the development phase, we would like to invite all of you, to help test the beta version of the application.
@@ -51,6 +51,7 @@ BTC:   1C1q8c2bpSvRBpupD43p1CAV98YXkNnnDx
 Doge:  DRU62QbterkCpMHEG7ZMSZXEJQzyR13CRB
 
 # News
+- [x] Releasing a new version 0.4b
 - [x] Fast enumerate BruteForce scan upgrade
 - [x] Mapping the domain and save image results/target.png
 - [x] add new module
