@@ -52,7 +52,7 @@ class TugaBruteScan:
         else:
             outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else 'results/' + target + '_tugascan_full.txt'
         self.outfile = open(outfile, 'w')
-        # ip_dict: save ip ,dns.
+        # save ip ,dns.
         self.ip_dict = {}
         self.last_scanned = time.time()
         self.ex_resolver = dns.resolver.Resolver(configure=False)
@@ -342,7 +342,7 @@ class TugaBruteScan:
                             self.outfile.flush()
 
                             try:
-                                self.resolvers[thread_id].query('lordneostark.' + cur_sub_domain)
+                                self.resolvers[thread_id].query(cur_sub_domain)
                             except dns.resolver.NXDOMAIN as e:
                                 _lst = []
                                 if_put_one = (self.queue.qsize() < self.dns_count * 5)
