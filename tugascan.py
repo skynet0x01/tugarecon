@@ -342,7 +342,7 @@ class TugaBruteScan:
                             self.outfile.flush()
 
                             try:
-                                self.resolvers[thread_id].query(cur_sub_domain)
+                                self.resolvers[thread_id].query('lordneostark.' + cur_sub_domain)
                             except dns.resolver.NXDOMAIN as e:
                                 _lst = []
                                 if_put_one = (self.queue.qsize() < self.dns_count * 5)
