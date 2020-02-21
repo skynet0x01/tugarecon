@@ -11,6 +11,7 @@ import sys  # System-specific parameters and functions
 import threading  # Thread-based parallelism
 import time  # Time access and conversions
 import dns.resolver  # dnspython
+import multiprocessing
 
 # Import internal
 
@@ -21,6 +22,7 @@ from lib.console_terminal import getTerminalSize
 ##################################################################################################
 
 class TugaBruteScan:
+
     def __init__(self, target, options):
 
         self.target = target
@@ -28,7 +30,7 @@ class TugaBruteScan:
         self.ignore_intranet = options.i  # need more options... not complete
         # set threads, count system
         self.thread_count = self.scan_count = self.found_count = 0
-        self.lock = threading.RLock()
+        self.lock = threading.Lock()
         # Resize console
         self.console_width = getTerminalSize()[0] - 2 # thanks guys
         self.msg_queue = queue.Queue()
@@ -39,9 +41,9 @@ class TugaBruteScan:
         # set resolver from dns.resolver
         self.resolvers = [dns.resolver.Resolver(configure=False) for _ in range(options.threads)]
         for _ in self.resolvers:
-            _.lifetime = _.timeout = 10.0
+            _.lifetime = _.timeout = 6.0
         self._load_next_sub()
-        self.queue = queue.PriorityQueue()
+        self.queue = queue.Queue()
         t = threading.Thread(target=self._load_sub_names)
         t.start()
         while not self.queue.qsize() > 0 and t.is_alive():
@@ -52,7 +54,7 @@ class TugaBruteScan:
         else:
             outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else 'results/' + target + '_tugascan_full.txt'
         self.outfile = open(outfile, 'w')
-        # save ip ,dns.
+        # ip_dict: save ip ,dns.
         self.ip_dict = {}
         self.last_scanned = time.time()
         self.ex_resolver = dns.resolver.Resolver(configure=False)
@@ -105,7 +107,7 @@ class TugaBruteScan:
 
     def _test_server(self, server):
         resolver = dns.resolver.Resolver(configure=False)
-        resolver.lifetime = resolver.timeout = 5.0
+        resolver.lifetime = resolver.timeout = 10.0
         try:
             resolver.nameservers = [server]
             answers = resolver.query('s-coco-ns01.co-co.nl')  # test lookup a existed domain
@@ -113,7 +115,7 @@ class TugaBruteScan:
                 raise Exception('incorrect DNS response')
             try:
                 resolver.query('test.bad.dns.lordneostark.pt')  # Non-existed domain test
-                with open('wordlist/bad_dns_servers.txt', 'a') as f:
+                with open('bad_dns_servers.txt', 'a') as f:
                     f.write(server + '\n')
                 self.msg_queue.put('[+] Bad DNS Server found %s' % server)
             except:
