@@ -9,7 +9,6 @@
 import argparse  # parse arguments
 import sys
 import time
-
 import urllib3
 
 # Import internal functions
@@ -26,10 +25,6 @@ from modules import virustotal
 # Import BruteForce tugascan
 from tugascan import TugaBruteScan
 
-# import thread
-# import threading
-
-
 # Banner, Tuga or portuguese, is the same ;)
 def banner():
     print(R +"        \n"
@@ -37,11 +32,12 @@ def banner():
           "            /_  __/_  ______ _____ _/ __ \___  _________  ____ \n"
           "             / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \                \n"
           "            / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               \n"
-          "           /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  V: 0.4b               \n"
+          "           /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  V: 0.45b               \n"
           "                     /____/                                    \n"
           "\n"
           "                        # Coded By LordNeoStark #\n"
           "    " + W)
+    print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country\n" + W)
 
 ################################################################################
 
@@ -73,10 +69,10 @@ def parse_args():
     parser.add_argument('-s', '--savemap', help='Save subdomains image map', action='store_true')
 
     parser.add_argument('-b', '--bruteforce', help='Enable the bruteforce scan', action='store_true')
-    parser.add_argument('-f', dest='file', default='subdomains.txt',
-                      help='A file contains new line delimited subs, default is subdomains.txt.')
+    parser.add_argument('-f', dest='file', default='first_names.txt',
+                      help='A file contains new line delimited subs, default is first_names.txt.')
     parser.add_argument('--full', dest='full_scan', default=False, action='store_true',
-                      help='Full scan, NAMES FILE subdomains_full.txt will be used to brute')
+                      help='Full scan, NAMES FILE first_names_full.txt will be used to brute')
     parser.add_argument('-i', '--ignore', dest='i', default=False, action='store_true',
                       help='Ignore domains pointed to private IPs')
     parser.add_argument("-t", "--threads", help="Number of threads to use to scan the domain. Default is 200",

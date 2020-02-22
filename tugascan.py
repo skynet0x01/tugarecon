@@ -14,7 +14,8 @@ import dns.resolver  # dnspython
 import multiprocessing
 
 # Import internal
-
+from lib.bscan import _dns_queries
+from lib.bscan import is_intranet
 from functions import G, W, R, Y
 from lib.console_terminal import getTerminalSize
 
@@ -26,7 +27,7 @@ class TugaBruteScan:
     def __init__(self, target, options):
 
         self.target = target
-        self.options = options # default threads 300
+        self.options = options # default threads 200
         self.ignore_intranet = options.i  # need more options... not complete
         # set threads, count system
         self.thread_count = self.scan_count = self.found_count = 0
@@ -36,7 +37,7 @@ class TugaBruteScan:
         self.msg_queue = queue.Queue()
         self.STOP_SCAN = False
         threading.Thread(target=self._print_msg).start()
-        self._dns_queries()
+        self._dns_queries = _dns_queries(target)
         self._load_dns_servers()  # load DNS servers from a list
         # set resolver from dns.resolver
         self.resolvers = [dns.resolver.Resolver(configure=False) for _ in range(options.threads)]
@@ -54,7 +55,7 @@ class TugaBruteScan:
         else:
             outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else 'results/' + target + '_tugascan_full.txt'
         self.outfile = open(outfile, 'w')
-        # ip_dict: save ip ,dns.
+        # save ip ,dns.
         self.ip_dict = {}
         self.last_scanned = time.time()
         self.ex_resolver = dns.resolver.Resolver(configure=False)
@@ -73,7 +74,7 @@ class TugaBruteScan:
                     continue
                 while True:
                     if threading.activeCount() < 50:
-                        t = threading.Thread(target=self._test_server, args=(server,))
+                        t = threading.Thread(target=self._test_dns_servers, args=(server,))
                         t.start()
                         break
                     else:
@@ -89,23 +90,7 @@ class TugaBruteScan:
             self.STOP_SCAN = True
             sys.exit(-1)
 
-    ###############################################################################################
-
-    def _dns_queries(self):
-        print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country\n" + W)
-        print(G + "\n[+] DNS queries...\n" + W)
-        print(G + "**************************************************************\n" + W)
-        for qtype in 'A', 'AAAA', 'MX', 'NS', 'TXT', 'SOA', 'CERT', 'HINFO', 'MINFO', 'TLSA', 'SPF':
-            answer = dns.resolver.query(self.target, qtype, raise_on_no_answer=False)
-            if answer.rrset is not None:
-                print(answer.rrset, '\n')
-            else:
-                pass
-        print(G + "**************************************************************\n" + W)
-
-    ###############################################################################################
-
-    def _test_server(self, server):
+    def _test_dns_servers(self, server):
         resolver = dns.resolver.Resolver(configure=False)
         resolver.lifetime = resolver.timeout = 10.0
         try:
@@ -122,14 +107,18 @@ class TugaBruteScan:
                 self.dns_servers.append(server)
             self.msg_queue.put('[+] Check DNS Server %s < OK >   Found %s' % (server.ljust(16), len(self.dns_servers)))
         except:
-            self.msg_queue.put('[+] Check DNS Server %s <Fail>   Found %s' % (server.ljust(16), len(self.dns_servers)))
+            self.msg_queue.put('[+] DNS Server %s <Fail>   Found %s' % (server.ljust(16), len(self.dns_servers)))
 
     ###############################################################################################
 
     def _load_sub_names(self):
-        self.msg_queue.put('[+] Load first list...\n' + W)
-        if self.options.full_scan and self.options.file == 'subdomains.txt':
-            _file = 'wordlist/subdomains_full.txt'
+        self.msg_queue.put('[+] Load the first list name...')
+        self.msg_queue.put('[+] Prepare the wildcard...\n' + W)
+
+        # Verify the first wordlist
+
+        if self.options.full_scan and self.options.file == 'first_names.txt':
+            _file = 'wordlist/first_names_full.txt'
         else:
             if os.path.exists(self.options.file):
                 _file = self.options.file
@@ -138,6 +127,8 @@ class TugaBruteScan:
             else:
                 self.msg_queue.put('[ERROR] Oops! Names file not exists: %s' % self.options.file)
                 return
+
+        # Wildcard
 
         normal_lines = []
         wildcard_lines = []
@@ -151,7 +142,6 @@ class TugaBruteScan:
                 if not sub or sub in lines:
                     continue
                 lines.add(sub)
-                #print(lines) # linha para testes e debug, remover linha no final
 
                 if sub.find('{alphnum}') >= 0 or sub.find('{alpha}') >= 0 or sub.find('{num}') >= 0:
                     wildcard_lines.append(sub)
@@ -161,7 +151,6 @@ class TugaBruteScan:
                     if sub not in wildcard_list:
                         wildcard_list.append(sub)
                         regex_list.append('^' + sub + '$')
-                        #print("teste", regex_list.append('^' + sub + '$'))
                 else:
                     normal_lines.append(sub)
         pattern = '|'.join(regex_list)
@@ -209,10 +198,14 @@ class TugaBruteScan:
     ###############################################################################################
 
     def _load_next_sub(self):
-        self.msg_queue.put('[+] Load second list ...')
+        self.msg_queue.put('[+] Load second list name...')
         next_subs = []
 
-        _file = 'wordlist/next_subdomains.txt' if not self.options.full_scan else 'wordlist/next_subdomains_full.txt'
+        # Verify the first wordlist
+
+        _file = 'wordlist/next_names.txt' if not self.options.full_scan else 'wordlist/next_names_full.txt'
+
+        # Wildcard
 
         with open(_file) as f:
             for line in f:
@@ -263,23 +256,8 @@ class TugaBruteScan:
             elif _msg.startswith('[+] Check DNS Server'):
                 sys.stdout.write('\r' + _msg + ' ' * (self.console_width - len(_msg)))
             else:
-                sys.stdout.write('\r' + _msg + ' ' * (self.console_width - len(_msg)) + '\n')
+                sys.stdout.write('\r' + _msg + ' ' * (self.console_width - len(_msg)) + '\n') # print subdomains in console
             sys.stdout.flush()
-
-    ###############################################################################################
-
-    @staticmethod
-    def is_intranet(ip):
-        ret = ip.split('.')
-        if not len(ret) == 4:
-            return True
-        if ret[0] == '10':
-            return True
-        if ret[0] == '172' and 16 <= int(ret[1]) <= 32:
-            return True
-        if ret[0] == '192' and ret[1] == '168':
-            return True
-        return False
 
     ###############################################################################################
 
@@ -335,7 +313,7 @@ class TugaBruteScan:
                         if is_wildcard_record:
                             break
 
-                        if (not self.ignore_intranet) or (not TugaBruteScan.is_intranet(answers[0].address)):
+                        if (not self.ignore_intranet) or (not is_intranet(answers[0].address)):
                             self._update_found_count()
                             msg = cur_sub_domain.ljust(30) + ips
                             self.msg_queue.put(msg)
