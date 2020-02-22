@@ -101,7 +101,7 @@ def parse_url(url):
 ################################################################################
 
 def queries(target):
-    print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country\n" + W)
+    
     print(R + "Querying SSL Certificates for " + target + " subdomains" + W)
     print(R + "Querying CertsPotter for " + target + " subdomains" + W)
     print(R + "Querying Virustotal for " + target + " subdomains" + W)
