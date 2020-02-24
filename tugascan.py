@@ -360,14 +360,14 @@ class TugaBruteScan:
         self.start_time = time.time()
         for i in range(self.options.threads):
             try:
-                t = threading.Thread(target=self._scan, name=str(i))
+                t = threading.Thread(target=self._scan, name=str(i)) # pass to def _scan()
                 t.setDaemon(True)
                 t.start()
             except:
                 pass
         while self.thread_count > 0:
             try:
-                time.sleep(1.0)
+                time.sleep(0.1) # time sleep 1, try to change to 0.1 or 0
             except KeyboardInterrupt as e:
                 msg = (R + '[WARNING] User aborted, wait all slave threads to exit...' + W)
                 sys.stdout.write('\r' + msg + ' ' * (self.console_width - len(msg)) + '\n\r')
