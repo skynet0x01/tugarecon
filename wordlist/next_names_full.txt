@@ -1,4 +1,5 @@
 {alphnum}
+{alphnum}{alphnum}
 c
 s
 n
@@ -60,6 +61,8 @@ cs
 c3
 cm
 co
+cookie
+cookiex
 c0
 cp
 cl
@@ -185,6 +188,7 @@ ht
 h7
 ha
 hd
+hds
 hq
 hw
 hj
@@ -202,7 +206,7 @@ hm
 ho
 h0
 hp
-hl
+hls
 he
 h6
 h5
@@ -1410,6 +1414,7 @@ demo
 demo2
 design
 desktop
+deskside
 dev1
 devel
 developer
@@ -1614,6 +1619,7 @@ music
 mysql
 nagios
 nanjing
+netsvs
 news
 newsletter
 newsroom
@@ -1681,6 +1687,7 @@ proxy
 public
 push
 quebec
+query
 radio
 radius
 radius-gnap-anycast
@@ -1696,6 +1703,7 @@ reports
 research
 resource
 resources
+rest-notify
 romeo
 router
 sales
@@ -1703,6 +1711,7 @@ sandbox
 scanner
 school
 search
+searchx
 secure
 security
 send
@@ -1736,6 +1745,7 @@ sites-googlegroups-qa10
 sites-googlegroups-qa0010
 sites-googlegroups-tctest
 smtp
+smtp.mail
 smtp1
 smtp2
 smtp3
