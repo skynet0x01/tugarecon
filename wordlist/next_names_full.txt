@@ -994,6 +994,7 @@ p6
 p7
 pr
 pd
+pdf
 pq
 pl
 pi
