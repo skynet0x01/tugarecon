@@ -274,6 +274,7 @@ ts
 t3
 tm
 to
+tor
 t0
 tp
 tl
@@ -1400,6 +1401,10 @@ contact
 content
 control
 corp
+corp-ic01
+corp-ic02
+corp-ic03
+corp-ic04
 corporate
 count
 counter
@@ -1446,6 +1451,7 @@ dns7
 dns8
 dns9
 dns10
+doc
 docs
 domain
 down
@@ -1631,6 +1637,7 @@ office
 online
 opac
 open
+oracle
 order
 orders
 origin
@@ -1714,6 +1721,7 @@ school
 search
 searchx
 secure
+securecards
 security
 send
 sentry
@@ -1731,6 +1739,8 @@ shopping
 show
 sierra
 signup
+sip
+sip1
 site
 sites
 sites-googlegroups-qa01
@@ -1759,6 +1769,7 @@ spam
 special
 sport
 sports
+spdy-proxy
 sslvpn
 staff
 stage
