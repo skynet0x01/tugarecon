@@ -17626,6 +17626,7 @@ cia
 ciao
 cib
 cic
+cicerone
 cid
 cie
 cielo
@@ -17828,6 +17829,7 @@ cloud2
 cloud3
 cloud4
 cloud9
+cloudprotect
 cloudmonitor
 cloudmonitor1
 cloudmonitor2
@@ -21513,6 +21515,7 @@ empire
 empleo
 emploi
 employee
+employeefeedback
 employment
 emprego
 empresas
@@ -21556,6 +21559,8 @@ endpoint
 endymion
 ene
 energy
+energysupport
+energydesk
 enet
 enet1
 enews
@@ -21786,6 +21791,10 @@ erq
 err
 error
 errors
+errlog
+err-log
+errlogs
+err-logs
 ers
 ert
 eru
@@ -28099,6 +28108,10 @@ inv
 invent
 inventario
 inventory
+inventory-assets
+inventory-energy
+inventory-power
+inventory-tesla
 invest
 investigacion
 investment
@@ -28383,6 +28396,7 @@ ita
 itadmin
 italia
 italy
+itanswers
 itb
 itc
 itcenter
@@ -32437,6 +32451,7 @@ livepromanager
 liverpool
 livestats
 livestream
+livestreamapi-test
 livestreamfiold.videocdn
 livesupport
 liw
@@ -35817,6 +35832,7 @@ nax
 nay
 naz
 nazgul
+na-sso
 nb
 nb0
 nb1
@@ -38008,6 +38024,7 @@ on8
 on9
 ona
 onb
+onboard
 onc
 ond
 one
@@ -44308,6 +44325,8 @@ securemail
 secureweb
 securecards
 securecard
+secureguest
+secure-guest
 security
 security2
 sed
@@ -45408,8 +45427,13 @@ ssltest
 ssl-vpn
 sslvpn
 sso
+sso-dev
+sso-test
+sso-energy
+sso-power
 ssotest
 ssp
+sspr
 ssr
 ssrs
 sss
@@ -45488,6 +45512,9 @@ static4
 static5
 static-mal-g-in-g01-s
 static.origin
+static-map
+static-assets
+static-assets-pay
 statics
 station
 statistic
@@ -47592,6 +47619,7 @@ twd
 twe
 tweb
 tweety
+tweventhook
 twf
 twg
 twh

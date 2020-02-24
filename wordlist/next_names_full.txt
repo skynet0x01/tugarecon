@@ -1465,6 +1465,13 @@ education
 eight
 email
 english
+err-logs
+err
+error
+errors
+errlog
+err-log
+errlogs
 enterprise
 event
 events
