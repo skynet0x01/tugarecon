@@ -52,7 +52,7 @@ def write_file(subdomains, output_file, target):
 def mapping_domain(target):
     try:
         try:
-            urllib.request.urlretrieve(f"https://dnsdumpster.com/static/map/{target}" + ".png", f"results/{target}.png")
+            urllib.request.urlretrieve(f"https://dnsdumpster.com/static/map/{target}" + ".png", f"results/{target}/{target}.png")
         except urllib.error.URLError as e:
             print("", e.reason)
         my_file = Path(f"results/{target}.png")
