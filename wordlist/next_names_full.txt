@@ -95,6 +95,7 @@ sp
 sk
 sc
 sq
+sql
 s3
 sy
 sw
@@ -1240,6 +1241,7 @@ fu
 ft
 f7
 fa
+faraday
 fd
 fq
 fl
@@ -1336,10 +1338,13 @@ audio
 auth
 auto
 autodiscover
+autobidder
+autobidder-eng
 backup
 bank
 barracuda
 bata
+battery
 beijing
 beta
 bf1-exchange-vip
@@ -1517,6 +1522,8 @@ gq1-crf
 green
 group
 groups
+gridlogic
+gridlogic-eng
 health
 help
 helpdesk
@@ -1688,6 +1695,8 @@ pop3
 portal
 post
 potala
+power
+powerhub
 press
 preview
 print
@@ -1735,6 +1744,9 @@ sentry
 server
 server1
 server2
+server-sql
+server-data
+server-database
 service
 services
 seven
