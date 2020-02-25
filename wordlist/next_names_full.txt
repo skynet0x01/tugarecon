@@ -1,5 +1,6 @@
 {alphnum}
 {alphnum}{alphnum}
+{alphnum}{alphnum}{alphnum}
 c
 s
 n
@@ -1697,6 +1698,8 @@ post
 potala
 power
 powerhub
+powertrip
+poweroutage
 press
 preview
 print
@@ -1713,6 +1716,8 @@ push
 quebec
 query
 radio
+radiofrequency
+radio-frequency
 radius
 radius-gnap-anycast
 redirect
