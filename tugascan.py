@@ -10,13 +10,13 @@ import re  # Regular expression operations
 import sys  # System-specific parameters and functions
 import threading  # Thread-based parallelism
 import time  # Time access and conversions
-import dns.resolver  # dnspython
-import multiprocessing
 
+import dns.resolver  # dnspython
+
+from functions import G, W, R
 # Import internal
 from lib.bscan import _dns_queries
 from lib.bscan import is_intranet
-from functions import G, W, R, Y
 from lib.console_terminal import getTerminalSize
 
 
@@ -27,13 +27,13 @@ class TugaBruteScan:
     def __init__(self, target, options):
 
         self.target = target
-        self.options = options # default threads 200
+        self.options = options  # default threads 200
         self.ignore_intranet = options.i  # need more options... not complete
         # set threads, count system
         self.thread_count = self.scan_count = self.found_count = 0
         self.lock = threading.Lock()
         # Resize console
-        self.console_width = getTerminalSize()[0] - 2 # thanks guys
+        self.console_width = getTerminalSize()[0] - 2  # thanks guys
         self.msg_queue = queue.Queue()
         self.STOP_SCAN = False
         threading.Thread(target=self._print_msg).start()
@@ -53,7 +53,13 @@ class TugaBruteScan:
         if options.output:
             outfile = options.output
         else:
-            outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else 'results/' + target + '_tugascan_full.txt'
+            if not os.path.exists("results/" + self.target):
+                os.mkdir("results/" + self.target)
+            else:
+                pass
+            outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else 'results/' + self.target + "/"\
+                                                                                          + target + '_tugascan_full.txt'
+            #outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else 'results/' + target + '_tugascan_full.txt'
         self.outfile = open(outfile, 'w')
         # save ip ,dns.
         self.ip_dict = {}
@@ -82,7 +88,7 @@ class TugaBruteScan:
 
         while threading.activeCount() > 2:
             time.sleep(0.1)
-        self.dns_count = len(self.dns_servers) # count the number of DNS servers
+        self.dns_count = len(self.dns_servers)  # count the number of DNS servers
         sys.stdout.write('\n')
         print('[+] Found %s available DNS Servers' % self.dns_count)
         if self.dns_count == 0:
@@ -226,6 +232,7 @@ class TugaBruteScan:
                         elif item not in next_subs:
                             next_subs.append(item)
         self.next_subs = next_subs
+        # print(self.next_subs) just for test
 
     ###############################################################################################
 
@@ -256,7 +263,8 @@ class TugaBruteScan:
             elif _msg.startswith('[+] Check DNS Server'):
                 sys.stdout.write('\r' + _msg + ' ' * (self.console_width - len(_msg)))
             else:
-                sys.stdout.write('\r' + _msg + ' ' * (self.console_width - len(_msg)) + '\n') # print subdomains in console
+                sys.stdout.write('\r' + _msg + ' ' * (self.console_width - len(_msg)) + '\n')  # print subdomains in
+                # console
             sys.stdout.flush()
 
     ###############################################################################################
@@ -280,7 +288,9 @@ class TugaBruteScan:
                     else:
                         continue
             sub = _lst_subs.pop()
+            # print("1: ",sub) just for tests
             _sub = sub.split('.')[-1]
+            # print("2: ", _sub) just for tests
             _sub_timeout_count = 0
             while not self.STOP_SCAN:
                 try:
@@ -315,10 +325,10 @@ class TugaBruteScan:
 
                         if (not self.ignore_intranet) or (not is_intranet(answers[0].address)):
                             self._update_found_count()
-                            msg = cur_sub_domain.ljust(30) + ips
+                            msg = cur_sub_domain.ljust(50) + ips  # default [30, 50], msg = <subs>.<target> and info.
                             self.msg_queue.put(msg)
                             self.msg_queue.put('status')
-                            self.outfile.write(cur_sub_domain.ljust(30) + '\t' + ips + '\n')
+                            self.outfile.write(cur_sub_domain.ljust(50) + '\t' + ips + '\n')
                             self.outfile.flush()
 
                             try:
@@ -360,14 +370,14 @@ class TugaBruteScan:
         self.start_time = time.time()
         for i in range(self.options.threads):
             try:
-                t = threading.Thread(target=self._scan, name=str(i)) # pass to def _scan()
+                t = threading.Thread(target=self._scan, name=str(i))  # pass to def _scan()
                 t.setDaemon(True)
                 t.start()
             except:
                 pass
         while self.thread_count > 0:
             try:
-                time.sleep(0.1) # time sleep 1, try to change to 0.1 or 0
+                time.sleep(0.1)  # time sleep 1, try to change to 0.1 or 0
             except KeyboardInterrupt as e:
                 msg = (R + '[WARNING] User aborted, wait all slave threads to exit...' + W)
                 sys.stdout.write('\r' + msg + ' ' * (self.console_width - len(msg)) + '\n\r')

@@ -8,6 +8,7 @@ import urllib.request
 import webbrowser
 import urllib.error
 import urllib3
+import os
 from pathlib import Path
 
 # Colors
@@ -37,9 +38,13 @@ def parse_url(url):
 
 
 # write subdomains to a file
-def write_file(subdomains, output_file):
+def write_file(subdomains, output_file, target):
     # saving subdomains results to output file
-    with open("results/" + output_file, 'a') as fp:
+    if not os.path.exists("results/" + target):
+        os.mkdir("results/" + target)
+    else:
+        pass
+    with open("results/" +target + "/" + output_file, 'a') as fp:
         fp.write(subdomains + '\n')
         fp.close()
 
