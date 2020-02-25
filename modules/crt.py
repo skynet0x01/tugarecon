@@ -6,7 +6,6 @@
 
 
 import time
-
 import requests
 
 from functions import G, W
@@ -26,13 +25,13 @@ class CRT:
         print(G + f"SSL Certificates: Enumerating subdomains now for {target} \n" + W)
 
         url = self.subdomains_list()
-        self.enumerate(url, output)
+        self.enumerate(url, output, target)
 
     def subdomains_list(self):
         url = f"https://crt.sh/?q={self.target}&output=json"
         return url
 
-    def enumerate(self, url, output):
+    def enumerate(self, url, output, target):
         subdomains = set()
         subdomainscount = 0
         start_time = time.time()
@@ -49,7 +48,7 @@ class CRT:
                     print(f"[*] {subdomains}")
 
                     if self.output is not None:
-                        write_file(subdomains, self.engine + '_' + self.output)
+                        write_file(subdomains, self.engine + '_' + self.output, target)
 
             if self.output:
                 print(f"\nSaving result... {self.engine + '_'+ self.output}")
