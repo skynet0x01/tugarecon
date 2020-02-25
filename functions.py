@@ -55,9 +55,9 @@ def mapping_domain(target):
             urllib.request.urlretrieve(f"https://dnsdumpster.com/static/map/{target}" + ".png", f"results/{target}/{target}.png")
         except urllib.error.URLError as e:
             print("", e.reason)
-        my_file = Path(f"results/{target}.png")
+        my_file = Path(f"results/{target}/{target}.png")
         if my_file.is_file():
-            webbrowser.open(f"results/{target}.png")
+            webbrowser.open(f"results/{target}/{target}.png")
         else:
             print(Y + "\nOops! The map file was not generated. Try again...\n" + W)
     except PermissionError:
