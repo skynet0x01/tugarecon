@@ -1,6 +1,5 @@
 {alphnum}
 {alphnum}{alphnum}
-{alphnum}{alphnum}{alphnum}
 c
 s
 n
