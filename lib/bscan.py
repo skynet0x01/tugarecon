@@ -3,10 +3,10 @@ import dns.resolver  # dnspython
 # Import internal
 from functions import G, W, R, Y
 
+
 ###############################################################################################
 
-def _dns_queries(target):
-
+def bscan_dns_queries(target):
     print(G + "\n[+] DNS queries...\n" + W)
     print(G + "**************************************************************\n" + W)
     for qtype in 'A', 'AAAA', 'MX', 'NS', 'TXT', 'SOA', 'CERT', 'HINFO', 'MINFO', 'TLSA', 'SPF':
@@ -16,6 +16,7 @@ def _dns_queries(target):
         else:
             pass
     print(G + "**************************************************************\n" + W)
+
 
 ###############################################################################################
 
