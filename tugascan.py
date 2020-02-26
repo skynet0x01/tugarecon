@@ -29,7 +29,7 @@ class TugaBruteScan:
         self.target = target
         self.options = options  # default threads 200
         self.ignore_intranet = options.i  # need more options... not complete
-        # set threads, count system
+        # set threads and count system to 0
         self.thread_count = self.scan_count = self.found_count = 0
         self.lock = threading.Lock()
         # Resize console
@@ -37,7 +37,7 @@ class TugaBruteScan:
         self.msg_queue = queue.Queue()
         self.STOP_SCAN = False
         threading.Thread(target=self._print_msg).start()
-        self._dns_queries = _dns_queries(target)
+        self._dns_queries_bscan = _dns_queries(target)
         self._load_dns_servers()  # load DNS servers from a list
         # set resolver from dns.resolver
         self.resolvers = [dns.resolver.Resolver(configure=False) for _ in range(options.threads)]
@@ -49,7 +49,7 @@ class TugaBruteScan:
         t.start()
         while not self.queue.qsize() > 0 and t.is_alive():
             time.sleep(0.1)
-            # save results in to a file
+            # create a target folder and save results in to a file
         if options.output:
             outfile = options.output
         else:
@@ -106,7 +106,7 @@ class TugaBruteScan:
                 raise Exception('incorrect DNS response')
             try:
                 resolver.query('test.bad.dns.lordneostark.pt')  # Non-existed domain test
-                with open('bad_dns_servers.txt', 'a') as f:
+                with open('wordlist/bad_dns_servers.txt', 'a') as f:
                     f.write(server + '\n')
                 self.msg_queue.put('[+] Bad DNS Server found %s' % server)
             except:
