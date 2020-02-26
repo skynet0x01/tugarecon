@@ -40,7 +40,15 @@ git clone https://github.com/LordNeoStark/tugarecon.git
 # Dependencies
 You need to install [dnspython](http://www.dnspython.org) to do DNS query
 
-        pip install dnspython
+        dnspython
+        threading
+        queue
+        re
+        os
+        time
+        sys
+        webbrowser
+        urllib3
 
 # DONATIONS:
 
