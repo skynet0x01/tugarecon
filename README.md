@@ -59,10 +59,10 @@ BTC:   1C1q8c2bpSvRBpupD43p1CAV98YXkNnnDx
 Doge:  DRU62QbterkCpMHEG7ZMSZXEJQzyR13CRB
 
 # News
-- [x] Save results: results/<target>/ files
+- [x] Save results: results/domain_target/ files
 - [x] Releasing a new version 0.45b
 - [x] Fast enumerate BruteForce scan upgrade
-- [x] Mapping the domain and save image results/<target>/target.png
+- [x] Mapping the domain and save image
 - [x] add new module
 - [x] add new folder /results
 - [ ] Random User-Agent
