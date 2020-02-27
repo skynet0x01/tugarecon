@@ -1,0 +1,10 @@
+dnspython>=1.16.0
+requests
+threading
+queue
+re
+os
+time
+sys
+webbrowser
+urllib3
