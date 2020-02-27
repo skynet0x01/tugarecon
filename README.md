@@ -40,7 +40,7 @@ git clone https://github.com/LordNeoStark/tugarecon.git
 # Dependencies
 You need to install [dnspython](http://www.dnspython.org) to do DNS query
 
-        dnspython
+        dnspython version 1.16.0
         threading
         queue
         re
