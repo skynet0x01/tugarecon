@@ -16,11 +16,11 @@ from functions import R, W, Y, G
 from functions import mapping_domain
 
 # Import internal modules
-from modules import certspotter
-from modules import crt
-from modules import hackertarget
-from modules import threatcrowd
-from modules import virustotal
+from modules import tuga_certspotter
+from modules import tuga_crt
+from modules import tuga_hackertarget
+from modules import tuga_threatcrowd
+from modules import tuga_virustotal
 
 # Import BruteForce tugascan
 from tugascan import TugaBruteScan
@@ -101,12 +101,16 @@ def parse_url(url):
 ################################################################################
 
 def queries(target):
-    
-    print(R + "Querying SSL Certificates for " + target + " subdomains" + W)
-    print(R + "Querying CertsPotter for " + target + " subdomains" + W)
-    print(R + "Querying Virustotal for " + target + " subdomains" + W)
-    print(R + "Querying ThreatCrowd for " + target + " subdomains\n" + W)
-    time.sleep(2)
+    print(G + "Enumerating subdomains for " + target + " \n" + W)
+    time.sleep(0.1)
+    print(R + "Searching in SSL Certificates in " + target + " " + W)
+    time.sleep(0.1)
+    print(R + "Searching in CertsPotter in " + target + " " + W)
+    time.sleep(0.1)
+    print(R + "Searching in Virustotal in " + target + " " + W)
+    time.sleep(0.1)
+    print(R + "Searching in ThreatCrowd in " + target + " \n" + W)
+    time.sleep(1)
 
 ################################################################################
 
@@ -123,18 +127,18 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
 
         # <Module required> Perform enumerations and network mapping
 
-        supported_engines = {'certspotter': certspotter.Certspotter,
-                             'hackertarget': hackertarget.Hackertarget,
-                             'virustotal': virustotal.Virustotal,
-                             'threatcrowd': threatcrowd.Threatcrowd,
-                             'ssl': crt.CRT
+        supported_engines = {'certspotter': tuga_certspotter.Certspotter,
+                             'hackertarget': tuga_hackertarget.Hackertarget,
+                             'virustotal': tuga_virustotal.Virustotal,
+                             'threatcrowd': tuga_threatcrowd.Threatcrowd,
+                             'ssl': tuga_crt.CRT
                              }
         chosenEnums = []
 
         if enum is None:
             queries(target)
-            chosenEnums = [certspotter.Certspotter, hackertarget.Hackertarget, virustotal.Virustotal,
-                           threatcrowd.Threatcrowd, crt.CRT]
+            chosenEnums = [tuga_certspotter.Certspotter, tuga_hackertarget.Hackertarget, tuga_virustotal.Virustotal,
+                           tuga_threatcrowd.Threatcrowd, tuga_crt.CRT]
 
             # Start super fast enumeration
             enums = [indicate(target, output) for indicate in chosenEnums]
