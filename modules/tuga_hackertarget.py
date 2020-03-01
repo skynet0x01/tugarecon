@@ -9,7 +9,7 @@ import time
 import requests
 
 # Import internal
-
+from modules import tuga_useragents
 from functions import write_file
 from functions import G, W
 
@@ -37,7 +37,7 @@ class Hackertarget:
         start_time = time.time()
 
         try:
-            response = requests.get(url)
+            response = requests.get(url, headers=tuga_useragents.useragent())
 
             while subdomainscount < 10000:
 

@@ -9,9 +9,8 @@ import time
 import requests
 
 from functions import G, W
-from functions import useragent
+from modules import tuga_useragents
 from functions import write_file
-
 
 class CRT:
 
@@ -37,7 +36,7 @@ class CRT:
         start_time = time.time()
 
         try:
-            response = requests.get(url, headers={'User-Agent': useragent()})
+            response = requests.get(url, headers=tuga_useragents.useragent())
 
             while subdomainscount < 10000:
                 subdomains = response.json()[subdomainscount]["name_value"]

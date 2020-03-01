@@ -8,7 +8,7 @@
 import time
 import requests
 
-from functions import useragent
+from modules import tuga_useragents
 from functions import write_file
 from functions import G, W
 
@@ -36,7 +36,7 @@ class Threatcrowd:
         start_time = time.time()
 
         try:
-            response = requests.get(url, headers={'User-Agent': useragent()})
+            response = requests.get(url, headers=tuga_useragents.useragent())
 
             while subdomainscount < 500:
                 subdomains = response.json()["subdomains"][subdomainscount]

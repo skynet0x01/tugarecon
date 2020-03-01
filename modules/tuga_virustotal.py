@@ -9,8 +9,8 @@ import time
 import requests
 
 from functions import G, W
-from functions import useragent
 from functions import write_file
+from modules import tuga_useragents
 
 
 class Virustotal:
@@ -37,7 +37,7 @@ class Virustotal:
         start_time = time.time()
 
         try:
-            response = requests.get(url, headers={'User-Agent': useragent()})
+            response = requests.get(url, headers=tuga_useragents.useragent())
 
             while subdomainscount < 40:
                 subdomains = response.json()["data"][subdomainscount]["id"]

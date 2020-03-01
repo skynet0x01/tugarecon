@@ -2,11 +2,12 @@
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
 # Coded By LordNeoStark | https://twitter.com/LordNeoStark | https://github.com/LordNeoStark
+
 # import modules
 import time
 import requests
 
-from functions import useragent
+from modules import tuga_useragents #random user-agent
 from functions import write_file
 from functions import G, W
 
@@ -34,7 +35,7 @@ class Certspotter:
         start_time = time.time()
 
         try:
-            response = requests.get(url, headers={'User-Agent': useragent()})
+            response = requests.get(url, headers=tuga_useragents.useragent())
 
             while subdomainscount < 100:
                 subdomains = response.json()[subdomainscount]["dns_names"][0]
