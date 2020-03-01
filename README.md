@@ -49,6 +49,7 @@ You need to install [dnspython](http://www.dnspython.org) to do DNS query
         sys
         webbrowser
         urllib3
+        random
 
 # DONATIONS:
 
