@@ -66,4 +66,4 @@ Doge:  DRU62QbterkCpMHEG7ZMSZXEJQzyR13CRB
 - [x] add new module
 - [x] add new folder results/domain_target/  ex: results/tesla.com/ 
 - [ ] Add more modules
-- [ ] Random User-Agent
+- [x] Random User-Agent
