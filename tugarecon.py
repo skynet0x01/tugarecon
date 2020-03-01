@@ -21,6 +21,7 @@ from modules import tuga_crt
 from modules import tuga_hackertarget
 from modules import tuga_threatcrowd
 from modules import tuga_virustotal
+#from modules import tuga_googlesearch
 
 # Import BruteForce tugascan
 from tugascan import TugaBruteScan
@@ -83,12 +84,6 @@ def parse_args():
 
 ################################################################################
 
-def useragent():
-    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
-    return user_agent
-
-################################################################################
-
 # parse host from scheme, to use for certificate transparency abuse
 def parse_url(url):
     try:
@@ -131,7 +126,8 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
                              'hackertarget': tuga_hackertarget.Hackertarget,
                              'virustotal': tuga_virustotal.Virustotal,
                              'threatcrowd': tuga_threatcrowd.Threatcrowd,
-                             'ssl': tuga_crt.CRT
+                             'ssl': tuga_crt.CRT,
+
                              }
         chosenEnums = []
 

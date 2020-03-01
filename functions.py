@@ -21,12 +21,6 @@ B = '\033[94m'  # blue
 R = '\033[91m'  # red
 W = '\033[0m'  # white
 
-
-def useragent():
-    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
-    return user_agent
-
-
 # parse host from scheme, to use for certificate transparency abuse
 def parse_url(url):
     try:
@@ -67,7 +61,6 @@ def mapping_domain(target):
 def Convert(subdomains):
     subdomains_list = list(subdomains.split(","))
     return subdomains_list
-
 
 # Future implementation
 '''
