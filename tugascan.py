@@ -52,13 +52,11 @@ class TugaBruteScan:
             # create a target folder and save results in to a file
         if options.output:
             outfile = options.output
+        if not os.path.exists("results/" + self.target):
+            os.mkdir("results/" + self.target)
         else:
-            if not os.path.exists("results/" + self.target):
-                os.mkdir("results/" + self.target)
-            else:
-                pass
-            outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else 'results/' + self.target + "/"\
-                                                                                          + target + '_tugascan_full.txt'
+            #pass
+            outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else 'results/' + self.target + "/" + target + '_tugascan_full.txt'
             #outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else 'results/' + target + '_tugascan_full.txt'
         self.outfile = open(outfile, 'w')
         # save ip ,dns.
