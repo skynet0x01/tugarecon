@@ -21,24 +21,26 @@ from modules import tuga_crt
 from modules import tuga_hackertarget
 from modules import tuga_threatcrowd
 from modules import tuga_virustotal
-#from modules import tuga_googlesearch
+from modules import tuga_googlesearch
 
 # Import BruteForce tugascan
 from tugascan import TugaBruteScan
 
+
 # Banner, Tuga or portuguese, is the same ;)
 def banner():
-    print(R +"        \n"
-          "             ______                  ____                      \n"
-          "            /_  __/_  ______ _____ _/ __ \___  _________  ____ \n"
-          "             / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \                \n"
-          "            / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               \n"
-          "           /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  V: 0.45b               \n"
-          "                     /____/                                    \n"
-          "\n"
-          "                        # Coded By LordNeoStark #\n"
-          "    " + W)
+    print(R + "        \n"
+              "             ______                  ____                      \n"
+              "            /_  __/_  ______ _____ _/ __ \___  _________  ____ \n"
+              "             / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \                \n"
+              "            / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               \n"
+              "           /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  V: 0.45b               \n"
+              "                     /____/                                    \n"
+              "\n"
+              "                        # Coded By LordNeoStark #\n"
+              "    " + W)
     print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country\n" + W)
+
 
 ################################################################################
 
@@ -48,11 +50,12 @@ def parser_error(errmsg):
     print("Error: " + errmsg)
     sys.exit(1)
 
+
 ################################################################################
 
 # parse the arguments
 def parse_args():
-    example_text = f'''\nmodules: certspotter, hackertarget, virustotal, threatcrowd, ssl\n
+    example_text = f'''\nmodules: certspotter, hackertarget, virustotal, threatcrowd, ssl, googlesearch\n
         Examples:
         python3 {sys.argv[0]} -d google.com
         python3 {sys.argv[0]} -d google.com --enum ssl
@@ -66,21 +69,22 @@ def parse_args():
     parser.error = parser_error
     parser._optionals.title = "OPTIONS"
     parser.add_argument('-d', '--domain', type=str, help="Domain name to enumerate it's subdomains", required=True)
-    #parser.add_argument('-p', '--ports', help='Scan the found subdomains against specified tcp ports')
+    # parser.add_argument('-p', '--ports', help='Scan the found subdomains against specified tcp ports')
     parser.add_argument('-s', '--savemap', help='Save subdomains image map', action='store_true')
 
     parser.add_argument('-b', '--bruteforce', help='Enable the bruteforce scan', action='store_true')
     parser.add_argument('-f', dest='file', default='first_names.txt',
-                      help='A file contains new line delimited subs, default is first_names.txt.')
+                        help='A file contains new line delimited subs, default is first_names.txt.')
     parser.add_argument('--full', dest='full_scan', default=False, action='store_true',
-                      help='Full scan, NAMES FILE first_names_full.txt will be used to brute')
+                        help='Full scan, NAMES FILE first_names_full.txt will be used to brute')
     parser.add_argument('-i', '--ignore', dest='i', default=False, action='store_true',
-                      help='Ignore domains pointed to private IPs')
+                        help='Ignore domains pointed to private IPs')
     parser.add_argument("-t", "--threads", help="Number of threads to use to scan the domain. Default is 200",
                         default=200, type=int)
     parser.add_argument('-o', '--output', help='Save the results to text file')
     parser.add_argument('--enum', nargs='*', help='<Module required> Perform enumerations and network mapping')
     return parser.parse_args()
+
 
 ################################################################################
 
@@ -92,6 +96,7 @@ def parse_url(url):
         print('[*] Invalid domain, try again..')
         sys.exit(1)
     return host
+
 
 ################################################################################
 
@@ -106,6 +111,7 @@ def queries(target):
     time.sleep(0.1)
     print(R + "Searching in ThreatCrowd in " + target + " \n" + W)
     time.sleep(1)
+
 
 ################################################################################
 
@@ -127,6 +133,7 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
                              'virustotal': tuga_virustotal.Virustotal,
                              'threatcrowd': tuga_threatcrowd.Threatcrowd,
                              'ssl': tuga_crt.CRT,
+                             'googlesearch': tuga_googlesearch.GoogleSearch
 
                              }
         chosenEnums = []
@@ -156,6 +163,7 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
         print("\nTugaRecon interrupted by user\n")
         sys.exit()
 
+
 ################################################################################
 
 def menu():
@@ -164,7 +172,7 @@ def menu():
     args = parse_args()  # args = parser.parse_args()
     target = parse_url(args.domain)
     output = args.output
-    #port = args.ports
+    # port = args.ports
     savemap = args.savemap
     enum = args.enum
     threads = args.threads
