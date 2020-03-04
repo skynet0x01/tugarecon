@@ -68,7 +68,7 @@ class GoogleSearch:
             # exception handling code to make sure we don't run into errors
             try:
                 gurl = self.get_list(target, page_number)
-                print(gurl)
+                #print(gurl)
 
                 # fetching the response using get method in requests
                 html = requests.get(gurl, headers=tuga_useragents.useragent())
