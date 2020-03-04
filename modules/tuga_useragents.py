@@ -38,11 +38,11 @@ def useragent():
     ]
 
     # Using Requests (all modules)
-    for i in range(1,6):
+    for i in range(1, 6):
         # Pick a random user agent
         tuga_user_agent = random.choice(user_agent_list)
         # Set the headers
         user_agent = {'User-Agent': tuga_user_agent}
         # Make the request,just for test
-        #response = requests.get(url, headers=user_agent)
+        # response = requests.get(url, headers=user_agent)
         return user_agent
