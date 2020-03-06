@@ -21,6 +21,7 @@ from modules import tuga_crt
 from modules import tuga_hackertarget
 from modules import tuga_threatcrowd
 from modules import tuga_virustotal
+from modules import tuga_entrust
 from modules import tuga_googlesearch
 
 # Import BruteForce tugascan
@@ -55,7 +56,7 @@ def parser_error(errmsg):
 
 # parse the arguments
 def parse_args():
-    example_text = f'''\nmodules: certspotter, hackertarget, virustotal, threatcrowd, ssl, googlesearch\n
+    example_text = f'''\nmodules: certspotter, hackertarget, virustotal, threatcrowd, ssl, entrust, googlesearch\n
         Examples:
         python3 {sys.argv[0]} -d google.com
         python3 {sys.argv[0]} -d google.com --enum ssl
@@ -109,6 +110,8 @@ def queries(target):
     time.sleep(0.1)
     print(R + "Searching in Virustotal in " + target + " " + W)
     time.sleep(0.1)
+    print(R + "Searching in Entrust Datacard in " + target + " " + W)
+    time.sleep(0.1)
     print(R + "Searching in ThreatCrowd in " + target + " \n" + W)
     time.sleep(1)
 
@@ -133,6 +136,7 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
                              'virustotal': tuga_virustotal.Virustotal,
                              'threatcrowd': tuga_threatcrowd.Threatcrowd,
                              'ssl': tuga_crt.CRT,
+                             'entrust': tuga_entrust.Entrust,
                              'googlesearch': tuga_googlesearch.GoogleSearch
 
                              }
@@ -141,7 +145,7 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
         if enum is None:
             queries(target)
             chosenEnums = [tuga_certspotter.Certspotter, tuga_hackertarget.Hackertarget, tuga_virustotal.Virustotal,
-                           tuga_threatcrowd.Threatcrowd, tuga_crt.CRT]
+                           tuga_threatcrowd.Threatcrowd, tuga_crt.CRT, tuga_entrust.Entrust]
 
             # Start super fast enumeration
             enums = [indicate(target, output) for indicate in chosenEnums]
