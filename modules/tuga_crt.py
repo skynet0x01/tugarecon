@@ -23,10 +23,10 @@ class CRT:
 
         print(G + f"SSL Certificates: Enumerating subdomains now for {target} \n" + W)
 
-        url = self.subdomains_list()
+        url = self.engine_url()
         self.enumerate(url, output, target)
 
-    def subdomains_list(self):
+    def engine_url(self):
         url = f"https://crt.sh/?q={self.target}&output=json"
         return url
 
