@@ -5,7 +5,7 @@ TugaRecon, tribute to Portuguese explorers reminding glorious past of this count
 During the 15th and 16th centuries, Portuguese explorers were at the forefront of European overseas exploration, which led them to reach India, establish multiple trading posts in Asia and Africa, and settle what would become Brazil, creating one of the most powerful empires.
 
 # Version
-0.45 beta
+0.50 beta
 
 
 During the development phase, we would like to invite all of you, to help test the beta version of the application.
@@ -36,6 +36,17 @@ git clone https://github.com/LordNeoStark/tugarecon.git
         python3 tugarecon.py -d google.com --bruteforce
         python3 tugarecon.py -d google.com --bruteforce --full
         python3 tugarecon.py -d google.com -b --full
+
+# Modules
+
+  bruteforce (tugascan - wildcards, wordlist)
+  certspotter
+  hackertarget
+  virustotal
+  threatcrowd
+  ssl
+  entrust
+  googlesearch
 
 # Dependencies
 You need to install [dnspython](http://www.dnspython.org) to do DNS query
