@@ -21,19 +21,18 @@ class Entrust:
         self.output = output
         self.module_name = "Entrust Datacard"
         self.engine = "entrust"
-        self.domainsFound = {}
-        self.domainsNotFound = {}
+
         requests.packages.urllib3.disable_warnings()
 
         print(G + f"Entrust Datacard: Enumerating subdomains now for {target} \n" + W)
 
         print("[+]: Downloading domain list...")
         self.response = self.engine_url(target)
-        print("[+]: Download of domain list complete.")
+        print("[+]: Download complete.")
         self.domains = self.enumerate(self.response)
         print("[+]: Parsed %s domain(s) from list." % len(self.domains))
 
-        print("\n[+]: Domains found:")
+        print("\n[+]: Domains found...")
         self.printDomains(self.domains, self.target, self.output)
 
     def engine_url(self, target):
