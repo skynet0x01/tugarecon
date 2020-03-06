@@ -39,14 +39,14 @@ git clone https://github.com/LordNeoStark/tugarecon.git
 
 # Modules
 
-  bruteforce (tugascan - wildcards, wordlist)
-  certspotter
-  hackertarget
-  virustotal
-  threatcrowd
-  ssl
-  entrust
-  googlesearch
+    bruteforce (tugascan - wildcards, wordlist)
+    certspotter
+    hackertarget
+    virustotal
+    threatcrowd
+    ssl
+    entrust
+    googlesearch
 
 # Dependencies
 You need to install [dnspython](http://www.dnspython.org) to do DNS query
