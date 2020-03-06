@@ -17567,6 +17567,12 @@ chewbacca
 chewie
 cheyenne
 chf
+chf01.ops.ne1
+chf02.ops.ne1
+chf03.ops.ne1
+chf04.ops.ne1
+chf01.ops.net
+chf02.ops.net
 chg
 chi
 chiba
@@ -17807,7 +17813,7 @@ cleveland
 cleverskincare
 clf
 clg
-clh
+clhssltest
 cli
 clic
 click
@@ -17827,6 +17833,7 @@ clinic
 clio
 clip
 clips
+cliacneu
 clj
 clk
 clm
@@ -18157,6 +18164,8 @@ corp
 corp2
 corpmail
 corporate
+corpsitesdrupal
+corpsitesdrupal-real
 correio
 correo
 correoweb
@@ -39192,6 +39201,8 @@ pax
 pay
 pay2
 payflow
+payflowlink
+payflowlinks
 paygate
 payment
 payments
@@ -39612,6 +39623,10 @@ pik
 pikachu
 pil
 pilot
+pilot-agw
+pilot-payflowlink
+pilot-payflowpro
+pilot-rms
 pim
 pimp
 pin
@@ -40240,6 +40255,8 @@ proxy2
 proxy3
 proxy4
 proxy5
+proxys
+proxysgc
 proyectos
 prp
 prq
@@ -45864,6 +45881,9 @@ sus
 susan
 sushi
 suspended
+suslink
+suslink2
+suslink2trade
 sut
 suv
 suw
@@ -46822,6 +46842,7 @@ testdns
 testdomain
 testdrive
 teste
+test-expresscheckout
 teste1
 tester
 testes
@@ -47283,6 +47304,10 @@ tnh
 tni
 tnj
 tnk
+tnk1
+tnk2
+tnk3
+tnk4
 tnl
 tnm
 tno
@@ -50071,6 +50096,7 @@ virt
 virtual
 virtual1
 virtual2
+virtualstudio
 virus
 vis
 visa
@@ -60646,6 +60672,10 @@ ydp
 ydq
 ydr
 yds
+ydsops
+ydsops.mysql
+ydsonboarding
+ydsonboarding.mysql
 ydt
 ydu
 ydv
