@@ -62,6 +62,9 @@ You need to install [dnspython](http://www.dnspython.org) to do DNS query
         urllib3
         random
 
+# Video
+<vimeo-embed embed="396145464"></vimeo-embed>
+
 # DONATIONS:
 
 Donations are welcome. This will help improved features, frequent updates and better overall support.
