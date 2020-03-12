@@ -15,7 +15,7 @@ And much more... :)
 
 # Screenshots
 
-![tugarecon_v04](https://user-images.githubusercontent.com/39160972/75100347-4488fa00-55c4-11ea-9d17-edb0929b259c.png)
+![tugarecon_bughunters](https://user-images.githubusercontent.com/39160972/76518858-cb105900-6457-11ea-9ac3-7ecfffc74fd8.png)
 
 ![tugarecon1](https://user-images.githubusercontent.com/39160972/72821211-1da77300-3c68-11ea-80a9-db8ea6716e4b.png)
 
