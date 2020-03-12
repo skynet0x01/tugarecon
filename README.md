@@ -11,7 +11,6 @@ During the 15th and 16th centuries, Portuguese explorers were at the forefront o
 During the development phase, we would like to invite all of you, to help test the beta version of the application.
 
 More modules will be added!
-New features!
 And much more... :)
 
 # Screenshots
