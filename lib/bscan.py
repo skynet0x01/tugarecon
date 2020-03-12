@@ -1,4 +1,5 @@
 import dns.resolver  # dnspython
+import whois
 
 # Import internal
 from functions import G, W, R, Y
@@ -9,14 +10,26 @@ from functions import G, W, R, Y
 def bscan_dns_queries(target):
     print(G + "\n[+] DNS queries...\n" + W)
     print(G + "**************************************************************\n" + W)
-    for qtype in 'A', 'AAAA', 'MX', 'NS', 'TXT', 'SOA', 'CERT', 'HINFO', 'MINFO', 'TLSA', 'SPF':
-        answer = dns.resolver.query(target, qtype, raise_on_no_answer=False)
-        if answer.rrset is not None:
-            print(answer.rrset, '\n')
-        else:
-            pass
+    try:
+        for qtype in 'A', 'AAAA', 'MX', 'NS', 'TXT', 'SOA', 'CERT', 'HINFO', 'MINFO', 'TLSA', 'SPF':
+            answer = dns.resolver.query(target, qtype, raise_on_no_answer=False, lifetime=10)
+            if answer.rrset is not None:
+                print(answer.rrset, '\n')
+            else:
+                pass
+    except Exception as e:
+        pass
     print(G + "**************************************************************\n" + W)
 
+###############################################################################################
+
+def bscan_whois_look(target):
+    #domain = whois.query(target)
+    #print(domain.__dict__, "\n")
+    #print(domain.name, "\n")
+    #print("Domain expiration: ", domain.expiration_date, "\n")
+    #print(G + "**************************************************************\n" + W)
+    pass
 
 ###############################################################################################
 
