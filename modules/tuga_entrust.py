@@ -3,8 +3,6 @@
 # Coded By LordNeoStark | https://twitter.com/LordNeoStark | https://github.com/LordNeoStark
 
 # import go here
-
-import sys
 import requests
 import time
 import re
@@ -21,21 +19,18 @@ class Entrust:
         self.output = output
         self.module_name = "Entrust Datacard"
         self.engine = "entrust"
+        self.count = 0
 
         requests.packages.urllib3.disable_warnings()
 
         print(G + f"Entrust Datacard: Enumerating subdomains now for {target} \n" + W)
 
-        print("[+]: Downloading domain list...")
-        self.response = self.engine_url(target)
-        print("[+]: Download complete.")
+        self.response = self.engine_url()
         self.domains = self.enumerate(self.response)
-        print("[+]: Parsed %s domain(s) from list." % len(self.domains))
-
-        print("\n[+]: Domains found...")
+        #print("[+]: Parsed %s domain(s) from list." % len(self.domains))
         self.printDomains(self.domains, self.target, self.output)
 
-    def engine_url(self, target):
+    def engine_url(self):
         url = f'https://ctsearch.entrust.com/api/v1/certificates?fields=subjectDN&domain={self.target}&includeExpired=true&exactMatch=false&limit=5000'
         response = requests.get(url, headers=tuga_useragents.useragent(), verify = False)
         return response
@@ -57,9 +52,12 @@ class Entrust:
     def printDomains(self, domains, target, output):
         for domain in sorted(domains):
             print(domain)
+            self.count = self.count + 1
 
             if self.output is not None:
                 write_file(domain, self.engine + '_' + self.output, target)
+
+        print(G + f"\n[**] TugaRecon is complete. Entrust Datacard: {self.count} subdomains have been found" +W)
 
         if self.output:
             print(f"\nSaving result... {self.engine + '_' + self.output}")

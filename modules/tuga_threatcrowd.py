@@ -23,21 +23,20 @@ class Threatcrowd:
 
         print(G + f"Threat Crowd: Enumerating subdomains now for {target} \n" + W)
 
-        url = self.subdomains_list()
-        self.enumerate(url, output, target)
+        self.response = self.engine_url()
+        self.enumerate(self.response, output, target)
 
-    def subdomains_list(self):
+    def engine_url(self):
         url = f'https://threatcrowd.org/searchApi/v2/domain/report/?domain={self.target}'
-        return url
+        response = requests.get(url, headers=tuga_useragents.useragent())
+        return response
 
-    def enumerate(self, url, output, target):
+    def enumerate(self, response, output, target):
         subdomains = set()
         subdomainscount = 0
         start_time = time.time()
 
         try:
-            response = requests.get(url, headers=tuga_useragents.useragent())
-
             while subdomainscount < 500:
                 subdomains = response.json()["subdomains"][subdomainscount]
                 subdomainscount = subdomainscount + 1

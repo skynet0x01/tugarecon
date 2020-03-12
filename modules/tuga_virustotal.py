@@ -24,21 +24,20 @@ class Virustotal:
 
         print(G + f"VirusTotal: Enumerating subdomains now for {target} \n" + W)
 
-        url = self.subdomains_list()
-        self.enumerate(url, output, target)
+        self.response = self.engine_url()
+        self.enumerate(self.response, output, target)
 
-    def subdomains_list(self):
+    def engine_url(self):
         url = f'https://www.virustotal.com/ui/domains/{self.target}/subdomains?limit=40'
-        return url
+        response = requests.get(url, headers=tuga_useragents.useragent())
+        return response
 
-    def enumerate(self, url, output, target):
+    def enumerate(self, response, output, target):
         subdomains = set()
         subdomainscount = 0
         start_time = time.time()
 
         try:
-            response = requests.get(url, headers=tuga_useragents.useragent())
-
             while subdomainscount < 40:
                 subdomains = response.json()["data"][subdomainscount]["id"]
                 subdomainscount = subdomainscount + 1

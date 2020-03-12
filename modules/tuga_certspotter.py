@@ -22,20 +22,20 @@ class Certspotter:
 
         print(G + f"CertSpotter: Enumerating subdomains now for {target} \n" + W)
 
-        url = self.subdomains_list()
-        self.enumerate(url, output, target)
+        self.response = self.engine_url()
+        self.enumerate(self.response, output, target)
 
-    def subdomains_list(self):
+    def engine_url(self):
         url = f'https://api.certspotter.com/v1/issuances?domain={self.target}&include_subdomains=true&expand=dns_names'
-        return url
+        response = requests.get(url, headers=tuga_useragents.useragent())
+        return response
 
-    def enumerate(self, url, output, target):
+    def enumerate(self, response, output, target):
         subdomains = set()
         subdomainscount = 0
         start_time = time.time()
 
         try:
-            response = requests.get(url, headers=tuga_useragents.useragent())
 
             while subdomainscount < 100:
                 subdomains = response.json()[subdomainscount]["dns_names"][0]
@@ -48,11 +48,11 @@ class Certspotter:
             if self.output:
                 print(f"\nSaving result... {self.engine + '_' + self.output}")
 
-        except IndexError:
+        except:
             pass
-
-        print(G + f"\n[**] TugaRecon is complete. CertSpotter: {subdomainscount} subdomains have been found in %s seconds" % (
-                    time.time() - start_time) + W)
 
         if not subdomains:
             print(f"[x] No data found for {self.target} using CertSpotter.")
+        else:
+            print(G + f"\n[**] TugaRecon is complete. CertSpotter: {subdomainscount} subdomains have been found in %s seconds" % (
+                    time.time() - start_time) + W)

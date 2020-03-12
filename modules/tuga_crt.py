@@ -23,21 +23,20 @@ class CRT:
 
         print(G + f"SSL Certificates: Enumerating subdomains now for {target} \n" + W)
 
-        url = self.engine_url()
-        self.enumerate(url, output, target)
+        self.response = self.engine_url()
+        self.enumerate(self.response, output, target)
 
     def engine_url(self):
         url = f"https://crt.sh/?q={self.target}&output=json"
-        return url
+        response = requests.get(url, headers=tuga_useragents.useragent())
+        return response
 
-    def enumerate(self, url, output, target):
+    def enumerate(self, response, output, target):
         subdomains = set()
         subdomainscount = 0
         start_time = time.time()
 
         try:
-            response = requests.get(url, headers=tuga_useragents.useragent())
-
             while subdomainscount < 10000:
                 subdomains = response.json()[subdomainscount]["name_value"]
                 subdomainscount = subdomainscount + 1
@@ -55,9 +54,10 @@ class CRT:
         except IndexError:
             pass
 
-        print(
-            G + f"\n[**] TugaRecon is complete.  SSL Certificates: {subdomainscount} subdomains have been found in %s seconds" % (
-                    time.time() - start_time) + W)
-
         if not subdomains:
             print(f"[x] Oops! No data found for {self.target} using  SSL Certificates.")
+        else:
+            print(
+                G + f"\n[**] TugaRecon is complete.  SSL Certificates: {subdomainscount} subdomains have been found in %s seconds" % (
+                        time.time() - start_time) + W)
+
