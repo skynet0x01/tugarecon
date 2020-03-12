@@ -26,6 +26,8 @@ from modules import tuga_googlesearch
 
 # Import BruteForce tugascan
 from tugascan import TugaBruteScan
+from lib.bscan import bscan_dns_queries
+from lib.bscan import bscan_whois_look
 
 
 # Banner, Tuga or portuguese, is the same ;)
@@ -35,7 +37,7 @@ def banner():
               "            /_  __/_  ______ _____ _/ __ \___  _________  ____ \n"
               "             / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \                \n"
               "            / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               \n"
-              "           /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  V: 0.5b               \n"
+              "           /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  V: 0.51b               \n"
               "                     /____/                                    \n"
               "\n"
               "                        # Coded By LordNeoStark #\n"
@@ -129,6 +131,9 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
 
     try:
 
+        bscan_dns_queries(target)
+        bscan_whois_look(target)
+
         # <Module required> Perform enumerations and network mapping
 
         supported_engines = {'certspotter': tuga_certspotter.Certspotter,
@@ -142,6 +147,7 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
                              }
         chosenEnums = []
 
+        # Default modules
         if enum is None:
             queries(target)
             chosenEnums = [tuga_certspotter.Certspotter, tuga_hackertarget.Hackertarget, tuga_virustotal.Virustotal,
@@ -151,12 +157,10 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
             enums = [indicate(target, output) for indicate in chosenEnums]
 
         else:
-
             for engine in enum:
                 if engine.lower() in supported_engines:
                     chosenEnums.append(supported_engines[engine.lower()])
                     # Start the enumeration
-
                     enums = [indicate(target, output) for indicate in chosenEnums]
 
         # Save map domain (png file)
@@ -171,8 +175,8 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
 ################################################################################
 
 def menu():
+    
     banner()
-
     args = parse_args()  # args = parser.parse_args()
     target = parse_url(args.domain)
     output = args.output

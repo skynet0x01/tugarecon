@@ -21,6 +21,7 @@ B = '\033[94m'  # blue
 R = '\033[91m'  # red
 W = '\033[0m'  # white
 
+
 # parse host from scheme, to use for certificate transparency abuse
 def parse_url(url):
     try:
@@ -40,13 +41,18 @@ def write_file(subdomains, output_file, target):
         pass
     with open("results/" +target + "/" + output_file, 'a') as fp:
         fp.write(subdomains + '\n')
-        fp.close()
+    fp.close()
+
+
+    # outfile = open("results/" + target + "/merge_files.txt", "a+")
+    # infile = open("results/" + target + "/" + output_file, 'r')
 
 
 def mapping_domain(target):
     try:
         try:
-            urllib.request.urlretrieve(f"https://dnsdumpster.com/static/map/{target}" + ".png", f"results/{target}/{target}.png")
+            urllib.request.urlretrieve(f"https://dnsdumpster.com/static/map/{target}" + ".png",
+                                       f"results/{target}/{target}.png")
         except urllib.error.URLError as e:
             print("", e.reason)
         my_file = Path(f"results/{target}/{target}.png")
@@ -57,10 +63,11 @@ def mapping_domain(target):
     except PermissionError:
         print("You dont have permission to save a file, use sudo su")
 
-
+# Future implementation
 def Convert(subdomains):
     subdomains_list = list(subdomains.split(","))
     return subdomains_list
+
 
 # Future implementation
 '''

@@ -16,6 +16,7 @@ import dns.resolver  # dnspython
 from functions import G, W, R
 # Import internal
 from lib.bscan import bscan_dns_queries
+from lib.bscan import bscan_whois_look
 from lib.bscan import is_intranet
 from lib.console_terminal import getTerminalSize
 
@@ -38,6 +39,7 @@ class TugaBruteScan:
         self.STOP_SCAN = False
         threading.Thread(target=self._print_msg).start()
         self.queries_bscan = bscan_dns_queries(target)
+        self.whois_bsan = bscan_whois_look(target)
         self._load_dns_servers()  # load DNS servers from a list
         # set resolver from dns.resolver
         self.resolvers = [dns.resolver.Resolver(configure=False) for _ in range(options.threads)]
@@ -56,7 +58,7 @@ class TugaBruteScan:
             os.mkdir("results/" + self.target)
         else:
             #pass
-            outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else 'results/' + self.target + "/" + target + '_tugascan_full.txt'
+            outfile = 'results/' + self.target + "/" + target + '_tugascan.txt' if not options.full_scan else 'results/' + self.target + "/" + target + '_tugascan_full.txt'
             #outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else 'results/' + target + '_tugascan_full.txt'
         self.outfile = open(outfile, 'w')
         # save ip ,dns.
@@ -94,6 +96,8 @@ class TugaBruteScan:
             self.STOP_SCAN = True
             sys.exit(-1)
 
+    ###############################################################################################
+
     def _test_dns_servers(self, server):
         resolver = dns.resolver.Resolver(configure=False)
         resolver.lifetime = resolver.timeout = 10.0
@@ -128,11 +132,12 @@ class TugaBruteScan:
                 _file = self.options.file
             elif os.path.exists('wordlist/%s' % self.options.file):
                 _file = 'wordlist/%s' % self.options.file
+                
             else:
                 self.msg_queue.put('[ERROR] Oops! Names file not exists: %s' % self.options.file)
                 return
 
-        # Wildcard
+        # Wildcard --------------------------------------------------
 
         normal_lines = []
         wildcard_lines = []
@@ -164,7 +169,6 @@ class TugaBruteScan:
                 for line in normal_lines:
                     if _regex.search(line):
                         normal_lines.remove(line)
-
         lst_subs = []
         GROUP_SIZE = 1 if not self.options.full_scan else 1  # disable scan by groups
 
