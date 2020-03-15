@@ -130,10 +130,6 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
         sys.exit()
 
     try:
-
-        bscan_dns_queries(target)
-        bscan_whois_look(target)
-
         # <Module required> Perform enumerations and network mapping
 
         supported_engines = {'certspotter': tuga_certspotter.Certspotter,
@@ -185,6 +181,8 @@ def menu():
     enum = args.enum
     threads = args.threads
     bruteforce = args.bruteforce
+    bscan_dns_queries(target)
+    bscan_whois_look(target)
 
     main(target, output, savemap, enum, threads, bruteforce, args)
 

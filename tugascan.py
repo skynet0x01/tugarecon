@@ -15,8 +15,6 @@ import dns.resolver  # dnspython
 
 from functions import G, W, R
 # Import internal
-from lib.bscan import bscan_dns_queries
-from lib.bscan import bscan_whois_look
 from lib.bscan import is_intranet
 from lib.console_terminal import getTerminalSize
 
@@ -38,8 +36,6 @@ class TugaBruteScan:
         self.msg_queue = queue.Queue()
         self.STOP_SCAN = False
         threading.Thread(target=self._print_msg).start()
-        self.queries_bscan = bscan_dns_queries(target)
-        self.whois_bsan = bscan_whois_look(target)
         self._load_dns_servers()  # load DNS servers from a list
         # set resolver from dns.resolver
         self.resolvers = [dns.resolver.Resolver(configure=False) for _ in range(options.threads)]

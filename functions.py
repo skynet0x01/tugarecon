@@ -31,7 +31,7 @@ def parse_url(url):
         sys.exit(1)
     return host
 
-
+'''
 # write subdomains to a file
 def write_file(subdomains, output_file, target):
     # saving subdomains results to output file
@@ -39,14 +39,42 @@ def write_file(subdomains, output_file, target):
         os.mkdir("results/" + target)
     else:
         pass
-    with open("results/" +target + "/" + output_file, 'a') as fp:
+    with open("results/" + target + "/" + output_file, 'a') as fp:
         fp.write(subdomains + '\n')
     fp.close()
-
+    #DeleteDuplicate(target, subdomains)
 
     # outfile = open("results/" + target + "/merge_files.txt", "a+")
     # infile = open("results/" + target + "/" + output_file, 'r')
+'''
 
+def write_file(subdomains, output_file, target):
+    # saving subdomains results to output file
+    if not os.path.exists("results/" + target):
+        os.mkdir("results/" + target)
+    else:
+        pass
+    try:
+        with open("results/" + target + "/" + "tmp.txt", 'a') as tmp:
+            tmp.write(subdomains + '\n')
+        tmp.close()
+    except:
+        pass
+
+
+def DeleteDuplicate(output_file, target):
+
+    content = open("results/" + target + "/" + "tmp.txt", 'r').readlines()
+    content_set = set(content)
+    cleandata = open("results/" + target + "/" + output_file, 'w')
+    for line in content_set:
+        cleandata.write(line)
+    try:
+        os.remove("results/" + target + "/" + "tmp.txt")
+    except OSError:
+        pass
+
+    #DeleteDuplicate(target, subdomains)
 
 def mapping_domain(target):
     try:
@@ -63,25 +91,8 @@ def mapping_domain(target):
     except PermissionError:
         print("You dont have permission to save a file, use sudo su")
 
+
 # Future implementation
 def Convert(subdomains):
     subdomains_list = list(subdomains.split(","))
     return subdomains_list
-
-
-# Future implementation
-'''
-def merge_files(certfile, certspotterfile, host):
-    aliases = {}
-    with open(certfile) as f:
-        for line in f:
-            key, val = line.strip().split(" ")
-            aliases[key] = val
-    with open(certspotterfile) as f:
-        for line in f:
-            key, val = line.strip().split(" ")
-            aliases[key] = val
-    with open("merge"+host+".txt", "w") as f:
-        for key, val in aliases.items():
-            f.write("{} {}\n".format(key, val))
-'''
