@@ -11,6 +11,7 @@ import requests
 from functions import G, W
 from modules import tuga_useragents
 from functions import write_file
+from functions import DeleteDuplicate
 
 class CRT:
 
@@ -25,6 +26,8 @@ class CRT:
 
         self.response = self.engine_url()
         self.enumerate(self.response, output, target)
+        DeleteDuplicate(self.engine + '_' + self.output, target)
+
 
     def engine_url(self):
         url = f"https://crt.sh/?q={self.target}&output=json"

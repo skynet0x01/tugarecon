@@ -12,6 +12,7 @@ import requests
 from modules import tuga_useragents
 from functions import write_file
 from functions import G, W
+from functions import DeleteDuplicate
 
 class Hackertarget:
 
@@ -26,6 +27,8 @@ class Hackertarget:
 
         self.response = self.engine_url()
         self.enumerate(self.response, output, target)
+        DeleteDuplicate(self.engine + '_' + self.output, target)
+
 
     def engine_url(self):
         url = f"https://api.hackertarget.com/hostsearch/?q={self.target}"
@@ -33,8 +36,9 @@ class Hackertarget:
         return response
 
     def enumerate(self, response, output, target):
-        subdomains = set()
+        subdomains = []
         subdomainscount = 0
+        sub = []
         start_time = time.time()
 
         try:
@@ -53,6 +57,7 @@ class Hackertarget:
 
             if self.output:
                 print(f"\nSaving result... {self.engine + '_' + self.output}")
+
 
         except IndexError:
             pass

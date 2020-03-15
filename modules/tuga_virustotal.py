@@ -10,6 +10,7 @@ import requests
 
 from functions import G, W
 from functions import write_file
+from functions import DeleteDuplicate
 from modules import tuga_useragents
 
 
@@ -26,6 +27,7 @@ class Virustotal:
 
         self.response = self.engine_url()
         self.enumerate(self.response, output, target)
+        DeleteDuplicate(self.engine + '_' + self.output, target)
 
     def engine_url(self):
         url = f'https://www.virustotal.com/ui/domains/{self.target}/subdomains?limit=40'

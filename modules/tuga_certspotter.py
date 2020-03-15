@@ -9,6 +9,7 @@ import requests
 
 from modules import tuga_useragents #random user-agent
 from functions import write_file
+from functions import DeleteDuplicate
 from functions import G, W
 
 class Certspotter:
@@ -24,6 +25,7 @@ class Certspotter:
 
         self.response = self.engine_url()
         self.enumerate(self.response, output, target)
+        DeleteDuplicate(self.engine + '_' + self.output, target)
 
     def engine_url(self):
         url = f'https://api.certspotter.com/v1/issuances?domain={self.target}&include_subdomains=true&expand=dns_names'
@@ -31,7 +33,7 @@ class Certspotter:
         return response
 
     def enumerate(self, response, output, target):
-        subdomains = set()
+        subdomains = []
         subdomainscount = 0
         start_time = time.time()
 

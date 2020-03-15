@@ -10,6 +10,7 @@ import re
 from functions import G, W
 from modules import tuga_useragents
 from functions import write_file
+from functions import DeleteDuplicate
 
 class Entrust:
 
@@ -29,6 +30,7 @@ class Entrust:
         self.domains = self.enumerate(self.response)
         #print("[+]: Parsed %s domain(s) from list." % len(self.domains))
         self.printDomains(self.domains, self.target, self.output)
+        DeleteDuplicate(self.engine + '_' + self.output, target)
 
     def engine_url(self):
         url = f'https://ctsearch.entrust.com/api/v1/certificates?fields=subjectDN&domain={self.target}&includeExpired=true&exactMatch=false&limit=5000'

@@ -10,6 +10,7 @@ import requests
 
 from modules import tuga_useragents
 from functions import write_file
+from functions import DeleteDuplicate
 from functions import G, W
 
 class Threatcrowd:
@@ -25,6 +26,7 @@ class Threatcrowd:
 
         self.response = self.engine_url()
         self.enumerate(self.response, output, target)
+        DeleteDuplicate(self.engine + '_' + self.output, target)
 
     def engine_url(self):
         url = f'https://threatcrowd.org/searchApi/v2/domain/report/?domain={self.target}'
