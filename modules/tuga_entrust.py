@@ -30,11 +30,16 @@ class Entrust:
         self.domains = self.enumerate(self.response)
         #print("[+]: Parsed %s domain(s) from list." % len(self.domains))
         self.printDomains(self.domains, self.target, self.output)
-        DeleteDuplicate(self.engine + '_' + self.output, target)
+        if self.output is not None:
+            DeleteDuplicate(self.engine + '_' + self.output, target)
+
 
     def engine_url(self):
-        url = f'https://ctsearch.entrust.com/api/v1/certificates?fields=subjectDN&domain={self.target}&includeExpired=true&exactMatch=false&limit=5000'
-        response = requests.get(url, headers=tuga_useragents.useragent(), verify = False)
+        try:
+            url = f'https://ctsearch.entrust.com/api/v1/certificates?fields=subjectDN&domain={self.target}&includeExpired=true&exactMatch=false&limit=5000'
+            response = requests.get(url, headers=tuga_useragents.useragent(), verify = False)
+        except requests.exceptions.Timeout:
+            pass
         return response
 
     def enumerate(self, response):

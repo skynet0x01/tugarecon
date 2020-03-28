@@ -26,11 +26,16 @@ class Threatcrowd:
 
         self.response = self.engine_url()
         self.enumerate(self.response, output, target)
-        DeleteDuplicate(self.engine + '_' + self.output, target)
+        if self.output is not None:
+            DeleteDuplicate(self.engine + '_' + self.output, target)
+
 
     def engine_url(self):
-        url = f'https://threatcrowd.org/searchApi/v2/domain/report/?domain={self.target}'
-        response = requests.get(url, headers=tuga_useragents.useragent())
+        try:
+            url = f'https://threatcrowd.org/searchApi/v2/domain/report/?domain={self.target}'
+            response = requests.get(url, headers=tuga_useragents.useragent())
+        except requests.exceptions.Timeout:
+            pass
         return response
 
     def enumerate(self, response, output, target):
