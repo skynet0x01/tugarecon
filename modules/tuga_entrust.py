@@ -30,9 +30,10 @@ class Entrust:
         self.domains = self.enumerate(self.response)
         #print("[+]: Parsed %s domain(s) from list." % len(self.domains))
         self.printDomains(self.domains, self.target, self.output)
-        if self.output is not None:
+        if self.output is not None and self.count != 0:
             DeleteDuplicate(self.engine + '_' + self.output, target)
-
+        else:
+            pass
 
     def engine_url(self):
         try:
