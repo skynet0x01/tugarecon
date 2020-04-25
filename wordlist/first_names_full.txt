@@ -17530,6 +17530,7 @@ chat1
 chat2
 chat4
 chatbox
+chatbot
 chatter
 chatting
 chb
@@ -27570,6 +27571,8 @@ icm
 icms
 icn
 ico
+icode
+icodes
 icom
 icon
 icp
@@ -43417,6 +43420,8 @@ rul
 rum
 rumba
 rumcollector
+rumipv4
+rumipv6
 run
 rune
 runner
@@ -44832,6 +44837,7 @@ signal
 signin
 signup
 sigrh
+sigkn
 sih
 sij
 sik
@@ -45031,6 +45037,7 @@ slice
 slide
 slides
 slim
+sling
 slingstone
 slipknot
 slj
@@ -56891,6 +56898,7 @@ wintermute
 winupdate
 winwin
 winxp
+win-t
 wio
 wip
 wiq
