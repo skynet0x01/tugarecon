@@ -84,6 +84,7 @@ Doge:  DRU62QbterkCpMHEG7ZMSZXEJQzyR13CRB
 - [x] Save results: results/domain_target/ files
 - [x] Releasing a new version 0.45b
 - [x] Fast enumerate BruteForce scan upgrade
+- [x] Wordlist
 - [x] Mapping the domain and save image
 - [x] add new module
 - [x] add new folder results/domain_target/  ex: results/tesla.com/ 
