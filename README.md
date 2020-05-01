@@ -28,10 +28,6 @@ And much more... :)
 
 ![Screenshot from 2020-01-26 20-59-16](https://user-images.githubusercontent.com/39160972/73141832-4d97b180-4080-11ea-9adc-a83667ea9687.png)
 
-# Video
-
-https://vimeo.com/396145464
-
 # Installation
 
 git clone https://github.com/LordNeoStark/tugarecon.git
@@ -88,8 +84,7 @@ Doge:  DRU62QbterkCpMHEG7ZMSZXEJQzyR13CRB
 - [x] Mapping the domain and save image
 - [x] add new module
 - [x] add new folder results/domain_target/  ex: results/tesla.com/ 
-- [ ] Add more modules
 - [x] Random User-Agent
-
+- [ ] Add more modules
 
    ![tugarecon](https://user-images.githubusercontent.com/39160972/75924110-45d8e300-5e5e-11ea-8832-55c08ecc2902.jpg)
