@@ -4,7 +4,6 @@
 # Coded By LordNeoStark | https://twitter.com/LordNeoStark | https://github.com/LordNeoStark
 # import modules
 
-
 import time
 import requests
 
@@ -26,10 +25,10 @@ class CRT:
 
         self.response = self.engine_url()
         self.enumerate(self.response, output, target)
-        if self.output is not None:
+        if self.output is not None and self.subdomainscount != 0:
             DeleteDuplicate(self.engine + '_' + self.output, target)
-
-
+        else:
+            pass
 
     def engine_url(self):
         try:
@@ -41,13 +40,19 @@ class CRT:
 
     def enumerate(self, response, output, target):
         subdomains = set()
-        subdomainscount = 0
+        self.subdomainscount = 0
         start_time = time.time()
 
         try:
-            while subdomainscount < 10000:
-                subdomains = response.json()[subdomainscount]["name_value"]
-                subdomainscount = subdomainscount + 1
+            while self.subdomainscount < 10000:
+                subdomains = response.json()[self.subdomainscount]["name_value"]
+
+                if not subdomains:
+                    print(f"[x] Oops! No data found for {self.target} using  SSL Certificates.")
+                else:
+                    pass
+
+                self.subdomainscount = self.subdomainscount + 1
                 if "@" in subdomains:  # filter for emails
                     pass
                 else:
@@ -62,10 +67,10 @@ class CRT:
         except IndexError:
             pass
 
-        if not subdomains:
-            print(f"[x] Oops! No data found for {self.target} using  SSL Certificates.")
-        else:
+        #if not subdomains:
+            #print(f"[x] Oops! No data found for {self.target} using  SSL Certificates.")
+        #else:
             print(
-                G + f"\n[**] TugaRecon is complete.  SSL Certificates: {subdomainscount} subdomains have been found in %s seconds" % (
+                G + f"\n[**] TugaRecon is complete.  SSL Certificates: {self.subdomainscount} subdomains have been found in %s seconds" % (
                         time.time() - start_time) + W)
 
