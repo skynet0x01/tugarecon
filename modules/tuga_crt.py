@@ -34,9 +34,10 @@ class CRT:
         try:
             url = f"https://crt.sh/?q={self.target}&output=json"
             response = requests.get(url, headers=tuga_useragents.useragent())
+            return response
         except requests.exceptions.Timeout:
             pass
-        return response
+
 
     def enumerate(self, response, output, target):
         subdomains = set()
@@ -50,20 +51,16 @@ class CRT:
                 if not subdomains:
                     print(f"[x] Oops! No data found for {self.target} using  SSL Certificates.")
                 else:
-                    pass
+                    self.subdomainscount = self.subdomainscount + 1
+                    if "@" in subdomains:  # filter for emails
+                        pass
+                    else:
+                        print(f"[*] {subdomains}")
 
-                self.subdomainscount = self.subdomainscount + 1
-                if "@" in subdomains:  # filter for emails
-                    pass
-                else:
-                    print(f"[*] {subdomains}")
-
-                    if self.output is not None:
-                        write_file(subdomains, self.engine + '_' + self.output, target)
-
+                        if self.output is not None:
+                            write_file(subdomains, self.engine + '_' + self.output, target)
             if self.output:
                 print(f"\nSaving result... {self.engine + '_'+ self.output}")
-
         except IndexError:
             pass
 
