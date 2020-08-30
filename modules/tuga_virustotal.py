@@ -47,6 +47,12 @@ class Virustotal:
         try:
             while subdomainscount < 40:
                 subdomains = response.json()["data"][subdomainscount]["id"]
+
+                if not subdomains:
+                    print(f"[x] Oops! No data found for {self.target} using  SSL Certificates.")
+                else:
+                    pass
+
                 subdomainscount = subdomainscount + 1
                 print(f"[*] {subdomains}")
 

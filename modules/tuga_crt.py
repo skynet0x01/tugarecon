@@ -70,4 +70,3 @@ class CRT:
             print(
                 G + f"\n[**] TugaRecon is complete.  SSL Certificates: {self.subdomainscount} subdomains have been found in %s seconds" % (
                         time.time() - start_time) + W)
-

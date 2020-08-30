@@ -27,8 +27,9 @@ class Hackertarget:
 
         self.response = self.engine_url()
         self.enumerate(self.response, output, target)
-        if self.output is not None:
-            DeleteDuplicate(self.engine + '_' + self.output, target)
+
+        #if self.output is not None:
+            #DeleteDuplicate(self.engine + '_' + self.output, target)
 
 
 
