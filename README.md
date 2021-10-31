@@ -47,12 +47,7 @@ git clone https://github.com/skynet0x01/tugarecon.git
 
     bruteforce (tugascan - wildcards, wordlist)
     certspotter
-    hackertarget
-    virustotal
-    threatcrowd
     ssl
-    entrust
-    googlesearch
 
 # Dependencies
 You need to install [dnspython](http://www.dnspython.org) to do DNS query
@@ -72,9 +67,13 @@ You need to install [dnspython](http://www.dnspython.org) to do DNS query
 
 Donations are welcome. This will help improved features, frequent updates and better overall support.
 
-BTC:   1C1q8c2bpSvRBpupD43p1CAV98YXkNnnDx
+BTC:   bc1q7hphnwg6ew88qej9306lqfvdyda83nstaznqwh
 
-Doge:  DRU62QbterkCpMHEG7ZMSZXEJQzyR13CRB
+ETH:  0x05215501b521D68e6904901d0a4DeF8B0c0f7F5d
+
+ADA:  addr1qy23mlr7a6qh3r2v7ltrxyzpfy43cekhcl4ejg6gtnsl08g4rh78am5p0zx5ea7kxvgyzjftr3nd03ltny35sh8p77ws7v8vk2
+
+Doge: D975LFaNwWAuv3X7Pf7vJ4zdnchFqPgVWm
 
 # News
 - [x] Save results: results/domain_target/ files
