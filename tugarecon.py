@@ -19,6 +19,7 @@ from tuga_dns import bscan_whois_look
 from modules import tuga_certspotter
 from modules import tuga_crt
 from modules import tuga_hackertarget
+from modules import tuga_threatcrowd
 ################################################################################
 # Banner, Tuga or portuguese, is the same ;)
 def banner():
@@ -36,7 +37,7 @@ def banner():
 ################################################################################
 # parse the arguments
 def parse_args():
-    Examples = f'''\nmodules: certspotter, hackertarget, ssl\n
+    Examples = f'''\nmodules: certspotter, hackertarget, ssl, threatcrowd\n
         Examples:
         python3 {sys.argv[0]} -d google.com
         python3 {sys.argv[0]} -d google.com --enum ssl
@@ -78,6 +79,8 @@ def queries(target):
     time.sleep(0.1)
     print(R + "Searching in HackerTarget in " + target + " \n" + W)
     time.sleep(1)
+    print(R + "Searching in ThreatCrowd in " + target + " \n" + W)
+    time.sleep(1)
 ################################################################################
 def main(target, output, savemap, enum, threads, bruteforce, args):
     # bruteforce fast scan
@@ -93,14 +96,15 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
         # <Module required> Perform enumerations and network mapping
         supported_engines = {'certspotter': tuga_certspotter.Certspotter,
                              'ssl': tuga_crt.CRT,
-                             'hackertarget': tuga_hackertarget.Hackertarget
+                             'hackertarget': tuga_hackertarget.Hackertarget,
+                             'threatcrowd': tuga_threatcrowd.Threatcrowd
                             }
         chosenEnums = []
 
         # Default modules
         if enum is None:
             queries(target)
-            chosenEnums = [tuga_certspotter.Certspotter, tuga_crt.CRT, tuga_hackertarget.Hackertarget]
+            chosenEnums = [tuga_certspotter.Certspotter, tuga_crt.CRT, tuga_hackertarget.Hackertarget, tuga_threatcrowd.Threatcrowd]
             # Start super fast enumeration
             enums = [indicate(target, output) for indicate in chosenEnums]
         else:
