@@ -14,6 +14,8 @@ TugaRecon, tribute to Portuguese explorers reminding glorious past of this count
 
 During the 15th and 16th centuries, Portuguese explorers were at the forefront of European overseas exploration, which led them to reach India, establish multiple trading posts in Asia and Africa, and settle what would become Brazil, creating one of the most powerful empires.
 
+LordNeoStark = skynet0x01 (Same person)
+
 # Version
 1.0
 
