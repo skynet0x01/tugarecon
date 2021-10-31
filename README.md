@@ -45,9 +45,10 @@ git clone https://github.com/skynet0x01/tugarecon.git
 
 # Modules
 
-    bruteforce (tugascan - wildcards, wordlist)
+    bruteforce (tuga_bruteforce - wildcards, wordlist)
     certspotter
     ssl
+    hackertarget
 
 # Dependencies
 You need to install [dnspython](http://www.dnspython.org) to do DNS query
@@ -79,7 +80,7 @@ XLM: GCNLVA3BR7EXJU5TLJUAF7LMWHKVEJ2EZ2BH4QTLTWZREBHLSXWANGJJ
 
 # News
 - [x] Save results: results/domain_target/ files
-- [x] Releasing a new version 0.45b
+- [x] Releasing a new version 1.0
 - [x] Fast enumerate BruteForce scan upgrade
 - [x] Wordlist
 - [x] Mapping the domain and save image
