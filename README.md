@@ -75,6 +75,8 @@ ADA:  addr1qy23mlr7a6qh3r2v7ltrxyzpfy43cekhcl4ejg6gtnsl08g4rh78am5p0zx5ea7kxvgyz
 
 Doge: D975LFaNwWAuv3X7Pf7vJ4zdnchFqPgVWm
 
+XLM: GCNLVA3BR7EXJU5TLJUAF7LMWHKVEJ2EZ2BH4QTLTWZREBHLSXWANGJJ
+
 # News
 - [x] Save results: results/domain_target/ files
 - [x] Releasing a new version 0.45b
