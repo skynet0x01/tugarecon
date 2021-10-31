@@ -46,6 +46,9 @@ def parse_args():
         python3 {sys.argv[0]} -d google.com --savemap
         python3 {sys.argv[0]} -d google.com --bruteforce
         python3 {sys.argv[0]} -d google.com -b --full
+
+        Donations are welcome. This will help improved features, frequent updates and better overall support.
+        (https://github.com/skynet0x01/tugarecon)
         '''
     parser = argparse.ArgumentParser(epilog=Examples, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser._optionals.title = "OPTIONS"
@@ -100,7 +103,6 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
                              'threatcrowd': tuga_threatcrowd.Threatcrowd
                             }
         chosenEnums = []
-
         # Default modules
         if enum is None:
             queries(target)
