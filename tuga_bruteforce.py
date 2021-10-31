@@ -55,7 +55,7 @@ class TugaBruteForce:
             os.mkdir("results/" + self.target)
         else:
             #pass
-            outfile = 'results/' + self.target + "/" + target + '_tugascan.txt' if not options.full_scan else 'results/' + self.target + "/" + target + '_tugascan_full.txt'
+            outfile = 'results/' + self.target + "/" + target + '_tuga_bruteforce.txt' if not options.full_scan else 'results/' + self.target + "/" + target + '_tuga_bruteforce_full.txt'
             #outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else 'results/' + target + '_tugascan_full.txt'
         self.outfile = open(outfile, 'w')
 
