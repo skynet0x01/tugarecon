@@ -49,6 +49,7 @@ git clone https://github.com/skynet0x01/tugarecon.git
     certspotter
     ssl
     hackertarget
+    threatcrowd
 
 # Dependencies
 You need to install [dnspython](http://www.dnspython.org) to do DNS query
