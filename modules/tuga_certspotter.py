@@ -6,6 +6,7 @@
 # import modules
 import time
 import requests
+import json
 # Import internal modules
 from modules import tuga_useragents #random user-agent
 # Import internal functions
@@ -21,10 +22,10 @@ class Certspotter:
         self.output = output
         self.module_name = "CertSpotter"
         self.engine = "certspotter"
+        self.response = self.engine_url()
 
         print(G + f"CertSpotter: Enumerating subdomains now for {target} \n" + W)
 
-        self.response = self.engine_url()
         self.enumerate(self.response, output, target)
         if self.output is not None:
             DeleteDuplicate(self.engine + '_' + self.output, target)
@@ -33,9 +34,21 @@ class Certspotter:
         try:
             url = f'https://api.certspotter.com/v1/issuances?domain={self.target}&include_subdomains=true&expand=dns_names'
             response = requests.get(url, headers=tuga_useragents.useragent())
-        except requests.exceptions.Timeout:
-            pass
+        except (requests.ConnectionError, requests.Timeout) as exception:
+            #pass
+            print(G + f"CertSpotter: Warning! Unable to get subdomains... Try again!\n" + W)
+            response = 0
         return response
+################################################################################
+################################################################################
+# parse host from scheme, to use for certificate transparency abuse
+    def parse_url(url):
+        try:
+            host = urllib3.util.url.parse_url(url).host
+        except Exception as e:
+            print('[*] Invalid domain, try again...')
+            sys.exit(1)
+        return host
 ################################################################################
     def enumerate(self, response, output, target):
         subdomains = []
@@ -46,7 +59,6 @@ class Certspotter:
                 subdomains = response.json()[subdomainscount]["dns_names"][0]
                 subdomainscount = subdomainscount + 1
                 print(f"[*] {subdomains}")
-
                 if self.output is not None:
                     write_file(subdomains, self.engine + '_' + self.output, target)
             if self.output:
