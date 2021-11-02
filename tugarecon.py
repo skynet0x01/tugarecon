@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
 # Coded By skynet0x01
@@ -9,6 +8,7 @@ import argparse  # parse arguments
 import sys
 import time
 import urllib3
+import requests
 # Import internal functions
 from functions import R, W, Y, G
 from functions import mapping_domain
@@ -67,23 +67,33 @@ def parse_args():
 def parse_url(url):
     try:
         host = urllib3.util.url.parse_url(url).host
-        # print(host)
     except Exception as e:
-        print('[*] Invalid domain, try again..')
+        print('[*] Invalid domain, try again...')
         sys.exit(1)
     return host
 ################################################################################
 def queries(target):
     print(G + "Enumerating subdomains for " + target + " \n" + W)
     time.sleep(0.1)
-    print(R + "Searching in SSL Certificates in " + target + " " + W)
-    time.sleep(0.1)
     print(R + "Searching in CertsPotter in " + target + " " + W)
     time.sleep(0.1)
-    print(R + "Searching in HackerTarget in " + target + " \n" + W)
-    time.sleep(1)
+    print(R + "Searching in SSL Certificates in " + target + " " + W)
+    time.sleep(0.1)
+    print(R + "Searching in HackerTarget in " + target + " " + W)
+    time.sleep(0.1)
     print(R + "Searching in ThreatCrowd in " + target + " \n" + W)
     time.sleep(1)
+################################################################################
+def internet_on():
+    url = "https://www.google.com"
+    test_timeout = 1
+    try:
+        request = requests.get(url, timeout=test_timeout)
+        print("Connection established... Wait!\n")
+        time.sleep(1)
+    except (requests.ConnectionError, requests.Timeout) as exception:
+        print("No internet connection. Check the network...\n")
+        exit(1)
 ################################################################################
 def main(target, output, savemap, enum, threads, bruteforce, args):
     # bruteforce fast scan
@@ -94,7 +104,6 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
         d.outfile.flush()
         d.outfile.close()
         sys.exit()
-
     try:
         # <Module required> Perform enumerations and network mapping
         supported_engines = {'certspotter': tuga_certspotter.Certspotter,
@@ -103,7 +112,7 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
                              'threatcrowd': tuga_threatcrowd.Threatcrowd
                             }
         chosenEnums = []
-        # Default modules
+        # Default modules (run all modules)
         if enum is None:
             queries(target)
             chosenEnums = [tuga_certspotter.Certspotter, tuga_crt.CRT, tuga_hackertarget.Hackertarget, tuga_threatcrowd.Threatcrowd]
@@ -131,6 +140,7 @@ def menu():
     threads = args.threads
     output = args.output
     savemap = args.savemap
+    internet_on()
     bscan_dns_queries(target)
     bscan_whois_look(target)
     main(target, output, savemap, enum, threads, bruteforce, args)
