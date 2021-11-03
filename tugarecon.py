@@ -75,13 +75,13 @@ def parse_url(url):
 def queries(target):
     print(G + "Enumerating subdomains for " + target + " \n" + W)
     time.sleep(0.1)
-    print(R + "Searching in CertsPotter in " + target + " " + W)
+    print(R + "Searching " + target + " in CertsPotter " + W)
     time.sleep(0.1)
-    print(R + "Searching in SSL Certificates in " + target + " " + W)
+    print(R + "Searching " + target + " in SSL Certificates " + W)
     time.sleep(0.1)
-    print(R + "Searching in HackerTarget in " + target + " " + W)
+    print(R + "Searching "  + target + " in HackerTarget " + W)
     time.sleep(0.1)
-    print(R + "Searching in ThreatCrowd in " + target + " \n" + W)
+    print(R + "Searching "  + target + " in ThreatCrowd\n" + W)
     time.sleep(1)
 ################################################################################
 def internet_on():
