@@ -23,9 +23,11 @@ class CRT:
         self.engine = "crt"
         self.response = self.engine_url() # URL
 
-        print(G + f"SSL Certificates: Enumerating subdomains now for {target} \n" + W)
-        self.enumerate(self.response, output, target) # Call the function enumerate
-
+        if self.response != 1:
+            print(G + f"\nSSL Certificates: Enumerating subdomains now for {target} \n" + W)
+            self.enumerate(self.response, output, target) # Call the function enumerate
+        else:
+            pass
         if self.output is not None and self.subdomainscount != 0:
             DeleteDuplicate(self.engine + '_' + self.output, target)
         else:
@@ -37,8 +39,9 @@ class CRT:
             response = requests.get(url, headers=tuga_useragents.useragent())
             return response
         except requests.ConnectionError:
-            print(G + f"SSL: Warning! Unable to get subdomains... Try again!\n" + W)
-            exit(1)
+            print(G + f"[SSL] Warning! Unable to get subdomains... Try again!\n" + W)
+            response = 1
+            return response
 ################################################################################
     def enumerate(self, response, output, target):
         subdomains = set()
@@ -62,5 +65,5 @@ class CRT:
         except IndexError:
             pass
             print(
-                G + f"\n[**] TugaRecon is complete.  SSL Certificates: {self.subdomainscount} subdomains have been found in %s seconds" % (
+                G + f"\n[**]SSL Certificates: {self.subdomainscount} subdomains have been found in %s seconds" % (
                         time.time() - start_time) + W)

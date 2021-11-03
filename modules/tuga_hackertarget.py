@@ -21,19 +21,25 @@ class Hackertarget:
         self.output = output
         self.module_name = "HackerTarget"
         self.engine = "hackertarget"
-
-        print(G + f"HackerTarget: Enumerating subdomains now for {target} \n" + W)
-
         self.response = self.engine_url()
-        self.enumerate(self.response, output, target)
 
+        if self.response != 1:
+            print(G + f"\nHackerTarget: Enumerating subdomains now for {target} \n" + W)
+            self.enumerate(self.response, output, target) # Call the function enumerate
+        else:
+            pass
         #if self.output is not None:
             #DeleteDuplicate(self.engine + '_' + self.output, target)
 ################################################################################
     def engine_url(self):
-        url = f"https://api.hackertarget.com/hostsearch/?q={self.target}"
-        response = requests.get(url, headers=tuga_useragents.useragent())
-        return response
+        try:
+            url = f"https://api.hackertarget.com/hostsearch/?q={self.target}"
+            response = requests.get(url, headers=tuga_useragents.useragent())
+            return response
+        except requests.ConnectionError:
+            print(G + f"[HackerTarget] Warning! Unable to get subdomains... Try again!\n" + W)
+            response = 1
+            return response
 ################################################################################
     def enumerate(self, response, output, target):
         subdomains = []
@@ -56,14 +62,11 @@ class Hackertarget:
 
             if self.output:
                 print(f"\nSaving result... {self.engine + '_' + self.output}")
-
-
         except IndexError:
             pass
-
         if not subdomains:
             print(f"[x] No data found for {self.target} using  HackerTarget.")
         else:
             print(
-                G + f"\n[**] TugaRecon is complete.  HackerTarget: {int((subdomainscount / 2) - 1)} subdomains have been found in %s seconds" % (
+                G + f"\n[**]HackerTarget: {int((subdomainscount / 2) - 1)} subdomains have been found in %s seconds" % (
                         time.time() - start_time) + W)

@@ -24,9 +24,11 @@ class Certspotter:
         self.engine = "certspotter"
         self.response = self.engine_url()
 
-        print(G + f"CertSpotter: Enumerating subdomains now for {target} \n" + W)
-
-        self.enumerate(self.response, output, target)
+        if self.response != 1:
+            print(G + f"\nCertSpotter: Enumerating subdomains now for {target} \n" + W)
+            self.enumerate(self.response, output, target) # Call the function enumerate
+        else:
+            pass
         if self.output is not None:
             DeleteDuplicate(self.engine + '_' + self.output, target)
 ################################################################################
@@ -35,11 +37,9 @@ class Certspotter:
             url = f'https://api.certspotter.com/v1/issuances?domain={self.target}&include_subdomains=true&expand=dns_names'
             response = requests.get(url, headers=tuga_useragents.useragent())
         except (requests.ConnectionError, requests.Timeout) as exception:
-            #pass
-            print(G + f"CertSpotter: Warning! Unable to get subdomains... Try again!\n" + W)
-            response = 0
+            print(G + f"[CertSpotter] Warning! Unable to get subdomains... Try again!\n" + W)
+            response = 1
         return response
-################################################################################
 ################################################################################
 # parse host from scheme, to use for certificate transparency abuse
     def parse_url(url):
@@ -68,5 +68,5 @@ class Certspotter:
         if not subdomains:
             print(f"[x] No data found for {self.target} using CertSpotter.")
         else:
-            print(G + f"\n[**] TugaRecon is complete. CertSpotter: {subdomainscount} subdomains have been found in %s seconds" % (
+            print(G + f"\n[**]CertSpotter: {subdomainscount} subdomains have been found in %s seconds" % (
                     time.time() - start_time) + W)

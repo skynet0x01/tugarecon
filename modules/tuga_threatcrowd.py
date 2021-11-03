@@ -6,6 +6,7 @@
 ################################################################################
 import time
 import requests
+import json
 # Import internal modules
 from modules import tuga_useragents #random user-agent
 # Import internal functions
@@ -21,11 +22,13 @@ class Threatcrowd:
         self.output = output
         self.module_name = "Threat Crowd"
         self.engine = "threatcrowd"
-
-        print(G + f"Threat Crowd: Enumerating subdomains now for {target} \n" + W)
-
         self.response = self.engine_url()
-        self.enumerate(self.response, output, target)
+
+        if self.response != 1:
+            print(G + f"\nThreatCrowd: Enumerating subdomains now for {target} \n" + W)
+            self.enumerate(self.response, output, target) # Call the function enumerate
+        else:
+            pass
         if self.output is not None:
             DeleteDuplicate(self.engine + '_' + self.output, target)
 ################################################################################
@@ -33,32 +36,33 @@ class Threatcrowd:
         try:
             url = f'https://threatcrowd.org/searchApi/v2/domain/report/?domain={self.target}'
             response = requests.get(url, headers=tuga_useragents.useragent())
-        except requests.exceptions.Timeout:
-            pass
-        return response
+            return response
+        except requests.ConnectionError:
+            print(G + f"[Threat Crowd] Warning! Unable to get subdomains... Try again!\n" + W)
+            response = 1
+            return response
 ################################################################################
     def enumerate(self, response, output, target):
         subdomains = set()
         subdomainscount = 0
         start_time = time.time()
-
         try:
+            #Test json
+            subdomains = response.json()["subdomains"][subdomainscount]
+        except KeyError:
+            print(G + f"[x] Decoding JSON has failed.... No data found for {self.target} using Threat Crowd." + W)
+            exit(1)
             while subdomainscount < 500:
                 subdomains = response.json()["subdomains"][subdomainscount]
                 subdomainscount = subdomainscount + 1
                 print(f"[*] {subdomains}")
-
                 if self.output is not None:
                     write_file(subdomains, self.engine + '_' + self.output, target)
-
             if self.output:
                 print(f"\nSaving result... {self.engine + '_' + self.output}")
-
         except IndexError:
             pass
-
-        print(G + f"\n[**] TugaRecon is complete. Threat Crowd: {subdomainscount} subdomains have been found in %s seconds" % (
+        print(G + f"\n[**]Threat Crowd: {subdomainscount} subdomains have been found in %s seconds" % (
                     time.time() - start_time) + W)
-
         if not subdomains:
             print(f"[x] No data found for {self.target} using Threat Crowd.")
