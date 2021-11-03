@@ -52,6 +52,7 @@ class Threatcrowd:
         except KeyError:
             print(G + f"[x] Decoding JSON has failed.... No data found for {self.target} using Threat Crowd." + W)
             exit(1)
+        try:
             while subdomainscount < 500:
                 subdomains = response.json()["subdomains"][subdomainscount]
                 subdomainscount = subdomainscount + 1
