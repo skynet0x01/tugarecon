@@ -17,7 +17,7 @@ During the 15th and 16th centuries, Portuguese explorers were at the forefront o
 LordNeoStark = skynet0x01 (Same person)
 
 # Version
-1.0
+1.1
 
 More modules will be added!
 And much more... :)
