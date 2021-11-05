@@ -23,36 +23,31 @@ from modules import tuga_threatcrowd
 ################################################################################
 # Banner, Tuga or portuguese, is the same ;)
 def banner():
-    print(R + "        \n"
-              "             ______                  ____                      \n"
-              "            /_  __/_  ______ _____ _/ __ \___  _________  ____ \n"
-              "             / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \                \n"
-              "            / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               \n"
-              "           /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  V: 1.0               \n"
-              "                     /____/                                    \n"
-              "\n"
-              "                        # Coded By skynet0x01 #\n"
-              "    " + W)
+    print(R + "              ______                  ____                      \n"
+              "             /_  __/_  ______ _____ _/ __ \___  _________  ____ \n"
+              "              / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \                \n"
+              "             / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               \n"
+              "            /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  Version 1.1               \n"
+              "                      /____/                               # Coded By skynet0x01 #\n" + W)
     print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country\n" + W)
 ################################################################################
 # parse the arguments
 def parse_args():
-    Examples = f'''\nmodules: certspotter, hackertarget, ssl, threatcrowd\n
-        Examples:
-        python3 {sys.argv[0]} -d google.com
-        python3 {sys.argv[0]} -d google.com --enum ssl
+    Examples = Y + '''modules: certspotter, hackertarget, ssl, threatcrowd\n''' + ''' [**]Examples: ''' + W + f'''
+        python3 {sys.argv[0]} -d google.com                                 (Default: All modules)
+        python3 {sys.argv[0]} -d google.com --enum ssl                      (One or more modules)
         python3 {sys.argv[0]} -d google.com --enum certspotter --savemap
-        python3 {sys.argv[0]} -d google.com -o google.txt
-        python3 {sys.argv[0]} -d google.com --savemap
-        python3 {sys.argv[0]} -d google.com --bruteforce
-        python3 {sys.argv[0]} -d google.com -b --full
+        python3 {sys.argv[0]} -d google.com -o google.txt                   (Save the results to txt file)
+        python3 {sys.argv[0]} -d google.com --savemap                       (Save subdomains image map)
+        python3 {sys.argv[0]} -d google.com --bruteforce                    (Use first_names.txt, and next_names.txt)
+        python3 {sys.argv[0]} -d google.com -b --full                       (Use first_names_full.txt, and next_names_full.txt)
 
         Donations are welcome. This will help improved features, frequent updates and better overall support.
         (https://github.com/skynet0x01/tugarecon)
         '''
     parser = argparse.ArgumentParser(epilog=Examples, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser._optionals.title = "OPTIONS"
-    parser.add_argument('-d', '--domain', type=str, metavar='', help="[required] Domain name to enumerate it's subdomains", required=True)
+    parser.add_argument('-d', '--domain', help="[required] Domain name to enumerate it's subdomains", required=True)
     parser.add_argument('-o', '--output', metavar='', help='Save the results to txt file')
     parser.add_argument('-i', '--ignore', dest='i', default=False, action='store_true', help='Ignore domains pointed to private IPs')
     parser.add_argument('-f', '--file', metavar='', dest='file', default='first_names.txt', help='A file contains new line delimited subdomains, default is first_names.txt.')
@@ -82,7 +77,7 @@ def queries(target):
     print(R + "Searching "  + target + " in HackerTarget " + W)
     time.sleep(0.1)
     print(R + "Searching "  + target + " in ThreatCrowd\n" + W)
-    time.sleep(1)
+    time.sleep(0.3)
 ################################################################################
 def internet_on():
     url = "https://www.google.com"
@@ -90,7 +85,7 @@ def internet_on():
     try:
         request = requests.get(url, timeout=test_timeout)
         print("Connection established... Wait!\n")
-        time.sleep(1)
+        time.sleep(0.5)
     except (requests.ConnectionError, requests.Timeout) as exception:
         print("No internet connection. Check the network...\n")
         exit(1)

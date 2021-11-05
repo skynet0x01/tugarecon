@@ -11,8 +11,7 @@ import sys  # System-specific parameters and functions
 import threading  # Thread-based parallelism
 import time  # Time access and conversions
 import dns.resolver  # dnspython
-
-# Import internal
+# Import internal functions
 from functions import G, W, R
 from tuga_dns import is_intranet
 from tuga_terminal import getTerminalSize
@@ -54,9 +53,7 @@ class TugaBruteForce:
         if not os.path.exists("results/" + self.target):
             os.mkdir("results/" + self.target)
         else:
-            #pass
             outfile = 'results/' + self.target + "/" + target + '_tuga_bruteforce.txt' if not options.full_scan else 'results/' + self.target + "/" + target + '_tuga_bruteforce_full.txt'
-            #outfile = 'results/' + target + '_tugascan.txt' if not options.full_scan else 'results/' + target + '_tugascan_full.txt'
         self.outfile = open(outfile, 'w')
 
         # save ip, dns.
@@ -102,7 +99,7 @@ class TugaBruteForce:
             if answers[0].address != '188.122.89.156':
                 raise Exception('incorrect DNS response')
             try:
-                resolver.query('test.bad.dns.lordneostark.pt')  # Non-existed domain test
+                resolver.query('test.bad.dns.skynet0x01.pt')  # Non-existed domain test
                 with open('wordlist/bad_dns_servers.txt', 'a') as f:
                     f.write(server + '\n')
                 self.msg_queue.put('[+] Bad DNS Server found %s' % server)
@@ -118,7 +115,6 @@ class TugaBruteForce:
         self.msg_queue.put('[+] Prepare the wildcard...\n' + W)
 
         # Verify the first wordlist
-
         if self.options.full_scan and self.options.file == 'first_names.txt':
             _file = 'wordlist/first_names_full.txt'
         else:
@@ -126,13 +122,11 @@ class TugaBruteForce:
                 _file = self.options.file
             elif os.path.exists('wordlist/%s' % self.options.file):
                 _file = 'wordlist/%s' % self.options.file
-
             else:
                 self.msg_queue.put('[ERROR] Oops! Names file not exists: %s' % self.options.file)
                 return
 
         # Wildcard --------------------------------------------------
-
         normal_lines = []
         wildcard_lines = []
         wildcard_list = []
@@ -147,7 +141,6 @@ class TugaBruteForce:
                 if not sub or sub in lines:
                     continue
                 lines.add(sub)
-
                 if sub.find('{alphnum}') >= 0 or sub.find('{alpha}') >= 0 or sub.find('{num}') >= 0:
                     wildcard_lines.append(sub)
                     sub = sub.replace('{alphnum}', '[a-z0-9]')
@@ -195,7 +188,6 @@ class TugaBruteForce:
                             time.sleep(0.1)
                         self.queue.put(lst_subs)
                         lst_subs = []
-
         if lst_subs:
             self.queue.put(lst_subs)
 ################################################################################
@@ -205,11 +197,9 @@ class TugaBruteForce:
         next_subs = []
 
         # Verify the first wordlist
-
         _file = 'wordlist/next_names.txt' if not self.options.full_scan else 'wordlist/next_names_full.txt'
 
         # Wildcard
-
         with open(_file) as f:
             for line in f:
                 sub = line.strip()
@@ -245,7 +235,6 @@ class TugaBruteForce:
                 _msg = self.msg_queue.get(timeout=0.1)
             except:
                 continue
-
             if _msg == 'status':
                 msg = 'Found %s subdomains | %s groups left | %s scanned in %.1f seconds| %s threads' % (
                     self.found_count, self.queue.qsize(), self.scan_count, time.time() - self.start_time,
@@ -261,7 +250,6 @@ class TugaBruteForce:
     def _scan(self):
         thread_id = int(threading.currentThread().getName())
         self.resolvers[thread_id].nameservers = [self.dns_servers[thread_id % self.dns_count]]
-
         _lst_subs = []
         self.lock.acquire()
         self.thread_count += 1
@@ -295,23 +283,18 @@ class TugaBruteForce:
                         ips = ', '.join(sorted([answer.address for answer in answers]))
                         if ips in ['1.1.1.1', '127.0.0.1', '0.0.0.0']:
                             break
-
                         if (_sub, ips) not in self.ip_dict:
                             self.ip_dict[(_sub, ips)] = 1
                         else:
                             self.ip_dict[(_sub, ips)] += 1
-
                         if ips not in self.ip_dict:
                             self.ip_dict[ips] = 1
                         else:
                             self.ip_dict[ips] += 1
-
                         if self.ip_dict[(_sub, ips)] > 3 or self.ip_dict[ips] > 6:
                             is_wildcard_record = True
-
                         if is_wildcard_record:
                             break
-
                         if (not self.ignore_intranet) or (not is_intranet(answers[0].address)):
                             self._update_found_count()
                             msg = cur_sub_domain.ljust(50) + ips  # default [30, 50], msg = <subs>.<target> and info.
@@ -319,7 +302,6 @@ class TugaBruteForce:
                             self.msg_queue.put('status')
                             self.outfile.write(cur_sub_domain.ljust(50) + '\t' + ips + '\n')
                             self.outfile.flush()
-
                             try:
                                 self.resolvers[thread_id].query('lordneostark.' + cur_sub_domain)
                             except dns.resolver.NXDOMAIN as e:
