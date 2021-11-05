@@ -47,6 +47,11 @@ class CRT:
         subdomains = set()
         self.subdomainscount = 0
         start_time = time.time()
+        #Test JSON
+        try:
+            subdomains = response.json()
+        except ValueError:  # includes simplejson.decoder.JSONDecodeError
+            print ("Decoding JSON has failed\n")
         try:
             while self.subdomainscount < 10000:
                 subdomains = response.json()[self.subdomainscount]["name_value"]
