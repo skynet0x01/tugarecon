@@ -29,8 +29,8 @@ class Threatcrowd:
             self.enumerate(self.response, output, target) # Call the function enumerate
         else:
             pass
-        if self.output is not None:
-            DeleteDuplicate(self.engine + '_' + self.output, target)
+        #if self.output is not None:
+            #DeleteDuplicate(self.engine + '_' + self.output, target)
 ################################################################################
     def engine_url(self):
         try:
@@ -46,12 +46,14 @@ class Threatcrowd:
         subdomains = set()
         subdomainscount = 0
         start_time = time.time()
+        #################################
         try:
             #Test json
             subdomains = response.json()["subdomains"][subdomainscount]
         except KeyError:
-            print(G + f"[x] Decoding JSON has failed.... No data found for {self.target} using Threat Crowd." + W)
+            print(f"[x] No data found for {self.target} using Threat Crowd.")
             exit(1)
+        #################################
         try:
             while subdomainscount < 500:
                 subdomains = response.json()["subdomains"][subdomainscount]
@@ -63,7 +65,11 @@ class Threatcrowd:
                 print(f"\nSaving result... {self.engine + '_' + self.output}")
         except IndexError:
             pass
-        print(G + f"\n[**]Threat Crowd: {subdomainscount} subdomains have been found in %s seconds" % (
-                    time.time() - start_time) + W)
+        #################################
         if not subdomains:
-            print(f"[x] No data found for {self.target} using Threat Crowd.")
+            print(f"[x] No data found for {self.target} using Threat Crowd.\n")
+        else:
+            print(G + f"\n[**]Threat Crowd: {subdomainscount} subdomains have been found in %s seconds" % (
+                    time.time() - start_time) +"\n"+ W)
+            if self.output is not None:
+                DeleteDuplicate(self.engine + '_' + self.output, target)

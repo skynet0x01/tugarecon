@@ -47,28 +47,34 @@ class CRT:
         subdomains = set()
         self.subdomainscount = 0
         start_time = time.time()
+        #################################
         #Test JSON
         try:
             subdomains = response.json()
         except ValueError:  # includes simplejson.decoder.JSONDecodeError
             print ("Decoding JSON has failed\n")
+            exit(1)
+
+        #################################
         try:
             while self.subdomainscount < 10000:
                 subdomains = response.json()[self.subdomainscount]["name_value"]
-                if not subdomains:
-                    print(f"[x] Oops! No data found for {self.target} using  SSL Certificates.")
+
+                self.subdomainscount = self.subdomainscount + 1
+                if "@" in subdomains:  # filter for emails
+                    pass
                 else:
-                    self.subdomainscount = self.subdomainscount + 1
-                    if "@" in subdomains:  # filter for emails
-                        pass
-                    else:
-                        print(f"[*] {subdomains}")
-                        if self.output is not None:
-                            write_file(subdomains, self.engine + '_' + self.output, target)
+                    print(f"[*] {subdomains}")
+                    if self.output is not None:
+                        write_file(subdomains, self.engine + '_' + self.output, target)
             if self.output:
                 print(f"\nSaving result... {self.engine + '_'+ self.output}")
         except IndexError:
             pass
-            print(
-                G + f"\n[**]SSL Certificates: {self.subdomainscount} subdomains have been found in %s seconds" % (
-                        time.time() - start_time) + W)
+        #################################
+        if not subdomains:
+            print(f"[x] Oops! No data found for {self.target} using  SSL Certificates.\n")
+            exit(2)
+        else:
+            print(G + f"\n[**]SSL Certificates: {self.subdomainscount} subdomains have been found in %s seconds" % (
+                        time.time() - start_time) +"\n"+ W)

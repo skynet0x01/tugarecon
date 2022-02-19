@@ -29,8 +29,8 @@ class Certspotter:
             self.enumerate(self.response, output, target) # Call the function enumerate
         else:
             pass
-        if self.output is not None:
-            DeleteDuplicate(self.engine + '_' + self.output, target)
+        #if self.output is not None:
+            #DeleteDuplicate(self.engine + '_' + self.output, target)
 ################################################################################
     def engine_url(self):
         try:
@@ -54,6 +54,7 @@ class Certspotter:
         subdomains = []
         subdomainscount = 0
         start_time = time.time()
+        #################################
         try:
             while subdomainscount < 100:
                 subdomains = response.json()[subdomainscount]["dns_names"][0]
@@ -65,8 +66,11 @@ class Certspotter:
                 print(f"\nSaving result... {self.engine + '_' + self.output}")
         except:
             pass
+        #################################
         if not subdomains:
             print(f"[x] No data found for {self.target} using CertSpotter.")
         else:
             print(G + f"\n[**]CertSpotter: {subdomainscount} subdomains have been found in %s seconds" % (
                     time.time() - start_time) + W)
+            if self.output is not None:
+                DeleteDuplicate(self.engine + '_' + self.output, target)

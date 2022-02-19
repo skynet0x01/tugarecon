@@ -46,27 +46,26 @@ class Hackertarget:
         subdomainscount = 0
         sub = []
         start_time = time.time()
+        #################################
         try:
             while subdomainscount < 10000:
-
                 # Remove "," an IP from list
                 remove_ip = response.text.replace(",", " ")
                 subdomains = remove_ip.split()
-
+                # Print subdomains...
                 subdomainscount = subdomainscount + 2
                 print(f"[*] {subdomains[subdomainscount]}")
-
                 # Write  to a file
                 if self.output is not None:
                     write_file(subdomains[subdomainscount], self.engine + '_' + self.output, target)
-
-            if self.output:
-                print(f"\nSaving result... {self.engine + '_' + self.output}")
         except IndexError:
             pass
+        #################################
+        if self.output:
+            print(f"\nSaving result... {self.engine + '_' + self.output}")
         if not subdomains:
-            print(f"[x] No data found for {self.target} using  HackerTarget.")
+            print(f"[x] No data found for {self.target} using  HackerTarget.\n")
         else:
-            print(
-                G + f"\n[**]HackerTarget: {int((subdomainscount / 2) - 1)} subdomains have been found in %s seconds" % (
-                        time.time() - start_time) + W)
+            print(G + f"\n[**]HackerTarget: {int((subdomainscount / 2) - 1)} subdomains have been found in %s seconds" % (time.time() - start_time) +"\n"+ W)
+            if self.output is not None:
+                DeleteDuplicate(self.engine + '_' + self.output, target)
