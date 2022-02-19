@@ -20,11 +20,14 @@ class TugaBruteForce:
     def __init__(self, target, options):
 
         self.target = target
-        self.options = options  # default threads 200
+        self.options = options  # default threads 100
         self.ignore_intranet = options.i  # need more options... not complete
 
         # set threads and count system to 0
-        self.thread_count = self.scan_count = self.found_count = 0
+        self.thread_count = 0
+        self.scan_count = 0
+        self.found_count = 0
+        
         self.lock = threading.Lock()
 
         # Resize console

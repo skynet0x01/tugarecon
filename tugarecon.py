@@ -27,7 +27,7 @@ def banner():
               "             /_  __/_  ______ _____ _/ __ \___  _________  ____ \n"
               "              / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \                \n"
               "             / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               \n"
-              "            /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  Version 1.1               \n"
+              "            /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  Version 1.2               \n"
               "                      /____/                               # Coded By skynet0x01 #\n" + W)
     print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country\n" + W)
 ################################################################################
@@ -81,6 +81,7 @@ def queries(target):
 ################################################################################
 def internet_on():
     url = "https://www.google.com"
+    #url = target
     test_timeout = 1
     try:
         request = requests.get(url, timeout=test_timeout)

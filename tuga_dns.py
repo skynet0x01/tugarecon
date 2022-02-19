@@ -3,10 +3,7 @@ import whois
 
 # Import internal
 from functions import G, W, R, Y
-
-
 ###############################################################################################
-
 def bscan_dns_queries(target):
     print(G + "\n[+] DNS queries...\n" + W)
     print(G + "**************************************************************\n" + W)
@@ -20,11 +17,8 @@ def bscan_dns_queries(target):
     except Exception as e:
         pass
     print(G + "**************************************************************\n" + W)
-
 ###############################################################################################
-
 def bscan_whois_look(target):
-
     try:
         dict = []
         domain = whois.query(target)
