@@ -58,26 +58,20 @@ def parse_args():
     parser.add_argument('--full', dest='full_scan', default=False, action='store_true', help='Full scan, NAMES FILE first_names_full.txt will be used to brute')
     return parser.parse_args()
 ################################################################################
-# parse host from scheme, to use for certificate transparency abuse
+# parse host from scheme, to use for certificate transparency abuse, validate domain
 def parse_url(url):
     try:
         host = urllib3.util.url.parse_url(url).host
+        response = requests.get('https://' + host)
+        if response.status_code == 200:
+            print('Target ONLINE... Lets go!\n')
+        else:
+            print('[*] Invalid domain, try again...')
     except Exception as e:
         print('[*] Invalid domain, try again...')
         sys.exit(1)
     return host
-################################################################################
-def queries(target):
-    print(G + "Enumerating subdomains for " + target + " \n" + W)
-    time.sleep(0.1)
-    print(R + "Searching " + target + " in CertsPotter " + W)
-    time.sleep(0.1)
-    print(R + "Searching " + target + " in SSL Certificates " + W)
-    time.sleep(0.1)
-    print(R + "Searching "  + target + " in HackerTarget " + W)
-    time.sleep(0.1)
-    print(R + "Searching "  + target + " in ThreatCrowd\n" + W)
-    time.sleep(0.3)
+
 ################################################################################
 def internet_on():
     url = "https://www.google.com"
@@ -90,6 +84,20 @@ def internet_on():
     except (requests.ConnectionError, requests.Timeout) as exception:
         print("No internet connection. Check the network...\n")
         exit(1)
+
+################################################################################
+def queries(target):
+    print(G + "Enumerating subdomains for " + target + " \n" + W)
+    time.sleep(0.1)
+    print(R + "Searching " + target + " in CertsPotter " + W)
+    time.sleep(0.1)
+    print(R + "Searching " + target + " in SSL Certificates " + W)
+    time.sleep(0.1)
+    print(R + "Searching "  + target + " in HackerTarget " + W)
+    time.sleep(0.1)
+    print(R + "Searching "  + target + " in ThreatCrowd\n" + W)
+    print("Wait for results...!\n")
+    return (0)
 ################################################################################
 def main(target, output, savemap, enum, threads, bruteforce, args):
     # bruteforce fast scan
