@@ -29,7 +29,7 @@ def banner():
               "             / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               \n"
               "            /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  Version 1.2               \n"
               "                      /____/                               # Coded By skynet0x01 #\n" + W)
-    print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country\n" + W)
+    print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country. 2020-2022\n" + W)
 ################################################################################
 # parse the arguments
 def parse_args():
@@ -62,8 +62,8 @@ def parse_args():
 def parse_url(url):
     try:
         host = urllib3.util.url.parse_url(url).host
-        response = requests.get('https://' + host)
-        if response.status_code == 200:
+        response = requests.get('http://' + host)
+        if (response.status_code == 200):
             print('Target ONLINE... Lets go!\n')
         else:
             print('[*] Invalid domain, try again...')
@@ -84,7 +84,6 @@ def internet_on():
     except (requests.ConnectionError, requests.Timeout) as exception:
         print("No internet connection. Check the network...\n")
         exit(1)
-
 ################################################################################
 def queries(target):
     print(G + "Enumerating subdomains for " + target + " \n" + W)
