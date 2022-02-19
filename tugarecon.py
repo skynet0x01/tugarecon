@@ -126,6 +126,7 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
             for engine in enum:
                 if engine.lower() in supported_engines:
                     chosenEnums.append(supported_engines[engine.lower()])
+                    print("\nWait for results...!\n")
                     # Start the enumeration
                     enums = [indicate(target, output) for indicate in chosenEnums]
         # Save map domain (png file)
