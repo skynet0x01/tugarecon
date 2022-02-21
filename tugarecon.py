@@ -88,13 +88,13 @@ def internet_on():
 def queries(target):
     print(G + "Enumerating subdomains for " + target + " \n" + W)
     time.sleep(0.1)
-    print(R + "Searching " + target + " in CertsPotter " + W)
+    print(R + "[-] Searching " + target + " in CertsPotter " + W)
     time.sleep(0.1)
-    print(R + "Searching " + target + " in SSL Certificates " + W)
+    print(R + "[-] Searching " + target + " in SSL Certificates " + W)
     time.sleep(0.1)
-    print(R + "Searching "  + target + " in HackerTarget " + W)
+    print(R + "[-] Searching "  + target + " in HackerTarget " + W)
     time.sleep(0.1)
-    print(R + "Searching "  + target + " in ThreatCrowd\n" + W)
+    print(R + "[-] Searching "  + target + " in ThreatCrowd\n" + W)
     print("Wait for results...!\n")
     return (0)
 ################################################################################
