@@ -20,14 +20,12 @@ class TugaBruteForce:
     def __init__(self, target, options):
 
         self.target = target
-        self.options = options  # default threads 100
+        self.options = options  # default threads 200
         self.ignore_intranet = options.i  # need more options... not complete
+        self.wordlist_domains = ""
 
         # set threads and count system to 0
-        self.thread_count = 0
-        self.scan_count = 0
-        self.found_count = 0
-        
+        self.thread_count = self.scan_count = self.found_count = 0
         self.lock = threading.Lock()
 
         # Resize console
@@ -222,7 +220,7 @@ class TugaBruteForce:
                         elif item not in next_subs:
                             next_subs.append(item)
         self.next_subs = next_subs
-        # print(self.next_subs) just for test
+        #print(self.next_subs) #just for test
 ################################################################################
     def _update_scan_count(self):
         self.last_scanned = time.time()
@@ -239,8 +237,8 @@ class TugaBruteForce:
             except:
                 continue
             if _msg == 'status':
-                msg = 'Found %s subdomains | %s groups left | %s scanned in %.1f seconds| %s threads' % (
-                    self.found_count, self.queue.qsize(), self.scan_count, time.time() - self.start_time,
+                msg = ' %s  | Found %s subdomains | %s groups left | %s scanned in %.1f seconds| %s threads' % (
+                     self.wordlist_domains, self.found_count, self.queue.qsize(), self.scan_count, time.time() - self.start_time,
                     self.thread_count)
                 sys.stdout.write('\r' + ' ' * (self.console_width - len(msg)) + msg)
             elif _msg.startswith('[+] Check DNS Server'):
@@ -275,6 +273,7 @@ class TugaBruteForce:
             while not self.STOP_SCAN:
                 try:
                     cur_sub_domain = sub + '.' + self.target
+                    self.wordlist_domains = cur_sub_domain
                     self._update_scan_count()
                     self.msg_queue.put('status')
                     try:
