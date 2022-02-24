@@ -409,6 +409,7 @@ android
 ao
 ap
 apache
+api
 apis
 apple
 apps
@@ -416,6 +417,7 @@ aq
 ar
 archive
 archives
+army
 as
 asia
 assets
@@ -424,6 +426,9 @@ atlas
 au
 audio
 auth
+authbs
+authvip
+authweb
 auto
 autobidder
 autobidder-eng
@@ -711,6 +716,8 @@ error
 errors
 es
 et
+etp
+etpgaz
 eu
 ev
 event
@@ -868,6 +875,7 @@ hm
 hn
 ho
 home
+homebank
 horizon
 host
 hotel
@@ -1295,6 +1303,7 @@ papa
 partner
 partners
 partnerservices
+pass
 passport
 password
 payment
@@ -1439,6 +1448,7 @@ rp
 rq
 rs
 rt
+rtest
 ru
 rv
 rw
@@ -1494,6 +1504,7 @@ si
 sierra
 signup
 sip
+sips
 sip1
 site
 sites
@@ -1593,7 +1604,10 @@ test
 test1
 test2
 test3
+testapi
+testdev
 testing
+testweb
 tf
 tg
 th
@@ -1706,6 +1720,7 @@ video
 videos
 view
 vip
+vipmail
 vj
 vk
 vl

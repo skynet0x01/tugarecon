@@ -14488,9 +14488,12 @@ auth
 auth1
 auth2
 auth3
+authbs
 auth-hack
 author
 authors
+authvip
+authweb
 auto
 autobidder
 autobidder.powerhub
@@ -20877,6 +20880,7 @@ ds0
 ds01
 ds1
 ds10
+ds144
 ds2
 ds3
 ds4
@@ -26168,6 +26172,7 @@ gw7
 gw8
 gw9
 gwa
+gwar
 gw.ag
 gwb
 gw.bnsc
@@ -27400,6 +27405,7 @@ home
 home1
 home2
 homebase
+homebank
 homeless
 homepage
 homepages
@@ -32232,6 +32238,7 @@ kph
 kpi
 kpj
 kpk
+kpku
 kpl
 kpm
 kpn
@@ -40876,6 +40883,7 @@ pete
 peter
 petra
 petrozavodsk
+petrpku
 pets
 peu
 peugeot
@@ -45012,6 +45020,7 @@ rtc
 rtd
 rte
 rtelnet
+rtest
 rtf
 rtg
 rth
@@ -46615,6 +46624,7 @@ sip3
 sipac
 sipexternal
 sipinternal
+sips
 siq
 sir
 sire
@@ -47421,6 +47431,7 @@ sso-energy
 sso-power
 sso-test
 ssotest
+ssovdr
 ssp
 sspr
 ssr
@@ -51747,6 +51758,8 @@ vaq
 var
 varnish
 varuna
+varvsn
+varvsn-serp
 vas
 vasco
 vat
@@ -52143,6 +52156,7 @@ viola
 violet
 violette
 vip
+vipmail
 vip1
 vip2
 vip3
