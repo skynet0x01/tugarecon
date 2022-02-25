@@ -9,6 +9,7 @@ import sys
 import time
 import urllib3
 import requests
+import bs4 #future...
 # Import internal functions
 from functions import R, W, Y, G
 from functions import mapping_domain
@@ -68,10 +69,9 @@ def parse_url(url):
         else:
             print('[*] Invalid domain, try again...')
     except Exception as e:
-        print('[*] Invalid domain, try again...')
-        sys.exit(1)
+        print('[*] Network unstable... !? ')
+        #sys.exit(1)
     return host
-
 ################################################################################
 def internet_on():
     url = "https://www.google.com"
@@ -87,17 +87,18 @@ def internet_on():
 ################################################################################
 def queries(target):
     print(G + "Enumerating subdomains for " + target + " \n" + W)
-    time.sleep(0.1)
+    time.sleep(1)
     print(R + "[-] Searching " + target + " in CertsPotter " + W)
-    time.sleep(0.1)
     print(R + "[-] Searching " + target + " in SSL Certificates " + W)
-    time.sleep(0.1)
     print(R + "[-] Searching "  + target + " in HackerTarget " + W)
-    time.sleep(0.1)
     print(R + "[-] Searching "  + target + " in ThreatCrowd\n" + W)
+    time.sleep(0.5)
     print("Wait for results...!\n")
     return (0)
 ################################################################################
+
+################################################################################
+
 def main(target, output, savemap, enum, threads, bruteforce, args):
     # bruteforce fast scan
     if bruteforce:
