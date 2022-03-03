@@ -19,10 +19,10 @@ from tuga_terminal import getTerminalSize
 class TugaBruteForce:
     def __init__(self, target, options):
 
-        self.target = target
-        self.options = options  # default threads 200
-        self.ignore_intranet = options.i  # need more options... not complete
-        self.wordlist_domains = ""
+        self.target = target              # Target
+        self.options = options            # default threads 200
+        self.ignore_intranet = options.i  # need more options... not complete (Ignore domains pointed to private IPs)
+        self.wordlist_domains = ""        # Wordlist
 
         # set threads and count system to 0
         self.thread_count = self.scan_count = self.found_count = 0
@@ -33,7 +33,9 @@ class TugaBruteForce:
 
         self.msg_queue = queue.Queue()
         self.STOP_SCAN = False
-        threading.Thread(target=self._print_msg).start() # Workers
+
+        threading.Thread(target=self._print_msg).start() # start the thread by calling the start()
+
         self._load_dns_servers()  # load DNS servers from a list
 
         # set resolver from dns.resolver
@@ -41,10 +43,12 @@ class TugaBruteForce:
         for _ in self.resolvers:
             _.lifetime = _.timeout = 6.0
 
-        self._load_next_sub()
+        self._load_next_sub() # Load second list name...
         self.queue = queue.Queue()
-        t = threading.Thread(target=self._load_sub_names) # Workers
-        t.start()
+
+        t = threading.Thread(target=self._load_sub_names) # Load the first list name...
+        t.start() # start the thread for the first list name...
+
         while not self.queue.qsize() > 0 and t.is_alive():
             time.sleep(0.1)
 
@@ -75,7 +79,7 @@ class TugaBruteForce:
                 while True:
                     if threading.activeCount() < 50:
                         t = threading.Thread(target=self._test_dns_servers, args=(server,))
-                        t.start()
+                        t.start() # start the thread
                         break
                     else:
                         time.sleep(0.1)
@@ -348,7 +352,7 @@ class TugaBruteForce:
                 pass
         while self.thread_count > 0:
             try:
-                time.sleep(0.1)  # time sleep 1, try to change to 0.1 or 0
+                time.sleep(1)  # time sleep 1, try to change to 0.1 or 0
             except KeyboardInterrupt as e:
                 msg = (R + '[WARNING] User aborted, wait all slave threads to exit...' + W)
                 sys.stdout.write('\r' + msg + ' ' * (self.console_width - len(msg)) + '\n\r')
