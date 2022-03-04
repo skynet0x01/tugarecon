@@ -9,7 +9,7 @@ import sys
 import time
 import urllib3
 import requests
-import bs4 #future...
+# import bs4 #future...
 # Import internal functions
 from functions import R, W, Y, G
 from functions import mapping_domain
@@ -98,15 +98,14 @@ def queries(target):
 ################################################################################
 
 ################################################################################
-
 def main(target, output, savemap, enum, threads, bruteforce, args):
     # bruteforce fast scan
     if bruteforce:
         #d = tuga_bruteforce.TugaBruteForce(target, options=args)
-        d = TugaBruteForce(target, options=args)
-        d.run()
-        d.outfile.flush()
-        d.outfile.close()
+        subdomains_test = TugaBruteForce(options=args)
+        subdomains_test.run()
+        subdomains_test.outfile.flush()
+        subdomains_test.outfile.close()
         sys.exit()
     try:
         # <Module required> Perform enumerations and network mapping
