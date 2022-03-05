@@ -17,43 +17,37 @@ from tuga_dns import is_intranet
 from tuga_terminal import getTerminalSize
 ################################################################################
 class TugaBruteForce:
-    def __init__(self, options):
-    # Namespace(domain='example.com', output=None, i=False, file='first_names.txt', savemap=False,
-    #           bruteforce=True, threads=200, enum=None, full_scan=True)
+    def __init__(self, target, options):
+    # options = (-t , --threads), (--full, Full scan), (-f , --file), (-i, --ignore), (-o , --output)
 
-        self.target = options.domain      # Target
-        self.options = options            # All options...
+        self.target = target              # Target
+        self.options = options            # default threads 200 / output
         self.ignore_intranet = options.i  # need more options... not complete (Ignore domains pointed to private IPs)
         self.wordlist_domains = ""        # Wordlist
-        #self.outfile = options.output
 
         # set threads and count system to 0
         self.thread_count = self.scan_count = self.found_count = 0
         self.lock = threading.Lock()
 
-        # Resize Terminal
+        # Resize console
         self.console_width = getTerminalSize()[0] - 2  # thanks guys
 
         self.msg_queue = queue.Queue()
         self.STOP_SCAN = False
 
-        # start the thread _print_msg by calling the start(). Terminal (self.console_width)
-        threading.Thread(target=self._print_msg).start()
+        threading.Thread(target=self._print_msg).start() # start the thread by calling the start(). Print information
 
-        # load DNS servers from a list (dns_servers.txt)
-        self._load_dns_servers()
+        self._load_dns_servers()  # load DNS servers from a list
 
-        # set resolver from dns.resolver, options.threads = 200 (default)
+        # set resolver from dns.resolver
         self.resolvers = [dns.resolver.Resolver(configure=False) for _ in range(options.threads)]
         for _ in self.resolvers:
             _.lifetime = _.timeout = 6.0
 
-        # Load second list name... (next_names.txt or next_names_full.txt)
-        self._load_next_sub()
+        self._load_next_sub() # Load second list name...
         self.queue = queue.Queue()
 
-        # start the thread by calling the start(). Load the first list name... (thread)
-        t = threading.Thread(target=self._load_sub_names)
+        t = threading.Thread(target=self._load_sub_names) # Load the first list name... (thread)
         t.start() # start the thread for the first list name...
 
         while not self.queue.qsize() > 0 and t.is_alive():
@@ -62,11 +56,10 @@ class TugaBruteForce:
         # create a target folder and save results in to a file txt
         if options.output:
             outfile = options.output
-            if not os.path.exists("results/" + self.target):
-                os.mkdir("results/" + self.target)
-            outfile = 'results/' + self.target + "/" + outfile + '_tuga_bruteforce.txt' if not options.full_scan else 'results/' + self.target + "/" + outfile + '_tuga_bruteforce_full.txt'
+        if not os.path.exists("results/" + self.target):
+            os.mkdir("results/" + self.target)
         else:
-            outfile = 'results/' + "_tmp" + '.txt' if not options.full_scan else 'results/' + "_tmp" + '.txt'
+            outfile = 'results/' + self.target + "/" + target + '_tuga_bruteforce.txt' if not options.full_scan else 'results/' + self.target + "/" + target + '_tuga_bruteforce_full.txt'
         self.outfile = open(outfile, 'w')
 
         # save ip, dns.
@@ -123,27 +116,23 @@ class TugaBruteForce:
             self.msg_queue.put('[+] DNS Server %s <Fail>   Found %s' % (server.ljust(16), len(self.dns_servers)))
 ################################################################################
     def _load_sub_names(self):
+        # first_names_full.txt
+        self.msg_queue.put('[+] Load the first list...')
+        self.msg_queue.put('[+] Prepare the wildcard...\n' + W)
 
         # Verify the first wordlist
         if self.options.full_scan and self.options.file == 'first_names.txt':
             _file = 'wordlist/first_names_full.txt'
-            self.msg_queue.put('[+] Load the first list...   ' + _file)
         else:
             if os.path.exists(self.options.file):
                 _file = self.options.file
-                self.msg_queue.put('[+] Load the first list...   ' + _file)
             elif os.path.exists('wordlist/%s' % self.options.file):
                 _file = 'wordlist/%s' % self.options.file
-                self.msg_queue.put('[+] Load the first list...   ' + _file)
             else:
-                self.msg_queue.put('[ERROR] [WORDLIST] Oops! File not exists: %s' % self.options.file)
+                self.msg_queue.put('[ERROR] Oops! Names file not exists: %s' % self.options.file)
                 return
 
         # Wildcard --------------------------------------------------
-        self.msg_queue.put('[+] Prepare the wildcard...')
-        self.msg_queue.put('[+] DONE...')
-        self.msg_queue.put('[+] Search for subdomains...\n' + W)
-
         normal_lines = []
         wildcard_lines = []
         wildcard_list = []
@@ -209,12 +198,12 @@ class TugaBruteForce:
             self.queue.put(lst_subs)
 ################################################################################
     def _load_next_sub(self):
+        # next_names_full.txt
+        self.msg_queue.put('\n[+] Load the second list...')
+        next_subs = []
 
         # Verify the next wordlist
         _file = 'wordlist/next_names.txt' if not self.options.full_scan else 'wordlist/next_names_full.txt'
-
-        self.msg_queue.put('\n[+] Load the second list...  ' + _file)
-        next_subs = []
 
         # Wildcard
         with open(_file) as f:
