@@ -348,10 +348,10 @@ class TugaBruteForce:
                     _sub_timeout_count += 1
                     if _sub_timeout_count >= 6:  # give up default 6
                     # TEST
-                        msg = cur_sub_domain.ljust(50)
-                        self.msg_queue.put(R + msg + 'DNS timeout...!?' + W)
-                        self.outfile.write(cur_sub_domain.ljust(50) + '\t' + 'DNS timeout!? \n')
-                        self.outfile.flush()
+                        #msg = cur_sub_domain.ljust(50)
+                        #self.msg_queue.put(R + msg + 'DNS timeout...!?' + W)
+                        #self.outfile.write(cur_sub_domain.ljust(50) + '\t' + 'DNS timeout!? \n')
+                        #self.outfile.flush()
                     # TEST END
                         break
                 except Exception as e:
