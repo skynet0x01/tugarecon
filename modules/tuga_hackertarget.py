@@ -28,8 +28,8 @@ class Hackertarget:
             self.enumerate(self.response, output, target) # Call the function enumerate
         else:
             pass
-        #if self.output is not None:
-            #DeleteDuplicate(self.engine + '_' + self.output, target)
+        #if self.output is not None and int((subdomainscount / 2) - 1) != 0:
+        #    DeleteDuplicate(self.engine + '_' + self.output, target)
 ################################################################################
     def engine_url(self):
         try:
@@ -56,16 +56,20 @@ class Hackertarget:
                 subdomainscount = subdomainscount + 2
                 print(f"[*] {subdomains[subdomainscount]}")
                 # Write  to a file
-                if self.output is not None:
+                if self.output is not None and int((subdomainscount / 2) - 1) != 0:
                     write_file(subdomains[subdomainscount], self.engine + '_' + self.output, target)
+                else:
+                    pass
         except IndexError:
             pass
         #################################
-        if self.output:
+        if self.output and not subdomains:
             print(f"\nSaving result... {self.engine + '_' + self.output}")
         if not subdomains:
             print(f"[x] No data found for {self.target} using  HackerTarget.\n")
         else:
             print(G + f"\n[**]HackerTarget: {int((subdomainscount / 2) - 1)} subdomains have been found in %s seconds" % (time.time() - start_time) +"\n"+ W)
-            if self.output is not None:
+            if self.output is not None and int((subdomainscount / 2) - 1) != 0:
                 DeleteDuplicate(self.engine + '_' + self.output, target)
+            else:
+                pass
