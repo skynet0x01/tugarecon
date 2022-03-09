@@ -14,7 +14,7 @@ import requests
 from functions import R, W, Y, G
 from functions import mapping_domain
 from tuga_bruteforce import TugaBruteForce
-from tuga_dns import bscan_dns_queries
+from tuga_dns import DNS_Record_Types
 from tuga_dns import bscan_whois_look
 # Import internal modules
 from modules import tuga_certspotter
@@ -28,7 +28,7 @@ def banner():
               "             /_  __/_  ______ _____ _/ __ \___  _________  ____ \n"
               "              / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \                \n"
               "             / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               \n"
-              "            /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  Version 1.2               \n"
+              "            /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  Version 1.21               \n"
               "                      /____/                               # Coded By skynet0x01 #\n" + W)
     print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country. 2020-2022\n" + W)
 ################################################################################
@@ -145,7 +145,7 @@ def menu():
     output = args.output
     savemap = args.savemap
     internet_on()
-    bscan_dns_queries(target)
+    DNS_Record_Types(target)
     bscan_whois_look(target)
     main(target, output, savemap, enum, threads, bruteforce, args)
 ################################################################################

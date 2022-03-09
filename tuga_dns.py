@@ -1,21 +1,29 @@
 import dns.resolver  # dnspython
 import whois
-
 # Import internal
 from functions import G, W, R, Y
 ###############################################################################################
-def bscan_dns_queries(target):
-    print(G + "\n[+] DNS queries...\n" + W)
-    print(G + "**************************************************************\n" + W)
-    try:
-        for qtype in 'A', 'AAAA', 'MX', 'NS', 'TXT', 'SOA', 'CERT', 'HINFO', 'MINFO', 'TLSA', 'SPF':
-            answer = dns.resolver.query(target, qtype, raise_on_no_answer=False, lifetime=10)
-            if answer.rrset is not None:
-                print(answer.rrset, '\n')
-            else:
-                pass
-    except Exception as e:
-        pass
+def DNS_Record_Types(target):
+    print(G + "\n[+] DNS Record Types..." + W)
+    print(G + "**************************************************************" + W)
+
+    record_types = ['A', 'AAAA', 'NS', 'CNAME', 'MX', 'PTR', 'SOA', 'TXT', 'CERT', 'HINFO', 'MINFO', 'TLSA', 'SPF', 'KEY', 'NXT']
+    for records in record_types:
+        try:
+            answer = dns.resolver.resolve(target, records)
+            print(f'\nRecords: {records}')
+            print('-' * 30)
+            for server in answer:
+                print(server.to_text())
+        except dns.resolver.NoAnswer:
+            pass
+        except dns.resolver.NXDOMAIN:
+            print(f'{target} does not exist.')
+            print(G + "**************************************************************\n" + W)
+            quit()
+        except KeyboardInterrupt:
+            print('Quitting.')
+            quit()
     print(G + "**************************************************************\n" + W)
 ###############################################################################################
 def bscan_whois_look(target):
@@ -26,7 +34,8 @@ def bscan_whois_look(target):
         dict.append(data)
         #print(domain.__dict__, "\n")
         #print(domain.name, "\n")
-        #print("Domain expiration: ", domain.expiration_date, "\n")
+        print("Domain expiration: ", domain.expiration_date, "\n")
+        print(G + "**************************************************************\n" + W)
         for dict_line in dict:
             for k, v in dict_line.items():
                 print(k + ": " + v)

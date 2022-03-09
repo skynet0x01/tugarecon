@@ -24,7 +24,7 @@ class TugaBruteForce:
         self.target = options.domain      # Target
         self.options = options            # All options...
         self.ignore_intranet = options.i  # need more options... not complete (Ignore domains pointed to private IPs)
-        self.wordlist_domains = ""        # Wordlist
+        self.wordlist_subdomains = ""        # Wordlist
         #self.outfile = options.output
 
         # set threads and count system to 0
@@ -50,7 +50,7 @@ class TugaBruteForce:
 
         # Load second list name... (next_names.txt or next_names_full.txt)
         self._load_next_sub()
-        self.queue = queue.Queue()
+        self.queue = queue.Queue()  # Create a queue to communicate with the worker threads
 
         # start the thread by calling the start(). Load the first list name... (thread)
         t = threading.Thread(target=self._load_sub_names)
@@ -77,30 +77,34 @@ class TugaBruteForce:
 ################################################################################
     def _load_dns_servers(self):
         # dns_servers.txt
-        print(G + '[+] Initializing, validate DNS servers ...')
-        self.dns_servers = []
-        with open('wordlist/dns_servers.txt') as f:
-            for line in f:
-                server = line.strip()
-                if not server:
-                    continue
-                while True:
-                    if threading.activeCount() < 11: # default 50
-                        t = threading.Thread(target=self._test_dns_servers, args=(server,)) # Testing DNS servers...
-                        t.start() # start the thread
-                        break
-                    else:
-                        time.sleep(0.1)
+        try:
+            print(G + '[+] Initializing, validate DNS servers ...')
+            self.dns_servers = []
+            with open('wordlist/dns_servers.txt') as f:
+                for line in f:
+                    server = line.strip()
+                    if not server:
+                        continue
+                    while True:
+                        if threading.activeCount() < 50: # default 50
+                            t = threading.Thread(target=self._test_dns_servers, args=(server,)) # Testing DNS servers...
+                            t.start() # start the thread
+                            break
+                        else:
+                            time.sleep(0.1)
 
-        while threading.activeCount() > 2:
-            time.sleep(0.1)
-        self.dns_count = len(self.dns_servers)  # count the number of DNS servers
-        #sys.stdout.write('\n')
-        print('[+] Found %s available DNS Servers' % self.dns_count)
-        if self.dns_count == 0:
-            print('[ERROR] Oops! No DNS Servers available.')
-            self.STOP_SCAN = True
-            sys.exit(-1)
+            while threading.activeCount() > 2:
+                time.sleep(0.1)
+            self.dns_count = len(self.dns_servers)  # count the number of DNS servers
+            #sys.stdout.write('\n')
+            print('[+] Found %s available DNS Servers' % self.dns_count)
+            if self.dns_count == 0:
+                print('[ERROR] Oops! No DNS Servers available.')
+                self.STOP_SCAN = True
+                sys.exit(-1)
+        except KeyboardInterrupt:
+            print('Quitting...')
+            quit()
 ################################################################################
     def _test_dns_servers(self, server):
         # dns_servers.txt
@@ -254,7 +258,7 @@ class TugaBruteForce:
                 continue
             if _msg == 'status':
                 msg = ' %s  | Found %s subdomains | %s groups left | %s scanned in %.1f seconds| %s threads' % (
-                     self.wordlist_domains, self.found_count, self.queue.qsize(), self.scan_count, time.time() - self.start_time,
+                     self.wordlist_subdomains, self.found_count, self.queue.qsize(), self.scan_count, time.time() - self.start_time,
                     self.thread_count)
                 sys.stdout.write('\r' + ' ' * (self.console_width - len(msg)) + msg)
             elif _msg.startswith('[+] Check DNS Server'):
@@ -277,23 +281,23 @@ class TugaBruteForce:
                 try:
                     _lst_subs = self.queue.get(timeout=0.1)
                 except:
-                    if time.time() - self.last_scanned > 2.0:
+                    if time.time() - self.last_scanned > 2.0: # default 2.0
                         break
                     else:
                         continue
             sub = _lst_subs.pop()
-            # print("1: ",sub) just for tests
             _sub = sub.split('.')[-1]
-            # print("2: ", _sub) just for tests
             _sub_timeout_count = 0
             while not self.STOP_SCAN:
                 try:
                     cur_sub_domain = sub + '.' + self.target
-                    self.wordlist_domains = cur_sub_domain
+                    self.wordlist_subdomains = cur_sub_domain
                     self._update_scan_count()
                     self.msg_queue.put('status')
                     try:
-                        answers = self.resolvers[thread_id].query(cur_sub_domain)
+                        answers = self.resolvers[thread_id].query(cur_sub_domain)   # Testing subdomains...
+                        #for server in answers:
+                        #    print(server.to_text())
                     except dns.resolver.NoAnswer as e:
                         answers = self.ex_resolver.query(cur_sub_domain)
                     is_wildcard_record = False
@@ -342,7 +346,13 @@ class TugaBruteForce:
                     break
                 except (dns.resolver.NoNameservers, dns.resolver.NoAnswer, dns.exception.Timeout) as e:
                     _sub_timeout_count += 1
-                    if _sub_timeout_count >= 6:  # give up
+                    if _sub_timeout_count >= 6:  # give up default 6
+                    # TEST
+                        msg = cur_sub_domain.ljust(50)
+                        self.msg_queue.put(R + msg + 'DNS timeout...!?' + W)
+                        self.outfile.write(cur_sub_domain.ljust(50) + '\t' + 'DNS timeout!? \n')
+                        self.outfile.flush()
+                    # TEST END
                         break
                 except Exception as e:
                     with open('errors.log', 'a') as errFile:
@@ -355,6 +365,7 @@ class TugaBruteForce:
 ################################################################################
     def run(self):
         self.start_time = time.time()
+        # Create a number of worker threads (self.options.threads)
         for i in range(self.options.threads):
             try:
                 t = threading.Thread(target=self._scan, name=str(i))  # (thread)
@@ -364,7 +375,7 @@ class TugaBruteForce:
                 pass
         while self.thread_count > 0:
             try:
-                time.sleep(1)  # time sleep 1, try to change to 0.1 or 0
+                time.sleep(0.1)  # time sleep 1, try to change to 0.1 or 0
             except KeyboardInterrupt as e:
                 msg = (R + '[WARNING] User aborted, wait all slave threads to exit...' + W)
                 sys.stdout.write('\r' + msg + ' ' * (self.console_width - len(msg)) + '\n\r')

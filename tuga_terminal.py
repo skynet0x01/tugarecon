@@ -2,7 +2,6 @@
 
 __all__ = ['getTerminalSize']
 
-
 def getTerminalSize():
     import platform
     current_os = platform.system()
@@ -14,7 +13,6 @@ def getTerminalSize():
         print ("default")
         tuple_xy = (80, 25)  # default value
     return tuple_xy
-
 
 def _getTerminalSize_linux():
     def ioctl_GWINSZ(fd):
@@ -39,7 +37,6 @@ def _getTerminalSize_linux():
         except:
             return None
     return int(cr[1]), int(cr[0])
-
 
 if __name__ == "__main__":
     sizex, sizey = getTerminalSize()
