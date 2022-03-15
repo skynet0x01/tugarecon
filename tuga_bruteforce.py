@@ -43,17 +43,17 @@ class TugaBruteForce:
         # load DNS servers from a list (dns_servers.txt)
         self._load_dns_servers()
 
-        # set resolver from dns.resolver, options.threads = 200 (default)
-        self.resolvers = [dns.resolver.Resolver(configure=False) for _ in range(options.threads)]
-        for _ in self.resolvers:
-            _.lifetime = _.timeout = 6.0
+        # # Send 200 task requests to the worker. options.threads = 200 (default)
+        self.resolvers = [dns.resolver.Resolver(configure=False) for number in range(options.threads)]
+        for number in self.resolvers:
+            number.lifetime = number.timeout = 6.0
 
         # Load second list name... (next_names.txt or next_names_full.txt)
-        self._load_next_sub()
+        self._load_second_sub_names()
         self.queue = queue.Queue()  # Create a queue to communicate with the worker threads
 
-        # start the thread by calling the start(). Load the first list name... (thread)
-        t = threading.Thread(target=self._load_sub_names)
+        # # Turn-on the worker thread. Load the first list name... (thread)
+        t = threading.Thread(target=self._load_first_sub_names)
         t.start() # start the thread for the first list name...
 
         while not self.queue.qsize() > 0 and t.is_alive():
@@ -119,14 +119,16 @@ class TugaBruteForce:
                 resolver.query('test.bad.dns.skynet0x01.pt')  # Non-existed domain test
                 with open('wordlist/bad_dns_servers.txt', 'a') as f:
                     f.write(server + '\n')
+                    # Put an item into the queue.
+                    # If the queue is full, wait until a free slot is available before adding the item.
                 self.msg_queue.put('[+] Bad DNS Server found %s' % server)
             except:
-                self.dns_servers.append(server)
+                self.dns_servers.append(server) # Adding elements to self.dns_servers
             self.msg_queue.put('[+] Check DNS Server %s < OK >   Found %s' % (server.ljust(16), len(self.dns_servers)))
         except:
             self.msg_queue.put('[+] DNS Server %s <Fail>   Found %s' % (server.ljust(16), len(self.dns_servers)))
 ################################################################################
-    def _load_sub_names(self):
+    def _load_first_sub_names(self):
 
         # Verify the first wordlist
         if self.options.full_scan and self.options.file == 'first_names.txt':
@@ -144,6 +146,8 @@ class TugaBruteForce:
                 return
 
         # Wildcard --------------------------------------------------
+        # Put an item into the queue.
+        # If the queue is full, wait until a free slot is available before adding the item.
         self.msg_queue.put('[+] Prepare the wildcard...')
         self.msg_queue.put('[+] DONE...')
         self.msg_queue.put('[+] Search for subdomains...\n' + W)
@@ -154,24 +158,25 @@ class TugaBruteForce:
         regex_list = []
         lines = set()
 
-        # _file = first_names_full.txt
-
+        # Open the first list names
         with open(_file) as f:
             for line in f:
                 sub = line.strip()
+                #print(sub)
                 if not sub or sub in lines:
+                    #print(sub)
                     continue
                 lines.add(sub)
                 if sub.find('{alphnum}') >= 0 or sub.find('{alpha}') >= 0 or sub.find('{num}') >= 0:
-                    wildcard_lines.append(sub)
+                    wildcard_lines.append(sub) # Adding elements to wildcard_lines
                     sub = sub.replace('{alphnum}', '[a-z0-9]')
                     sub = sub.replace('{alpha}', '[a-z]')
                     sub = sub.replace('{num}', '[0-9]')
                     if sub not in wildcard_list:
-                        wildcard_list.append(sub)
-                        regex_list.append('^' + sub + '$')
+                        wildcard_list.append(sub) # Adding elements to wildcard_list
+                        regex_list.append('^' + sub + '$') # Adding elements to regex_list
                 else:
-                    normal_lines.append(sub)
+                    normal_lines.append(sub) # Adding elements to normal_lines
         pattern = '|'.join(regex_list)
         if pattern:
             _regex = re.compile(pattern)
@@ -192,7 +197,7 @@ class TugaBruteForce:
         for line in wildcard_lines:
             sub_queue.put(line)
             while sub_queue.qsize() > 0:
-                item = sub_queue.get()
+                item = sub_queue.get() # Remove and return an item from the queue. If queue is empty, wait until an item is available.
                 if item.find('{alphnum}') >= 0:
                     for _letter in 'abcdefghijklmnopqrstuvwxyz0123456789':
                         sub_queue.put(item.replace('{alphnum}', _letter, 1))
@@ -212,7 +217,7 @@ class TugaBruteForce:
         if lst_subs:
             self.queue.put(lst_subs)
 ################################################################################
-    def _load_next_sub(self):
+    def _load_second_sub_names(self):
 
         # Verify the next wordlist
         _file = 'wordlist/next_names.txt' if not self.options.full_scan else 'wordlist/next_names_full.txt'
@@ -227,7 +232,7 @@ class TugaBruteForce:
                 if sub and sub not in next_subs:
                     tmp_set = {sub}
                     while len(tmp_set) > 0:
-                        item = tmp_set.pop()
+                        item = tmp_set.pop() # Removing elements from the tmp_set
                         if item.find('{alphnum}') >= 0:
                             for _letter in 'abcdefghijklmnopqrstuvwxyz0123456789':
                                 tmp_set.add(item.replace('{alphnum}', _letter, 1))
@@ -253,6 +258,7 @@ class TugaBruteForce:
     def _print_msg(self):
         while not self.STOP_SCAN:
             try:
+                # Queue.get( block = True , timeout = None )
                 _msg = self.msg_queue.get(timeout=0.1) # _msg (subdomains), timeout=0.1
             except:
                 continue
@@ -260,11 +266,10 @@ class TugaBruteForce:
                 msg = ' %s  | Found %s subdomains | %s groups left | %s scanned in %.1f seconds| %s threads' % (
                      self.wordlist_subdomains, self.found_count, self.queue.qsize(), self.scan_count, time.time() - self.start_time,
                     self.thread_count)
-                sys.stdout.write('\r' + ' ' * (self.console_width - len(msg)) + msg)
+                sys.stdout.write('\r' + ' ' * (self.console_width - len(msg)) + msg) # print Found 6 subdomains | 0 groups left | 26274 scanned in 49.0 seconds| 199 threads
             elif _msg.startswith('[+] Check DNS Server'):
-                sys.stdout.write('\r' + _msg + ' ' * (self.console_width - len(_msg)))
+                sys.stdout.write('\r' + _msg + ' ' * (self.console_width - len(_msg))) # print Check DNS
             else:
-                #time.sleep(5)
                 sys.stdout.write('\r' + _msg + ' ' * (self.console_width - len(_msg)) + '\n')  # _msg print subdomains in console
             sys.stdout.flush()
 ################################################################################
@@ -279,14 +284,17 @@ class TugaBruteForce:
         while not self.STOP_SCAN:
             if not _lst_subs:
                 try:
-                    _lst_subs = self.queue.get(timeout=0.1)
+                    _lst_subs = self.queue.get(timeout=0.1) # Remove and return an item from the queue. If queue is empty, wait until an item is available.
                 except:
                     if time.time() - self.last_scanned > 2.0: # default 2.0
                         break
                     else:
                         continue
-            sub = _lst_subs.pop()
+            # print(_lst_subs) result words list ['oscommerce']
+            sub = _lst_subs.pop() # Removing elements from the _lst_subs print(_lst_subs) result empty [] pass to sub
+            #print(sub)
             _sub = sub.split('.')[-1]
+            #print(_sub)
             _sub_timeout_count = 0
             while not self.STOP_SCAN:
                 try:
@@ -300,7 +308,9 @@ class TugaBruteForce:
                         #    print(server.to_text())
                     except dns.resolver.NoAnswer as e:
                         answers = self.ex_resolver.query(cur_sub_domain)
+
                     is_wildcard_record = False
+
                     if answers:
                         ips = ', '.join(sorted([answer.address for answer in answers]))
                         if ips in ['192.168.1.1', '127.0.0.1', '0.0.0.0']:
@@ -322,7 +332,7 @@ class TugaBruteForce:
                             msg = cur_sub_domain.ljust(50) + ips  # default [30, 50], msg = <subs>.<target> and info.
                             self.msg_queue.put(msg)
                             self.msg_queue.put('status')
-                            self.outfile.write(cur_sub_domain.ljust(50) + '\t' + ips + '\n')
+                            self.outfile.write(cur_sub_domain.ljust(50) + '\t' + ips + '\n') #Write to a file
                             self.outfile.flush()
                             try:
                                 self.resolvers[thread_id].query('lordneostark.' + cur_sub_domain)
@@ -365,10 +375,11 @@ class TugaBruteForce:
 ################################################################################
     def run(self):
         self.start_time = time.time()
-        # Create a number of worker threads (self.options.threads)
+        # Send 200 task requests to the workers.
         for i in range(self.options.threads):
             try:
-                t = threading.Thread(target=self._scan, name=str(i))  # (thread)
+                # Turn-on the worker thread.
+                t = threading.Thread(target=self._scan, name=str(i))
                 t.setDaemon(True)
                 t.start() # start the thread for the def _scan()
             except:

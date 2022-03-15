@@ -7,15 +7,20 @@ def DNS_Record_Types(target):
     print(G + "\n[+] DNS Record Types..." + W)
     print(G + "**************************************************************" + W)
 
-    record_types = ['A', 'AAAA', 'NS', 'CNAME', 'MX', 'PTR', 'SOA', 'TXT', 'CERT', 'HINFO', 'MINFO', 'TLSA', 'SPF', 'KEY', 'NXT']
-    for records in record_types:
+    record_types = ['A', 'AAAA', 'AFSDB', 'NS', 'CNAME', 'MX', 'PTR', 'SOA', 'CERT',
+                    'HINFO', 'MINFO', 'TLSA', 'SPF', 'KEY', 'NXT', 'CAA', 'TXT', 'MD',
+                    'NULL', 'DNAME', 'URI', 'DLV', 'APL', 'CSYNC', 'DHCID', 'LOC']
+
+    for record in record_types:
         try:
-            answer = dns.resolver.resolve(target, records)
-            print(f'\nRecords: {records}')
+            answer = dns.resolver.resolve(target, record)
+            print(Y + f'\nRecords: {record}' + W)
             print('-' * 30)
-            for server in answer:
-                print(server.to_text())
+            for rdata in answer:
+                print(rdata.to_text())
         except dns.resolver.NoAnswer:
+            pass
+        except dns.exception.Timeout:
             pass
         except dns.resolver.NXDOMAIN:
             print(f'{target} does not exist.')
@@ -24,7 +29,7 @@ def DNS_Record_Types(target):
         except KeyboardInterrupt:
             print('Quitting.')
             quit()
-    print(G + "**************************************************************\n" + W)
+    print(G + "**************************************************************" + W)
 ###############################################################################################
 def bscan_whois_look(target):
     try:
@@ -34,7 +39,7 @@ def bscan_whois_look(target):
         dict.append(data)
         #print(domain.__dict__, "\n")
         #print(domain.name, "\n")
-        print("Domain expiration: ", domain.expiration_date, "\n")
+        print("Domain expiration: ", domain.expiration_date)
         print(G + "**************************************************************\n" + W)
         for dict_line in dict:
             for k, v in dict_line.items():

@@ -65,7 +65,7 @@ def parse_url(url):
         host = urllib3.util.url.parse_url(url).host
         response = requests.get('http://' + host)
         if (response.status_code == 200):
-            print('Target ONLINE... Lets go!\n')
+            print('Target ONLINE... Lets go!')
         else:
             print('[*] Invalid domain, try again...')
     except Exception as e:
