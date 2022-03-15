@@ -2339,7 +2339,9 @@ circus
 cirrus
 cis
 cisco
+cisco0
 cisco1
+cisco-admin
 cisco-capwap-controller
 CISCO-CAPWAP-CONTROLLER
 cisco-lwapp-controller
@@ -3450,7 +3452,7 @@ domaincontrolpanel
 domaincp
 domaindnszones
 DomainDnsZones
-_domainkey
+domainkey
 domains
 domi
 domination
@@ -4698,7 +4700,7 @@ gca
 gcc
 gci
 gcm
-gc._msdcs
+gc.msdcs
 gcs
 gd
 gdi
@@ -8361,7 +8363,6 @@ ns04
 ns05
 ns-1
 ns1
-NS1
 ns10
 ns100
 ns101
@@ -8411,7 +8412,6 @@ ns1.ha
 ns1.hosting
 ns-2
 ns2
-NS2
 ns20
 ns201
 ns21
@@ -8430,7 +8430,6 @@ ns2.ha
 ns2.hosting
 ns-3
 ns3
-NS3
 ns30
 ns31
 ns32
@@ -8539,6 +8538,7 @@ nts
 ntt
 ntv
 nu
+nuclear
 nucleus
 nueva
 nuevo
@@ -12500,6 +12500,7 @@ unix
 unknown
 unlimited
 uno
+unplug
 unplugged
 unreal
 UNREGISTERED.zmc
@@ -13609,9 +13610,7 @@ wwb
 wwe
 wws
 wwu
-#www
 www
-WWW
 www0
 www001
 www003

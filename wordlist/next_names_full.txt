@@ -383,7 +383,9 @@ ac
 access
 account
 accounts
+accountservices
 activity
+activation
 ad
 admin
 adminht
@@ -719,6 +721,7 @@ et
 etp
 etpgaz
 eu
+europe
 ev
 event
 events
@@ -727,6 +730,7 @@ ex
 exam
 exchange
 extranet
+extranettest
 ey
 ez
 f
@@ -767,6 +771,8 @@ fk
 fl
 flash
 flickr
+fltop
+fltops
 fm
 fn
 fo
@@ -836,6 +842,7 @@ gridlogic-eng
 group
 groups
 gs
+gsfc
 gt
 gu
 gv
@@ -1049,6 +1056,12 @@ l8
 l9
 la
 labs
+la-wc-1268a-1105p-1
+la-wc-1268a-1105p-2
+la-wc-1268a-1105p-3
+la-wc-1268a-1105p-4
+la-wc-1268a-1105p-5
+la-wc-1268a-1105p-6
 lb
 lc
 ld
@@ -1136,6 +1149,7 @@ meet
 meeting
 member
 members
+membership
 mercury
 metrics
 mf
@@ -1164,6 +1178,8 @@ mrtg
 ms
 msoid
 mssql
+msconnect
+mspartner
 mt
 mtest
 mu
@@ -1307,6 +1323,10 @@ pass
 passport
 password
 payment
+payloads
+payloads1
+payloads2
+payloads3
 pb
 pc
 pd
@@ -1421,6 +1441,7 @@ rd
 re
 redirect
 redmine
+redmond
 register
 registration
 relay
@@ -1535,6 +1556,7 @@ social
 soft
 software
 solutions
+southamerica
 sp
 space
 spam
@@ -1613,6 +1635,7 @@ tg
 th
 thousand
 three
+thermal
 ti
 ticket
 time
