@@ -7,6 +7,10 @@
 import time
 import requests
 import json
+
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
 # Import internal modules
 from modules import tuga_useragents #random user-agent
 # Import internal functions
@@ -16,60 +20,39 @@ from functions import G, W
 ################################################################################
 class Threatcrowd:
 
-    def __init__(self, target, output):
-
+    def __init__(self, target):
         self.target = target
-        self.output = output
         self.module_name = "Threat Crowd"
         self.engine = "threatcrowd"
         self.response = self.engine_url()
 
         if self.response != 1:
-            print(G + f"\nThreatCrowd: Enumerating subdomains now for {target} \n" + W)
-            self.enumerate(self.response, output, target) # Call the function enumerate
+            self.enumerate(self.response, target) # Call the function enumerate
         else:
             pass
-        #if self.output is not None:
-            #DeleteDuplicate(self.engine + '_' + self.output, target)
 ################################################################################
     def engine_url(self):
         try:
-            url = f'https://threatcrowd.org/searchApi/v2/domain/report/?domain={self.target}'
-            response = requests.get(url, headers=tuga_useragents.useragent())
+            response = requests.get(f'https://threatcrowd.org/searchApi/v2/domain/report/?domain={self.target}').text
             return response
         except requests.ConnectionError:
-            print(G + f"[Threat Crowd] Warning! Unable to get subdomains... Try again!\n" + W)
             response = 1
             return response
 ################################################################################
-    def enumerate(self, response, output, target):
-        subdomains = set()
+    def enumerate(self, response, target):
+        subdomains = []
         subdomainscount = 0
         start_time = time.time()
         #################################
         try:
-            #Test json
-            subdomains = response.json()["subdomains"][subdomainscount]
-        except KeyError:
-            print(f"[x] No data found for {self.target} using Threat Crowd.")
-            exit(1)
-        #################################
-        try:
-            while subdomainscount < 500:
-                subdomains = response.json()["subdomains"][subdomainscount]
-                subdomainscount = subdomainscount + 1
-                print(f"[*] {subdomains}")
-                if self.output is not None:
-                    write_file(subdomains, self.engine + '_' + self.output, target)
-            if self.output:
-                print(f"\nSaving result... {self.engine + '_' + self.output}")
-        except IndexError:
+            extract_sub = json.loads(response)
+            #print(extract_sub)
+            for i in extract_sub['subdomains']:
+                self.subdomainscount = self.subdomainscount + 1
+                #subdomains = response.json()[self.subdomainscount]["name_value"]
+                subdomains = i
+                #print(f"    [*] {subdomains}")
+                write_file(subdomains, target)
+        except Exception as e:
             pass
-        #################################
-        if not subdomains:
-            print(f"[x] No data found for {self.target} using Threat Crowd.\n")
-        else:
-            print(G + f"\n[**]Threat Crowd: {subdomainscount} subdomains have been found in %s seconds" % (
-                    time.time() - start_time) +"\n"+ W)
-            if self.output is not None:
-                DeleteDuplicate(self.engine + '_' + self.output, target)
+                #################################

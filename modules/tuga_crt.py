@@ -6,6 +6,10 @@
 import time
 import requests
 import json
+
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
 # Import internal modules
 from modules import tuga_useragents #random user-agent
 # Import internal functions
@@ -15,66 +19,41 @@ from functions import G, W
 ################################################################################
 class CRT:
 
-    def __init__(self, target, output):
+    def __init__(self, target):
 
         self.target = target
-        self.output = output
         self.module_name = "SSL Certificates"
         self.engine = "crt"
         self.response = self.engine_url() # URL
 
         if self.response != 1:
-            print(G + f"\nSSL Certificates: Enumerating subdomains now for {target} \n" + W)
-            self.enumerate(self.response, output, target) # Call the function enumerate
-        else:
-            pass
-        if self.output is not None and self.subdomainscount != 0:
-            DeleteDuplicate(self.engine + '_' + self.output, target)
+            self.enumerate(self.response, target) # Call the function enumerate
         else:
             pass
 ################################################################################
     def engine_url(self):
         try:
-            url = f"https://crt.sh/?q={self.target}&output=json"
-            response = requests.get(url, headers=tuga_useragents.useragent())
+            response = requests.get(f'https://crt.sh/?q={self.target}&output=json').text
             return response
         except requests.ConnectionError:
-            print(G + f"[SSL] Warning! Unable to get subdomains... Try again!\n" + W)
             response = 1
             return response
 ################################################################################
-    def enumerate(self, response, output, target):
-        subdomains = set()
+    def enumerate(self, response, target):
+        subdomains = []
         self.subdomainscount = 0
         start_time = time.time()
         #################################
-        #Test JSON
         try:
-            subdomains = response.json()
-        except ValueError:  # includes simplejson.decoder.JSONDecodeError
-            print ("Decoding JSON has failed\n")
-            exit(1)
-
-        #################################
-        try:
-            while self.subdomainscount < 10000:
-                subdomains = response.json()[self.subdomainscount]["name_value"]
-
+            extract_sub = json.loads(response)
+            #print(extract_sub)
+            for i in extract_sub:
                 self.subdomainscount = self.subdomainscount + 1
-                if "@" in subdomains:  # filter for emails
-                    pass
-                else:
-                    print(f"[*] {subdomains}")
-                    if self.output is not None:
-                        write_file(subdomains, self.engine + '_' + self.output, target)
-            if self.output:
-                print(f"\nSaving result... {self.engine + '_'+ self.output}")
-        except IndexError:
+                #subdomains = response.json()[self.subdomainscount]["name_value"]
+                subdomains = i['name_value']
+                #print(f"{subdomains}")
+
+                write_file(subdomains, target)
+        except Exception as e:
             pass
-        #################################
-        if not subdomains:
-            print(f"[x] Oops! No data found for {self.target} using  SSL Certificates.\n")
-            exit(2)
-        else:
-            print(G + f"\n[**]SSL Certificates: {self.subdomainscount} subdomains have been found in %s seconds" % (
-                        time.time() - start_time) +"\n"+ W)
+                #################################
