@@ -9,18 +9,23 @@ import sys
 import time
 import urllib3
 import requests
-# import bs4 #future...
+
 # Import internal functions
 from functions import R, W, Y, G
 from functions import mapping_domain
+from functions import DeleteDuplicate
+from functions import ReadFile
 from tuga_bruteforce import TugaBruteForce
 from tuga_dns import DNS_Record_Types
 from tuga_dns import bscan_whois_look
+
 # Import internal modules
 from modules import tuga_certspotter
 from modules import tuga_crt
 from modules import tuga_hackertarget
 from modules import tuga_threatcrowd
+from modules import tuga_alienvault
+from modules import tuga_threatminer
 ################################################################################
 # Banner, Tuga or portuguese, is the same ;)
 def banner():
@@ -28,7 +33,7 @@ def banner():
               "             /_  __/_  ______ _____ _/ __ \___  _________  ____ \n"
               "              / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \                \n"
               "             / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               \n"
-              "            /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  Version 1.21               \n"
+              "            /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  Version 1.30               \n"
               "                      /____/                               # Coded By skynet0x01 #\n" + W)
     print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country. 2020-2022\n" + W)
 ################################################################################
@@ -38,7 +43,6 @@ def parse_args():
         python3 {sys.argv[0]} -d google.com                                 (Default: All modules)
         python3 {sys.argv[0]} -d google.com --enum ssl                      (One or more modules)
         python3 {sys.argv[0]} -d google.com --enum certspotter --savemap
-        python3 {sys.argv[0]} -d google.com -o google.txt                   (Save the results to txt file)
         python3 {sys.argv[0]} -d google.com --savemap                       (Save subdomains image map)
         python3 {sys.argv[0]} -d google.com --bruteforce                    (Use first_names.txt, and next_names.txt)
         python3 {sys.argv[0]} -d google.com -b --full                       (Use first_names_full.txt, and next_names_full.txt)
@@ -49,7 +53,6 @@ def parse_args():
     parser = argparse.ArgumentParser(epilog=Examples, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser._optionals.title = "OPTIONS"
     parser.add_argument('-d', '--domain', help="[required] Domain name to enumerate it's subdomains", required=True)
-    parser.add_argument('-o', '--output', metavar='', help='Save the results to txt file')
     parser.add_argument('-i', '--ignore', dest='i', default=False, action='store_true', help='Ignore domains pointed to private IPs')
     parser.add_argument('-f', '--file', metavar='', dest='file', default='first_names.txt', help='A file contains new line delimited subdomains, default is first_names.txt.')
     parser.add_argument('-s', '--savemap', help='Save subdomains image map', action='store_true')
@@ -91,14 +94,16 @@ def queries(target):
     print(R + "[-] Searching " + target + " in CertsPotter " + W)
     print(R + "[-] Searching " + target + " in SSL Certificates " + W)
     print(R + "[-] Searching "  + target + " in HackerTarget " + W)
-    print(R + "[-] Searching "  + target + " in ThreatCrowd\n" + W)
+    print(R + "[-] Searching "  + target + " in ThreatCrowd " + W)
+    print(R + "[-] Searching "  + target + " in Alienvault " + W)
+    print(R + "[-] Searching "  + target + " in Threatminer\n" + W)
     time.sleep(0.5)
     print("Wait for results...!\n")
     return (0)
 ################################################################################
 
 ################################################################################
-def main(target, output, savemap, enum, threads, bruteforce, args):
+def main(target, savemap, enum, threads, bruteforce, args):
     # bruteforce fast scan
     if bruteforce:
         #d = tuga_bruteforce.TugaBruteForce(target, options=args)
@@ -107,27 +112,38 @@ def main(target, output, savemap, enum, threads, bruteforce, args):
         subdomains_test.outfile.flush()
         subdomains_test.outfile.close()
         sys.exit()
+
     try:
         # <Module required> Perform enumerations and network mapping
         supported_engines = {'certspotter': tuga_certspotter.Certspotter,
                              'ssl': tuga_crt.CRT,
                              'hackertarget': tuga_hackertarget.Hackertarget,
-                             'threatcrowd': tuga_threatcrowd.Threatcrowd
+                             'threatcrowd': tuga_threatcrowd.Threatcrowd,
+                             'alienvault': tuga_alienvault.Alienvault,
+                             'threatminer': tuga_threatminer.Threatminer
                             }
         chosenEnums = []
+
         # Default modules (run all modules)
-        if enum is None:
+        if enum is None: # Run all modules
             queries(target)
-            chosenEnums = [tuga_certspotter.Certspotter, tuga_crt.CRT, tuga_hackertarget.Hackertarget, tuga_threatcrowd.Threatcrowd]
+            chosenEnums = [tuga_certspotter.Certspotter, tuga_crt.CRT, tuga_hackertarget.Hackertarget,
+                           tuga_threatcrowd.Threatcrowd, tuga_alienvault.Alienvault, tuga_threatminer.Threatminer]
             # Start super fast enumeration
-            enums = [indicate(target, output) for indicate in chosenEnums]
-        else:
+            enums = [indicate(target) for indicate in chosenEnums]
+            print("-------------------------------\n")
+            DeleteDuplicate(target)
+            ReadFile(target)
+        else: # Perform enumerations
             for engine in enum:
                 if engine.lower() in supported_engines:
                     chosenEnums.append(supported_engines[engine.lower()])
                     print("\nWait for results...!\n")
                     # Start the enumeration
-                    enums = [indicate(target, output) for indicate in chosenEnums]
+                    enums = [indicate(target) for indicate in chosenEnums]
+                    DeleteDuplicate(target)
+                    ReadFile(target)
+
         # Save map domain (png file)
         if savemap is not False:
             mapping_domain(target)
@@ -139,15 +155,15 @@ def menu():
     banner()
     args = parse_args()  # args = parser.parse_args()
     target = parse_url(args.domain)
-    enum = args.enum
-    bruteforce = args.bruteforce
-    threads = args.threads
-    output = args.output
-    savemap = args.savemap
     internet_on()
     DNS_Record_Types(target)
     bscan_whois_look(target)
-    main(target, output, savemap, enum, threads, bruteforce, args)
+    enum = args.enum
+    bruteforce = args.bruteforce
+    threads = args.threads
+    savemap = args.savemap
+    #internet_on()
+    main(target, savemap, enum, threads, bruteforce, args)
 ################################################################################
 if __name__ == "__main__":
     menu()

@@ -11,6 +11,7 @@ import sys  # System-specific parameters and functions
 import threading  # Thread-based parallelism
 import time  # Time access and conversions
 import dns.resolver  # dnspython
+import datetime
 # Import internal functions
 from functions import G, W, R
 from tuga_dns import is_intranet
@@ -60,13 +61,15 @@ class TugaBruteForce:
             time.sleep(0.1)
 
         # create a target folder and save results in to a file txt
-        if options.output:
-            outfile = options.output
-            if not os.path.exists("results/" + self.target):
-                os.mkdir("results/" + self.target)
-            outfile = 'results/' + self.target + "/" + outfile + '_tuga_bruteforce.txt' if not options.full_scan else 'results/' + self.target + "/" + outfile + '_tuga_bruteforce_full.txt'
-        else:
-            outfile = 'results/' + "_tmp" + '.txt' if not options.full_scan else 'results/' + "_tmp" + '.txt'
+        #if options.output:
+        #    outfile = options.output
+        date = str(datetime.datetime.now().date())
+        #############
+        if not os.path.exists("results/" + self.target):
+            os.mkdir("results/" + self.target)
+        outfile = 'results/' + self.target + "/" + date  + "/" + '_tuga_bruteforce.txt' if not options.full_scan else 'results/' + self.target + "/" + date + "/" + '_tuga_bruteforce_full.txt'
+        #else:
+        #    outfile = 'results/' + "_tmp" + '.txt' if not options.full_scan else 'results/' + "_tmp" + '.txt'
         self.outfile = open(outfile, 'w')
 
         # save ip, dns.
