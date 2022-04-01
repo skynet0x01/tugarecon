@@ -100,7 +100,6 @@ def queries(target):
     print(R + "[-] Searching "  + target + " in Alienvault " + W)
     print(R + "[-] Searching "  + target + " in Threatminer\n" + W)
     time.sleep(0.5)
-    print("Wait for results...!\n")
     return (0)
 ################################################################################
 
@@ -131,9 +130,11 @@ def main(target, savemap, enum, threads, bruteforce, args):
         if enum is None: # Run all modules
             start_time = time.time()
             queries(target)
+            #print("Wait for results...!\n")
             chosenEnums = [tuga_certspotter.Certspotter, tuga_crt.CRT, tuga_hackertarget.Hackertarget,
                            tuga_threatcrowd.Threatcrowd, tuga_alienvault.Alienvault, tuga_threatminer.Threatminer]
             # Start super fast enumeration
+            print("Wait for results...!\n")
             bar = IncrementalBar('Loading', max = len(chosenEnums))
             #enums = [indicate(target) for indicate in chosenEnums]
             for indicate in chosenEnums:
