@@ -107,6 +107,7 @@ def queries(target):
 def main(target, savemap, enum, threads, bruteforce, args):
     # bruteforce fast scan
     if bruteforce:
+        print("\nWait for results...!\n")
         #d = tuga_bruteforce.TugaBruteForce(target, options=args)
         subdomains_test = TugaBruteForce(options=args)
         subdomains_test.run()
@@ -134,13 +135,13 @@ def main(target, savemap, enum, threads, bruteforce, args):
                            tuga_threatcrowd.Threatcrowd, tuga_alienvault.Alienvault, tuga_threatminer.Threatminer]
             # Start super fast enumeration
             print("Wait for results...! (It might take a while)\n")
-            bar = IncrementalBar('Loading', max = len(chosenEnums))
+            bar = IncrementalBar('Processing', max = len(chosenEnums))
             #enums = [indicate(target) for indicate in chosenEnums]
             for indicate in chosenEnums:
                 enums = indicate(target)
                 bar.next()
             bar.finish()
-            print("-------------------------------\n")
+            print(G + "**************************************************************\n" + W)
             DeleteDuplicate(target)
             ReadFile(target, start_time)
         else: # Perform enumerations
