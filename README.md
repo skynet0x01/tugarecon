@@ -33,6 +33,7 @@ And much more... :)
 # Installation
 
 git clone https://github.com/skynet0x01/tugarecon.git
+pip install -r requirements.txt
 
 # Usage
 
