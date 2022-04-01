@@ -39,8 +39,8 @@ def banner():
 ################################################################################
 # parse the arguments
 def parse_args():
-    Examples = Y + '''modules: certspotter, hackertarget, ssl, threatcrowd\n''' + ''' [**]Examples: ''' + W + f'''
-        python3 {sys.argv[0]} -d google.com                                 (Default: All modules)
+    Examples = Y + '''modules: certspotter, hackertarget, ssl, threatcrowd, alienvault, threatminer\n''' + ''' [**]Examples: ''' + W + f'''
+        python3 {sys.argv[0]} -d google.com                                 (Default: All modules, except bruteforce)
         python3 {sys.argv[0]} -d google.com --enum ssl                      (One or more modules)
         python3 {sys.argv[0]} -d google.com --enum certspotter --savemap
         python3 {sys.argv[0]} -d google.com --savemap                       (Save subdomains image map)
@@ -162,7 +162,6 @@ def menu():
     bruteforce = args.bruteforce
     threads = args.threads
     savemap = args.savemap
-    #internet_on()
     main(target, savemap, enum, threads, bruteforce, args)
 ################################################################################
 if __name__ == "__main__":
