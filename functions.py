@@ -8,12 +8,12 @@ import webbrowser
 import urllib.error
 import urllib3
 import os
+import time
 import datetime
-from pathlib import Path
+from pathlib import Path # Future: Nedd to change to pathlib2
 ################################################################################
 # Colors
 global G, Y, B, R, W
-
 G = '\033[92m'  # green
 Y = '\033[93m'  # yellow
 B = '\033[94m'  # blue
@@ -23,7 +23,6 @@ W = '\033[0m'  # white
 def write_file(subdomains, target):
     date = str(datetime.datetime.now().date())
     pwd = os.getcwd()
-
     # saving subdomains results to output file
     folder = os.path.join(pwd, "results/" + target + "/" + date)
     try:
@@ -49,19 +48,19 @@ def DeleteDuplicate(target):
     except OSError:
         pass
 ################################################################################
-def ReadFile(target):
+def ReadFile(target, start_time):
     date = str(datetime.datetime.now().date())
     pwd = os.getcwd()
     folder = os.path.join(pwd, "results/" + target + "/" + date)
-
     file = open("results/" + target + "/" + date + "/" + "subdomains.txt", 'r')
     lines = file.readlines()
 
     for index, line in enumerate(lines):
         print("     [*] {}:  {}".format(index, line.strip()))
     file.close()
-    print("\n[*] Total Subdomains Found: {}".format(index))
-    print(Y + "\n\n[+] Output Result" + W)
+    print(Y + "\n[*] Total Subdomains Found: {}".format(index) + W)
+    print(Y + f"[**]TugaRecon: Subdomains have been found in %s seconds" % (time.time() - start_time) +"\n"+ W)
+    print(Y + "\n[+] Output Result" + W)
     print(G + "**************************************************************" + W)
     print(R + "         ->->-> " + W, folder + "\n")
 ################################################################################

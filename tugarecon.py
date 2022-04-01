@@ -126,6 +126,7 @@ def main(target, savemap, enum, threads, bruteforce, args):
 
         # Default modules (run all modules)
         if enum is None: # Run all modules
+            start_time = time.time()
             queries(target)
             chosenEnums = [tuga_certspotter.Certspotter, tuga_crt.CRT, tuga_hackertarget.Hackertarget,
                            tuga_threatcrowd.Threatcrowd, tuga_alienvault.Alienvault, tuga_threatminer.Threatminer]
@@ -133,7 +134,7 @@ def main(target, savemap, enum, threads, bruteforce, args):
             enums = [indicate(target) for indicate in chosenEnums]
             print("-------------------------------\n")
             DeleteDuplicate(target)
-            ReadFile(target)
+            ReadFile(target, start_time)
         else: # Perform enumerations
             for engine in enum:
                 if engine.lower() in supported_engines:
@@ -142,7 +143,7 @@ def main(target, savemap, enum, threads, bruteforce, args):
                     # Start the enumeration
                     enums = [indicate(target) for indicate in chosenEnums]
                     DeleteDuplicate(target)
-                    ReadFile(target)
+                    ReadFile(target, start_time)
 
         # Save map domain (png file)
         if savemap is not False:
