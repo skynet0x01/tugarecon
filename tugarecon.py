@@ -9,6 +9,8 @@ import sys
 import time
 import urllib3
 import requests
+from progress.bar import IncrementalBar
+#from progress.bar import Bar
 
 # Import internal functions
 from functions import R, W, Y, G
@@ -112,7 +114,8 @@ def main(target, savemap, enum, threads, bruteforce, args):
         subdomains_test.outfile.flush()
         subdomains_test.outfile.close()
         sys.exit()
-
+    # END bruteforce fast scan
+    # Modules scan
     try:
         # <Module required> Perform enumerations and network mapping
         supported_engines = {'certspotter': tuga_certspotter.Certspotter,
@@ -131,7 +134,12 @@ def main(target, savemap, enum, threads, bruteforce, args):
             chosenEnums = [tuga_certspotter.Certspotter, tuga_crt.CRT, tuga_hackertarget.Hackertarget,
                            tuga_threatcrowd.Threatcrowd, tuga_alienvault.Alienvault, tuga_threatminer.Threatminer]
             # Start super fast enumeration
-            enums = [indicate(target) for indicate in chosenEnums]
+            bar = IncrementalBar('Loading', max = len(chosenEnums))
+            #enums = [indicate(target) for indicate in chosenEnums]
+            for indicate in chosenEnums:
+                enums = indicate(target)
+                bar.next()
+            bar.finish()
             print("-------------------------------\n")
             DeleteDuplicate(target)
             ReadFile(target, start_time)
