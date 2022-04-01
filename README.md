@@ -57,16 +57,21 @@ git clone https://github.com/skynet0x01/tugarecon.git
 # Dependencies
 You need to install [dnspython](http://www.dnspython.org) to do DNS query
 
-        dnspython version 1.16.0
-        threading
-        queue
-        re
-        os
-        time
+        dnspython>=1.16.0
+        argparse
         sys
-        webbrowser
+        time
+        datetime
         urllib3
-        random
+        requests
+        webbrowser
+        os
+        pathlib
+        json
+        threading
+        re 
+        queue
+        whois
 
 # DONATIONS:
 
