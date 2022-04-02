@@ -11,14 +11,8 @@ import os
 import time
 import datetime
 from pathlib import Path # Future: Nedd to change to pathlib2
-################################################################################
-# Colors
-global G, Y, B, R, W
-G = '\033[92m'  # green
-Y = '\033[93m'  # yellow
-B = '\033[94m'  # blue
-R = '\033[91m'  # red
-W = '\033[0m'  # white
+
+from colors import G, Y, B, R, W
 ################################################################################
 def write_file(subdomains, target):
     date = str(datetime.datetime.now().date())

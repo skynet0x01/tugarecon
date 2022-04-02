@@ -13,7 +13,7 @@ from progress.bar import IncrementalBar
 #from progress.bar import Bar
 
 # Import internal functions
-from functions import R, W, Y, G
+from colors import G, Y, B, R, W
 from functions import mapping_domain
 from functions import DeleteDuplicate
 from functions import ReadFile
@@ -75,12 +75,15 @@ def parse_url(url):
             print('[*] Invalid domain, try again...')
     except Exception as e:
         print('[*] Network unstable... !? ')
+    except KeyboardInterrupt:
+        print("\nTugaRecon interrupted by user\n")
+        print(G + "**************************************************************" + W)
+        quit()
         #sys.exit(1)
     return host
 ################################################################################
 def internet_on():
     url = "https://www.google.com"
-    #url = target
     test_timeout = 1
     try:
         request = requests.get(url, timeout=test_timeout)
@@ -89,6 +92,10 @@ def internet_on():
     except (requests.ConnectionError, requests.Timeout) as exception:
         print("No internet connection. Check the network...\n")
         exit(1)
+    except KeyboardInterrupt:
+        print(G + "**************************************************************" + W)
+        print("\nTugaRecon interrupted by user\n")
+        sys.exit()
 ################################################################################
 def queries(target):
     print(G + "Enumerating subdomains for " + target + " \n" + W)
@@ -143,7 +150,7 @@ def main(target, savemap, enum, threads, bruteforce, args):
                 enums = indicate(target)
                 bar.next()
             bar.finish()
-            print(G + "**************************************************************\n" + W)
+            print(G + "\n**************************************************************\n" + W)
             DeleteDuplicate(target)
             ReadFile(target, start_time)
         else: # Perform enumerations

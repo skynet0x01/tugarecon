@@ -13,7 +13,7 @@ import time  # Time access and conversions
 import dns.resolver  # dnspython
 import datetime
 # Import internal functions
-from functions import G, W, R
+from colors import G, Y, B, R, W
 from tuga_dns import is_intranet
 from tuga_terminal import getTerminalSize
 ################################################################################
@@ -108,7 +108,7 @@ class TugaBruteForce:
                 self.STOP_SCAN = True
                 sys.exit(-1)
         except KeyboardInterrupt:
-            print('Quitting...')
+            print("\nTugaRecon interrupted by user\n")
             quit()
 ################################################################################
     def _test_dns_servers(self, server):

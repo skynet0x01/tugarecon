@@ -1,7 +1,7 @@
 import dns.resolver  # dnspython
 import whois
 # Import internal
-from functions import G, W, R, Y
+from colors import G, Y, B, R, W
 ###############################################################################################
 def DNS_Record_Types(target):
     print(G + "\n[+] DNS Record Types..." + W)
@@ -27,7 +27,7 @@ def DNS_Record_Types(target):
             print(G + "**************************************************************\n" + W)
             quit()
         except KeyboardInterrupt:
-            print('Quitting.')
+            print("\nTugaRecon interrupted by user\n")
             quit()
     print(G + "**************************************************************" + W)
 ###############################################################################################
@@ -45,6 +45,9 @@ def bscan_whois_look(target):
             for k, v in dict_line.items():
                 print(k + ": " + v)
         print(G + "**************************************************************\n" + W)
+    except KeyboardInterrupt:
+        print("\nTugaRecon interrupted by user\n")
+        quit()
     except Exception as e:
         pass
 ###############################################################################################
