@@ -14,7 +14,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 # Import internal functions
 from functions import write_file
 from functions import DeleteDuplicate
-from functions import G, W
+from colors import G, Y, B, R, W
 ################################################################################
 class Certspotter:
 
