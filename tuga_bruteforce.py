@@ -26,7 +26,6 @@ class TugaBruteForce:
         self.options = options            # All options...
         self.ignore_intranet = options.i  # need more options... not complete (Ignore domains pointed to private IPs)
         self.wordlist_subdomains = ""        # Wordlist
-        #self.outfile = options.output
 
         # set threads and count system to 0
         self.thread_count = self.scan_count = self.found_count = 0
@@ -64,14 +63,17 @@ class TugaBruteForce:
         #if options.output:
         #    outfile = options.output
         date = str(datetime.datetime.now().date())
+        pwd = os.getcwd()
         #############
-        if not os.path.exists("results/" + self.target):
-            os.mkdir("results/" + self.target)
+        # saving subdomains results to output file
+        folder = os.path.join(pwd, "results/" + self.target + "/" + date)
+        try:
+            os.makedirs(folder)
+        except:
+            pass
         outfile = 'results/' + self.target + "/" + date  + "/" + '_tuga_bruteforce.txt' if not options.full_scan else 'results/' + self.target + "/" + date + "/" + '_tuga_bruteforce_full.txt'
-        #else:
-        #    outfile = 'results/' + "_tmp" + '.txt' if not options.full_scan else 'results/' + "_tmp" + '.txt'
         self.outfile = open(outfile, 'w')
-
+################################################################################
         # save ip, dns.
         self.ip_dict = {}
         self.last_scanned = time.time()

@@ -107,7 +107,8 @@ def queries(target):
 def main(target, savemap, enum, threads, bruteforce, args):
     # bruteforce fast scan
     if bruteforce:
-        print("\nWait for results...!\n")
+        print("\nWait for results...!")
+        print(G + "**************************************************************\n" + W)
         #d = tuga_bruteforce.TugaBruteForce(target, options=args)
         subdomains_test = TugaBruteForce(options=args)
         subdomains_test.run()
@@ -134,7 +135,8 @@ def main(target, savemap, enum, threads, bruteforce, args):
             chosenEnums = [tuga_certspotter.Certspotter, tuga_crt.CRT, tuga_hackertarget.Hackertarget,
                            tuga_threatcrowd.Threatcrowd, tuga_alienvault.Alienvault, tuga_threatminer.Threatminer]
             # Start super fast enumeration
-            print("Wait for results...! (It might take a while)\n")
+            print("Wait for results...! (It might take a while)")
+            print(G + "**************************************************************\n" + W)
             bar = IncrementalBar('Processing', max = len(chosenEnums))
             #enums = [indicate(target) for indicate in chosenEnums]
             for indicate in chosenEnums:
@@ -158,6 +160,7 @@ def main(target, savemap, enum, threads, bruteforce, args):
         if savemap is not False:
             mapping_domain(target)
     except KeyboardInterrupt:
+        print(G + "**************************************************************" + W)
         print("\nTugaRecon interrupted by user\n")
         sys.exit()
 ################################################################################
