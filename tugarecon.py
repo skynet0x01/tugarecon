@@ -106,7 +106,7 @@ def queries(target):
     print(R + "[-] Searching "  + target + " in HackerTarget " + W)
     print(R + "[-] Searching "  + target + " in ThreatCrowd " + W)
     print(R + "[-] Searching "  + target + " in Alienvault " + W)
-    print(R + "[-] Searching "  + target + " in Threatminer\n" + W)
+    print(R + "[-] Searching "  + target + " in Threatminer" + W)
     print(R + "[-] Searching "  + target + " in Omnisint\n" + W)
     time.sleep(0.5)
     return (0)
