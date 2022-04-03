@@ -28,6 +28,7 @@ from modules import tuga_hackertarget
 from modules import tuga_threatcrowd
 from modules import tuga_alienvault
 from modules import tuga_threatminer
+from modules import tuga_omnisint
 ################################################################################
 # Banner, Tuga or portuguese, is the same ;)
 def banner():
@@ -41,7 +42,7 @@ def banner():
 ################################################################################
 # parse the arguments
 def parse_args():
-    Examples = Y + '''modules: certspotter, hackertarget, ssl, threatcrowd, alienvault, threatminer\n''' + ''' [**]Examples: ''' + W + f'''
+    Examples = Y + '''modules: certspotter, hackertarget, ssl, threatcrowd, alienvault, threatminer, omnisint\n''' + ''' [**]Examples: ''' + W + f'''
         python3 {sys.argv[0]} -d google.com                                 (Default: All modules, except bruteforce)
         python3 {sys.argv[0]} -d google.com --enum ssl                      (One or more modules)
         python3 {sys.argv[0]} -d google.com --enum certspotter --savemap
@@ -106,6 +107,7 @@ def queries(target):
     print(R + "[-] Searching "  + target + " in ThreatCrowd " + W)
     print(R + "[-] Searching "  + target + " in Alienvault " + W)
     print(R + "[-] Searching "  + target + " in Threatminer\n" + W)
+    print(R + "[-] Searching "  + target + " in Omnisint\n" + W)
     time.sleep(0.5)
     return (0)
 ################################################################################
@@ -131,7 +133,8 @@ def main(target, savemap, enum, threads, bruteforce, args):
                              'hackertarget': tuga_hackertarget.Hackertarget,
                              'threatcrowd': tuga_threatcrowd.Threatcrowd,
                              'alienvault': tuga_alienvault.Alienvault,
-                             'threatminer': tuga_threatminer.Threatminer
+                             'threatminer': tuga_threatminer.Threatminer,
+                             'omnisint': tuga_omnisint.Omnisint
                             }
         chosenEnums = []
 
@@ -140,7 +143,8 @@ def main(target, savemap, enum, threads, bruteforce, args):
             start_time = time.time()
             queries(target)
             chosenEnums = [tuga_certspotter.Certspotter, tuga_crt.CRT, tuga_hackertarget.Hackertarget,
-                           tuga_threatcrowd.Threatcrowd, tuga_alienvault.Alienvault, tuga_threatminer.Threatminer]
+                           tuga_threatcrowd.Threatcrowd, tuga_alienvault.Alienvault, tuga_threatminer.Threatminer,
+                           tuga_omnisint.Omnisint]
             # Start super fast enumeration
             print("Wait for results...! (It might take a while)")
             print(G + "**************************************************************\n" + W)
