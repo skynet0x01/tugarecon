@@ -55,6 +55,7 @@ pip install -r requirements.txt
     threatcrowd
     Alienvault
     Threatminer
+    Omnisint
 
 # Dependencies
 You need to install [dnspython](http://www.dnspython.org) to do DNS query
