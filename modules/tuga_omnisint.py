@@ -31,7 +31,7 @@ class Omnisint:
 ################################################################################
     def engine_url(self):
         try:
-            response = requests.get(f"https://sonar.omnisint.io/subdomains/sapo.pt", timeout=5).json()
+            response = requests.get(f"https://sonar.omnisint.io/subdomains/{self.target}", timeout=5).json()
             return response
         except requests.ConnectionError:
             response = 1
