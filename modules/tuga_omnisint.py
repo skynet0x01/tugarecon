@@ -13,9 +13,9 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 # Import internal modules
 from modules import tuga_useragents #random user-agent
 # Import internal functions
-from functions import write_file
-from functions import DeleteDuplicate
-from colors import G, Y, B, R, W
+from utils.tuga_functions import write_file
+from utils.tuga_functions import DeleteDuplicate
+from utils.tuga_colors import G, Y, B, R, W
 ################################################################################
 class Omnisint:
     def __init__(self, target):
@@ -31,9 +31,9 @@ class Omnisint:
 ################################################################################
     def engine_url(self):
         try:
-            response = requests.get(f"https://sonar.omnisint.io/subdomains/{self.target}", timeout=5).json()
+            response = requests.get(f"https://sonar.omnisint.io/subdomains/{self.target}").json()
             return response
-        except requests.ConnectionError:
+        except (requests.ConnectionError, requests.exceptions.ReadTimeout):
             response = 1
             return response
 ################################################################################

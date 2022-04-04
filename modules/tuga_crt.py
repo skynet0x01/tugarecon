@@ -13,9 +13,9 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 # Import internal modules
 from modules import tuga_useragents #random user-agent
 # Import internal functions
-from functions import write_file
-from functions import DeleteDuplicate
-from colors import G, Y, B, R, W
+from utils.tuga_functions import write_file
+from utils.tuga_functions import DeleteDuplicate
+from utils.tuga_colors import G, Y, B, R, W
 ################################################################################
 class CRT:
 
