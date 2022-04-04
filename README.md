@@ -45,6 +45,7 @@ pip install -r requirements.txt
         python3 tugarecon.py -d google.com --bruteforce
         python3 tugarecon.py -d google.com --bruteforce --full
         python3 tugarecon.py -d google.com -b --full
+        python3 tugarecon.py -r
 
 # Modules
 
