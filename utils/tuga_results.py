@@ -9,7 +9,7 @@ from utils.tuga_colors import G, Y, B, R, W
 def main_work_subdirs():
     rootdir = "results"
     print("\nResults: ")
-    print(G + "**************************************************************\n" + W)
+    print(G + "**************************************************************" + W)
     for root, dirs, files in os.walk(rootdir):
         dirs.sort()
         if root == rootdir:
