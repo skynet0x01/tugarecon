@@ -12,7 +12,7 @@ import time
 import datetime
 from pathlib import Path # Future: Nedd to change to pathlib2
 
-from colors import G, Y, B, R, W
+from utils.tuga_colors import G, Y, B, R, W
 ################################################################################
 def write_file(subdomains, target):
     date = str(datetime.datetime.now().date())

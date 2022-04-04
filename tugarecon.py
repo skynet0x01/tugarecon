@@ -10,35 +10,20 @@ import time
 import urllib3
 import requests
 from progress.bar import IncrementalBar
-#from progress.bar import Bar
 
 # Import internal functions
-from colors import G, Y, B, R, W
-from functions import mapping_domain
-from functions import DeleteDuplicate
-from functions import ReadFile
+from utils.tuga_colors import G, Y, B, R, W
+from utils.tuga_functions import mapping_domain
+from utils.tuga_functions import DeleteDuplicate
+from utils.tuga_functions import ReadFile
+from utils.tuga_dns import DNS_Record_Types
+from utils.tuga_dns import bscan_whois_look
+from utils.tuga_banner import banner
 from tuga_bruteforce import TugaBruteForce
-from tuga_dns import DNS_Record_Types
-from tuga_dns import bscan_whois_look
 
 # Import internal modules
-from modules import tuga_certspotter
-from modules import tuga_crt
-from modules import tuga_hackertarget
-from modules import tuga_threatcrowd
-from modules import tuga_alienvault
-from modules import tuga_threatminer
-from modules import tuga_omnisint
-################################################################################
-# Banner, Tuga or portuguese, is the same ;)
-def banner():
-    print(R + "              ______                  ____                      \n"
-              "             /_  __/_  ______ _____ _/ __ \___  _________  ____ \n"
-              "              / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \                \n"
-              "             / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               \n"
-              "            /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  Version 1.30               \n"
-              "                      /____/                               # Coded By skynet0x01 #\n" + W)
-    print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country. 2020-2022\n" + W)
+from modules.tuga_modules import tuga_certspotter, tuga_crt, tuga_hackertarget, tuga_threatcrowd, \
+                                 tuga_alienvault, tuga_threatminer, tuga_omnisint
 ################################################################################
 # parse the arguments
 def parse_args():
@@ -110,8 +95,6 @@ def queries(target):
     print(R + "[-] Searching "  + target + " in Omnisint\n" + W)
     time.sleep(0.5)
     return (0)
-################################################################################
-
 ################################################################################
 def main(target, savemap, enum, threads, bruteforce, args):
     # bruteforce fast scan
