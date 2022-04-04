@@ -13,17 +13,28 @@ from progress.bar import IncrementalBar
 
 # Import internal functions
 from utils.tuga_colors import G, Y, B, R, W
+from utils.tuga_banner import banner
 from utils.tuga_functions import mapping_domain
 from utils.tuga_functions import DeleteDuplicate
 from utils.tuga_functions import ReadFile
 from utils.tuga_dns import DNS_Record_Types
 from utils.tuga_dns import bscan_whois_look
-from utils.tuga_banner import banner
+from utils.tuga_results import main_work_subdirs
 from tuga_bruteforce import TugaBruteForce
 
 # Import internal modules
 from modules.tuga_modules import tuga_certspotter, tuga_crt, tuga_hackertarget, tuga_threatcrowd, \
                                  tuga_alienvault, tuga_threatminer, tuga_omnisint
+################################################################################
+def data_results():
+    main_work_subdirs()
+    print(G + "**************************************************************\n" + W)
+def override(func):
+    class OverrideAction(argparse.Action):
+        def __call__(self, parser, namespace, values, option_string):
+            func()
+            parser.exit()
+    return OverrideAction
 ################################################################################
 # parse the arguments
 def parse_args():
@@ -46,6 +57,7 @@ def parse_args():
     parser.add_argument('-s', '--savemap', help='Save subdomains image map', action='store_true')
     parser.add_argument('-b', '--bruteforce', help='Enable the bruteforce scan', action='store_true')
     parser.add_argument('-t', '--threads', metavar='', help="Number of threads to use to scan the domain. Default is 200", default=200, type=int)
+    parser.add_argument('-r', '--results', nargs=0, action=override(data_results), help='View saved results')
     parser.add_argument('--enum', nargs='*', help='<optional> Perform enumerations and network mapping')
     parser.add_argument('--full', dest='full_scan', default=False, action='store_true', help='Full scan, NAMES FILE first_names_full.txt will be used to brute')
     return parser.parse_args()
@@ -96,7 +108,7 @@ def queries(target):
     time.sleep(0.5)
     return (0)
 ################################################################################
-def main(target, savemap, enum, threads, bruteforce, args):
+def main(target, savemap, enum, threads, bruteforce, results, args):
     # bruteforce fast scan
     if bruteforce:
         print("\nWait for results...!")
@@ -169,7 +181,8 @@ def menu():
     bruteforce = args.bruteforce
     threads = args.threads
     savemap = args.savemap
-    main(target, savemap, enum, threads, bruteforce, args)
+    results = args.results
+    main(target, savemap, enum, threads, bruteforce, results, args)
 ################################################################################
 if __name__ == "__main__":
     menu()
