@@ -14,17 +14,15 @@ from progress.bar import IncrementalBar
 # Import internal functions
 from utils.tuga_colors import G, Y, B, R, W
 from utils.tuga_banner import banner
-from utils.tuga_functions import mapping_domain
-from utils.tuga_functions import DeleteDuplicate
-from utils.tuga_functions import ReadFile
-from utils.tuga_dns import DNS_Record_Types
-from utils.tuga_dns import bscan_whois_look
+from utils.tuga_functions import ReadFile, DeleteDuplicate, mapping_domain
+from utils.tuga_dns import DNS_Record_Types, bscan_whois_look
 from utils.tuga_results import main_work_subdirs
 from tuga_bruteforce import TugaBruteForce
 
 # Import internal modules
 from modules.tuga_modules import tuga_certspotter, tuga_crt, tuga_hackertarget, tuga_threatcrowd, \
                                  tuga_alienvault, tuga_threatminer, tuga_omnisint
+from modules.tuga_modules import queries
 ################################################################################
 def data_results():
     main_work_subdirs()
@@ -82,7 +80,7 @@ def parse_url(url):
 ################################################################################
 def internet_on():
     url = "https://www.google.com"
-    test_timeout = 1
+    test_timeout = 2
     try:
         request = requests.get(url, timeout=test_timeout)
         print("Connection established... Wait!\n")
@@ -94,19 +92,6 @@ def internet_on():
         print(G + "**************************************************************" + W)
         print("\nTugaRecon interrupted by user\n")
         sys.exit()
-################################################################################
-def queries(target):
-    print(G + "Enumerating subdomains for " + target + " \n" + W)
-    time.sleep(1)
-    print(R + "[-] Searching " + target + " in CertsPotter " + W)
-    print(R + "[-] Searching " + target + " in SSL Certificates " + W)
-    print(R + "[-] Searching "  + target + " in HackerTarget " + W)
-    print(R + "[-] Searching "  + target + " in ThreatCrowd " + W)
-    print(R + "[-] Searching "  + target + " in Alienvault " + W)
-    print(R + "[-] Searching "  + target + " in Threatminer" + W)
-    print(R + "[-] Searching "  + target + " in Omnisint\n" + W)
-    time.sleep(0.5)
-    return (0)
 ################################################################################
 def main(target, savemap, enum, threads, bruteforce, results, args):
     # bruteforce fast scan
@@ -133,7 +118,6 @@ def main(target, savemap, enum, threads, bruteforce, results, args):
                             }
         chosenEnums = []
 
-        # Default modules (run all modules)
         if enum is None: # Run all modules
             start_time = time.time()
             queries(target)
@@ -161,7 +145,6 @@ def main(target, savemap, enum, threads, bruteforce, results, args):
                     enums = [indicate(target) for indicate in chosenEnums]
                     DeleteDuplicate(target)
                     ReadFile(target, start_time)
-
         # Save map domain (png file)
         if savemap is not False:
             mapping_domain(target)
