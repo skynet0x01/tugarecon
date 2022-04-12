@@ -26,7 +26,7 @@ And much more... :)
 
 ![tugarecon_bughunters](https://user-images.githubusercontent.com/39160972/162957618-02e38cff-942a-4ea5-983b-d3c21eca1f9b.png)
 
-![tugarecon1](https://user-images.githubusercontent.com/39160972/72821211-1da77300-3c68-11ea-80a9-db8ea6716e4b.png)
+![tugarecon1](https://user-images.githubusercontent.com/39160972/162958638-0b8221b9-9c94-47cd-8de5-8a067d7bf2e9.png)
 
 ![Screenshot from 2020-01-26 20-59-16](https://user-images.githubusercontent.com/39160972/73141832-4d97b180-4080-11ea-9adc-a83667ea9687.png)
 
@@ -39,8 +39,6 @@ pip install -r requirements.txt
 # Usage
 
         python3 tugarecon.py -d google.com
-        python3 tugarecon.py -d google.com --enum ssl
-        python3 tugarecon.py -d google.com --enum certspotter --savemap
         python3 tugarecon.py -d google.com --savemap
         python3 tugarecon.py -d google.com --bruteforce
         python3 tugarecon.py -d google.com --bruteforce --full
