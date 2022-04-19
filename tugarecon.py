@@ -21,7 +21,7 @@ from tuga_bruteforce import TugaBruteForce
 
 # Import internal modules
 from modules.tuga_modules import tuga_certspotter, tuga_crt, tuga_hackertarget, tuga_threatcrowd, \
-                                 tuga_alienvault, tuga_threatminer, tuga_omnisint
+                                 tuga_alienvault, tuga_threatminer, tuga_omnisint, tuga_sublist3r
 from modules.tuga_modules import queries
 ################################################################################
 def data_results():
@@ -114,7 +114,8 @@ def main(target, savemap, enum, threads, bruteforce, results, args):
                              'threatcrowd': tuga_threatcrowd.Threatcrowd,
                              'alienvault': tuga_alienvault.Alienvault,
                              'threatminer': tuga_threatminer.Threatminer,
-                             'omnisint': tuga_omnisint.Omnisint
+                             'omnisint': tuga_omnisint.Omnisint,
+                             'sublist3r': tuga_sublist3r.Sublist3r
                             }
         chosenEnums = []
 
@@ -123,7 +124,7 @@ def main(target, savemap, enum, threads, bruteforce, results, args):
             queries(target)
             chosenEnums = [tuga_certspotter.Certspotter, tuga_crt.CRT, tuga_hackertarget.Hackertarget,
                            tuga_threatcrowd.Threatcrowd, tuga_alienvault.Alienvault, tuga_threatminer.Threatminer,
-                           tuga_omnisint.Omnisint]
+                           tuga_omnisint.Omnisint, tuga_sublist3r.Sublist3r]
             # Start super fast enumeration
             print("Wait for results...! (It might take a while)")
             print(G + "**************************************************************\n" + W)
@@ -141,6 +142,7 @@ def main(target, savemap, enum, threads, bruteforce, results, args):
                 if engine.lower() in supported_engines:
                     chosenEnums.append(supported_engines[engine.lower()])
                     print("\nWait for results...!\n")
+                    start_time = time.time()
                     # Start the enumeration
                     enums = [indicate(target) for indicate in chosenEnums]
                     DeleteDuplicate(target)
