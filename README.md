@@ -9,7 +9,7 @@
   
                                            # Coded By skynet0x01 #
 
-  tugarecon is a python tool designed to enumerate subdomains using modules. It helps penetration testers and bug hunters collect and gather subdomains for the domain they are targeting.  Bruteforce was integrated was a module to increase the possibility of finding more subdomains using bruteforce with an improved wordlist.
+Tugarecon is a python tool designed to enumerate subdomains using modules. It helps penetration testers and bug hunters collect and gather subdomains for the domain they are targeting.  Bruteforce was integrated was a module to increase the possibility of finding more subdomains using bruteforce with an improved wordlist.
 TugaRecon, tribute to Portuguese explorers reminding glorious past of this country.
 
 During the 15th and 16th centuries, Portuguese explorers were at the forefront of European overseas exploration, which led them to reach India, establish multiple trading posts in Asia and Africa, and settle what would become Brazil, creating one of the most powerful empires.
@@ -30,13 +30,12 @@ And much more... :)
 
 ![Screenshot from 2020-01-26 20-59-16](https://user-images.githubusercontent.com/39160972/73141832-4d97b180-4080-11ea-9adc-a83667ea9687.png)
 
-# Installation
+## Installation
 
 git clone https://github.com/skynet0x01/tugarecon.git
-
 pip install -r requirements.txt
 
-# Usage
+## Usage
 
         python3 tugarecon.py -d google.com
         python3 tugarecon.py -d google.com --savemap
@@ -45,7 +44,7 @@ pip install -r requirements.txt
         python3 tugarecon.py -d google.com -b --full
         python3 tugarecon.py -r
 
-# Modules
+## Modules
 
     bruteforce (tuga_bruteforce - wildcards, wordlist)
     certspotter
@@ -57,7 +56,7 @@ pip install -r requirements.txt
     Omnisint
     API Sublist3r
 
-# Dependencies
+## Dependencies
 You need to install [dnspython](http://www.dnspython.org) to do DNS query
 
         dnspython>=1.16.0
@@ -78,23 +77,11 @@ You need to install [dnspython](http://www.dnspython.org) to do DNS query
         progress
 
 ### DONATIONS:
-
 Donations are welcome. This will help improved features, frequent updates and better overall support.
 
   - BTC: bc1q7hphnwg6ew88qej9306lqfvdyda83nstaznqwh
   - ETH: 0x05215501b521D68e6904901d0a4DeF8B0c0f7F5d
   - Doge: D975LFaNwWAuv3X7Pf7vJ4zdnchFqPgVWm
   - ONE: one1jkesu8meu7sckzwv287sxxj7q0c37xldealsq4
-
-# News
-- [x] Save results: results/domain_target/ files
-- [x] Releasing a new version 1.0
-- [x] Fast enumerate BruteForce scan upgrade
-- [x] Wordlist
-- [x] Mapping the domain and save image
-- [x] add new module
-- [x] add new folder results/domain_target/  ex: results/tesla.com/ 
-- [x] Random User-Agent
-- [ ] Add more modules
 
    ![tugarecon](https://user-images.githubusercontent.com/39160972/75924110-45d8e300-5e5e-11ea-8832-55c08ecc2902.jpg)
