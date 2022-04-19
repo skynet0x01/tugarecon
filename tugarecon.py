@@ -36,7 +36,7 @@ def override(func):
 ################################################################################
 # parse the arguments
 def parse_args():
-    Examples = Y + '''modules: certspotter, hackertarget, ssl, threatcrowd, alienvault, threatminer, omnisint\n''' + ''' [**]Examples: ''' + W + f'''
+    Examples = Y + '''modules: certspotter, hackertarget, ssl, threatcrowd, alienvault, threatminer, omnisint, Sublist3r\n''' + ''' [**]Examples: ''' + W + f'''
         python3 {sys.argv[0]} -d google.com                                 (Default: All modules, except bruteforce)
         python3 {sys.argv[0]} -d google.com --enum ssl                      (One or more modules)
         python3 {sys.argv[0]} -d google.com --enum certspotter --savemap
