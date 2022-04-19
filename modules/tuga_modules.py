@@ -1,4 +1,4 @@
-# TugaRecon - crt module, write by skynet0x01
+# TugaRecon - module, write by skynet0x01
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
 # Coded By skynet0x01
@@ -21,11 +21,11 @@ def queries(target):
     time.sleep(1)
     print(R + "[-] Searching " + target + " in CertsPotter " + W)
     print(R + "[-] Searching " + target + " in SSL Certificates " + W)
-    print(R + "[-] Searching "  + target + " in HackerTarget " + W)
-    print(R + "[-] Searching "  + target + " in ThreatCrowd " + W)
-    print(R + "[-] Searching "  + target + " in Alienvault " + W)
-    print(R + "[-] Searching "  + target + " in Threatminer" + W)
-    print(R + "[-] Searching "  + target + " in Omnisint" + W)
-    print(R + "[-] Searching "  + target + " in API Sublist3r\n" + W)
+    print(R + "[-] Searching " + target + " in HackerTarget " + W)
+    print(R + "[-] Searching " + target + " in ThreatCrowd " + W)
+    print(R + "[-] Searching " + target + " in Alienvault " + W)
+    print(R + "[-] Searching " + target + " in Threatminer" + W)
+    print(R + "[-] Searching " + target + " in Omnisint" + W)
+    print(R + "[-] Searching " + target + " in API Sublist3r\n" + W)
     #time.sleep(0.5)
     return (0)
