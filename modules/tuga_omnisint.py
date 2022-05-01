@@ -1,4 +1,4 @@
-# TugaRecon - crt module, write by skynet0x01
+# TugaRecon - Omnisint module, write by skynet0x01
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
 # Coded By skynet0x01
@@ -33,7 +33,7 @@ class Omnisint:
         try:
             response = requests.get(f"https://sonar.omnisint.io/subdomains/{self.target}").json()
             return response
-        except (requests.ConnectionError, requests.exceptions.ReadTimeout):
+        except (requests.ConnectionError, requests.exceptions.ReadTimeout, requests.exceptions.JSONDecodeError):
             response = 1
             return response
 ################################################################################
