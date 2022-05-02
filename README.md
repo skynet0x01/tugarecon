@@ -3,11 +3,11 @@
 <a href="https://github.com/skynet0x01/tugarecon/network"><img alt="GitHub forks" src="https://img.shields.io/github/forks/skynet0x01/tugarecon?style=for-the-badge"></a>
 <a href="https://github.com/skynet0x01/tugarecon/blob/master/LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/skynet0x01/tugarecon?style=for-the-badge"></a>
 
-                               ______                  ____                      
-                              /_  __/_  ______ _____ _/ __ \___  _________  ____ 
-                               / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \                
-                              / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               
-                             /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/              
+                               ______                  ____
+                              /_  __/_  ______ _____ _/ __ \___  _________  ____
+                               / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \
+                              / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /
+                             /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/
                                        /____/    # Coded By skynet0x01 #
 
 Tugarecon is a python tool designed to enumerate subdomains using modules. It helps penetration testers and bug hunters collect and gather subdomains for the domain they are targeting.  Bruteforce was integrated was a module to increase the possibility of finding more subdomains using bruteforce with an improved wordlist.
