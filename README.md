@@ -8,9 +8,7 @@
                                / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \                
                               / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /               
                              /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/              
-                                       /____/                                    
-  
-                                           # Coded By skynet0x01 #
+                                       /____/    # Coded By skynet0x01 #
 
 Tugarecon is a python tool designed to enumerate subdomains using modules. It helps penetration testers and bug hunters collect and gather subdomains for the domain they are targeting.  Bruteforce was integrated was a module to increase the possibility of finding more subdomains using bruteforce with an improved wordlist.
 TugaRecon, tribute to Portuguese explorers reminding glorious past of this country.
