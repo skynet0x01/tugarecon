@@ -1,16 +1,7 @@
 dnspython>=1.16.0
 argparse
-sys
-time
-datetime
 urllib3
 requests
-webbrowser
-os
 pathlib
-json
-threading
-re 
-queue
 whois
 progress
