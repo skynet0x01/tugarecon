@@ -1,3 +1,7 @@
+# TugaRecon - DNS, write by skynet0x01
+# TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
+# Bug Bounty Recon, search for subdomains and save in to a file
+# Coded By skynet0x01
 import dns.resolver  # dnspython
 import whois
 # Import internal
@@ -14,13 +18,18 @@ def DNS_Record_Types(target):
     for record in record_types:
         try:
             answer = dns.resolver.resolve(target, record)
+            answer.timeout = 10
             print(Y + f'\nRecords: {record}' + W)
             print('-' * 30)
             for rdata in answer:
                 print(rdata.to_text())
+        except dns.resolver.LifetimeTimeout:
+            pass
         except dns.resolver.NoAnswer:
             pass
         except dns.exception.Timeout:
+            pass
+        except dns.resolver.NoNameservers:
             pass
         except dns.resolver.NXDOMAIN:
             print(f'{target} does not exist.')
