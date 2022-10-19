@@ -23,8 +23,8 @@ def DNS_Record_Types(target):
             print('-' * 30)
             for rdata in answer:
                 print(rdata.to_text())
-        except dns.resolver.LifetimeTimeout:
-            pass
+        #except dns.resolver.LifetimeTimeout:
+            #pass
         except dns.resolver.NoAnswer:
             pass
         except dns.exception.Timeout:
