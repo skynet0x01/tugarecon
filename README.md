@@ -80,9 +80,11 @@ You need to install [dnspython](http://www.dnspython.org) to do DNS query
 ### DONATIONS:
 Donations are welcome. This will help improved features, frequent updates and better overall support.
 
-  - BTC: bc1q7hphnwg6ew88qej9306lqfvdyda83nstaznqwh
-  - ETH: 0x05215501b521D68e6904901d0a4DeF8B0c0f7F5d
-  - Doge: D975LFaNwWAuv3X7Pf7vJ4zdnchFqPgVWm
-  - ONE: one1jkesu8meu7sckzwv287sxxj7q0c37xldealsq4
+  - BTC: 17EbiXrVAvAqgkyunPYPBdKKz2AFHmb7mZ
+  - ETH: 0x642187e3f8F9CaF95d92df823D17E8020c50647E
+  - LTC: LLsJVJibVFRqYjnxbUfhYFd4kSowcRHdcN
+  - Doge: DPWbTMEaqTNzpfC5oYC1xcScT9dQBW17MW
+  - ONE: one1q2y2hntw32yakh6fxk5ls7dkvswfuhcm70ymvh
+  - SCRT: secret1fc88f5asq3lmkrhst2shsa7ew5fxt7qapjsda7
 
    ![tugarecon](https://user-images.githubusercontent.com/39160972/75924110-45d8e300-5e5e-11ea-8832-55c08ecc2902.jpg)
