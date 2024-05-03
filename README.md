@@ -15,7 +15,7 @@ NEWS: Imagine that...
 
 ![Google_Screenshot from 2024-05-03 14-21-51](https://github.com/skynet0x01/tugarecon/assets/39160972/c576b72b-361f-4c94-8f7f-f080776454c4)
 
-In less than 26 seconds, it can discover 15464 subdomains.
+In less than 28 seconds, it can discover 15464 subdomains.
 
 ********** AVAILABLE SOON **********
 
