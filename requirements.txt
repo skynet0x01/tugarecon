@@ -1,0 +1,5 @@
+dnspython>=2.7.0
+whois>=1.20240129.2
+requests>=2.32.3
+urllib3>=2.4.0
+progress>=1.6
