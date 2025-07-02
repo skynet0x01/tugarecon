@@ -32,7 +32,6 @@ And much more... :)
 
 ![tugarecon1](https://user-images.githubusercontent.com/39160972/162959038-5fbfc6df-8f18-4c91-b037-0097e6338d9e.png)
 
-![Screenshot from 2020-01-26 20-59-16](https://user-images.githubusercontent.com/39160972/73141832-4d97b180-4080-11ea-9adc-a83667ea9687.png)
 
 ## Installation
 
