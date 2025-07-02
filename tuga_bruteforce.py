@@ -107,7 +107,7 @@ class TugaBruteForce:
                         with self.subdomains_count.get_lock():
                             count = self.subdomains_count.value
                             self.subdomains_count.value += 1
-                        print(f"     [**] {count}:   {next_sub_domain}", flush=True)
+                        print(f"     [*] {count}:   {next_sub_domain}", flush=True)
                         self.outfile.write(next_sub_domain + '\n')
                         self.outfile.flush()
 

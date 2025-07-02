@@ -41,15 +41,12 @@ And much more... :)
 ## Usage
 
         python3 tugarecon.py -d google.com
-        python3 tugarecon.py -d google.com --savemap
-        python3 tugarecon.py -d google.com --bruteforce
-        python3 tugarecon.py -d google.com --bruteforce --full
-        python3 tugarecon.py -d google.com -b --full
+        python3 tugarecon.py -d google.com -b 
         python3 tugarecon.py -r
 
 ## Modules
 
-    bruteforce (tuga_bruteforce - wildcards, wordlist)
+    bruteforce (tuga_bruteforce - wordlist)
     certspotter
     ssl
     hackertarget
@@ -82,11 +79,11 @@ You need to install [dnspython](http://www.dnspython.org) to do DNS query
 ### DONATIONS:
 Donations are welcome. This will help improved features, frequent updates and better overall support.
 
-  - BTC: 17EbiXrVAvAqgkyunPYPBdKKz2AFHmb7mZ
-  - ETH: 0x642187e3f8F9CaF95d92df823D17E8020c50647E
-  - LTC: LLsJVJibVFRqYjnxbUfhYFd4kSowcRHdcN
-  - Doge: DPWbTMEaqTNzpfC5oYC1xcScT9dQBW17MW
-  - ONE: one1q2y2hntw32yakh6fxk5ls7dkvswfuhcm70ymvh
-  - SCRT: secret1fc88f5asq3lmkrhst2shsa7ew5fxt7qapjsda7
+  - BTC: 18Zg2qiypXRj7QnGWCpcXrKywmcfKkcUSs
+  - ETH: 0x177c81746009cd7ab02adf85d28fbf27aca7a240
+  - LTC: Le1jfoWqVoEJtm4BYbQRJbggiauMQNqjWy
+  - Doge: DSnRY69q1k6xhFkKULSTcSCQdJpVuGeB7k
+  - ONE: one1cv90mednznu629p3jr7gqgmqd6qcm368stalwp
+  - SOL: 5yRzoxDp17B5XEHSzmgTHWY4NYTWnk7s4qT48t941wyP
 
    ![tugarecon](https://user-images.githubusercontent.com/39160972/75924110-45d8e300-5e5e-11ea-8832-55c08ecc2902.jpg)
