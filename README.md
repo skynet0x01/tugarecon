@@ -21,7 +21,7 @@ During the 15th and 16th centuries, Portuguese explorers were at the forefront o
 skynet0x01
 
 # Version
-1.30
+NEW *********** 2.0 
 
 More modules will be added!
 And much more... :)
