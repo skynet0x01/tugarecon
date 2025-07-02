@@ -1,1 +1,10 @@
-
+TugaRecon/modules/tuga_alienvault.py
+TugaRecon/modules/tuga_certspotter.py
+TugaRecon/modules/tuga_crt.py
+TugaRecon/modules/tuga_hackertarget.py
+TugaRecon/modules/tuga_modules.py
+TugaRecon/modules/tuga_omnisint.py
+TugaRecon/modules/tuga_sublist3r.py
+TugaRecon/modules/tuga_threatcrowd.py
+TugaRecon/modules/tuga_threatminer.py
+TugaRecon/modules/tuga_useragents.py

@@ -14,7 +14,9 @@ from modules import tuga_threatminer
 from modules import tuga_omnisint
 from modules import tuga_sublist3r
 from utils.tuga_colors import G, Y, B, R, W
-################################################################################
+
+
+# ----------------------------------------------------------------------------------------------------------
 # Run all Modules...
 def queries(target):
     print(G + "Enumerating subdomains for " + target + " ...\n" + W)
