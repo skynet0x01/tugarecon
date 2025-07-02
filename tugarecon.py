@@ -57,9 +57,6 @@ def parse_args():
     parser = argparse.ArgumentParser(epilog=Examples, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser._optionals.title = "OPTIONS"
     parser.add_argument('-d', '--domain', required=True)
-    #parser.add_argument('-i', '--ignore', dest='i', default=False, action='store_true', help='Ignore domains pointed to private IPs')
-    #parser.add_argument('-f', '--file', metavar='', dest='file', default='first_names.txt', help='A file contains new line delimited subdomains, default is first_names.txt.')
-    #parser.add_argument('-s', '--savemap', help='Save subdomains image map', action='store_true')
     parser.add_argument('-r', '--results', nargs=0, action=override(data_results), help='View saved domains')
     parser.add_argument('--enum', nargs='*', help='<optional> Perform enumerations and network mapping')
     parser.add_argument('-b', '--bruteforce', help='Enable the bruteforce scan', action='store_true')
