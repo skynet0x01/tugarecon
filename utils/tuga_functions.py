@@ -2,18 +2,19 @@
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
 # Coded By skynet0x01
-import sys
+
 import urllib.request
 import webbrowser
 import urllib.error
-import urllib3
 import os
 import time
 import datetime
 from pathlib import Path # Future: Nedd to change to pathlib2
 
-from utils.tuga_colors import G, Y, B, R, W
-################################################################################
+from utils.tuga_colors import G, Y, R, W
+
+
+# ----------------------------------------------------------------------------------------------------------
 def write_file(subdomains, target):
     date = str(datetime.datetime.now().date())
     pwd = os.getcwd()
@@ -29,7 +30,27 @@ def write_file(subdomains, target):
         tmp.close()
     except:
         pass
-################################################################################
+
+
+# ----------------------------------------------------------------------------------------------------------
+def write_file_bruteforce(subdomains, target): # 26/05/2025
+    date = str(datetime.datetime.now().date())
+    pwd = os.getcwd()
+    # saving subdomains results to output file
+    folder = os.path.join(pwd, "results/" + target + "/" + date)
+    try:
+        os.makedirs(folder)
+    except:
+        pass
+    try:
+        with open("results/" + target + "/" + "bruteforce.txt", 'a') as tmp:
+            tmp.write(subdomains + '\n')
+        tmp.close()
+    except:
+        pass
+
+
+# ----------------------------------------------------------------------------------------------------------
 def DeleteDuplicate(target):
     date = str(datetime.datetime.now().date())
     content = open("results/" + target + "/" + "tmp.txt", 'r').readlines()
@@ -41,7 +62,9 @@ def DeleteDuplicate(target):
         os.remove("results/"+ target + "/" + "tmp.txt")
     except OSError:
         pass
-################################################################################
+
+
+# ----------------------------------------------------------------------------------------------------------
 def ReadFile(target, start_time):
     date = str(datetime.datetime.now().date())
     pwd = os.getcwd()
@@ -57,7 +80,31 @@ def ReadFile(target, start_time):
     print(Y + "\n[+] Output Result" + W)
     print(G + "**************************************************************" + W)
     print(R + "         ->->-> " + W, folder + "\n")
-################################################################################
+
+
+# ----------------------------------------------------------------------------------------------------------
+
+
+
+
+def BruteForceReadFile(target, start_time):
+    date = str(datetime.datetime.now().date())
+    pwd = os.getcwd()
+    folder = os.path.join(pwd, "results/" + target + "/" + date)
+    file = open("results/" + target + "/" + date + "/" + "tuga_bruteforce.txt", 'r')
+    lines = file.readlines()
+
+    for index, line in enumerate(lines):
+        print("     [*] {}:  {}".format(index, line.strip()))
+    file.close()
+    print(Y + "\n[*] Total Subdomains Found: {}".format(index) + W)
+    print(Y + f"[**]TugaRecon: Subdomains have been found in %s seconds" % (time.time() - start_time) +"\n"+ W)
+    print(Y + "\n[+] Output Result" + W)
+    print(G + "**************************************************************" + W)
+    print(R + "         ->->-> " + W, folder + "\n")
+    
+    
+# ----------------------------------------------------------------------------------------------------------
 def mapping_domain(target):
     date = str(datetime.datetime.now().date())
     if not os.path.exists("results/" + target + "/" + date):
