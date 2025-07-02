@@ -1,7 +1,0 @@
-dnspython>=1.16.0
-argparse
-urllib3
-requests
-pathlib
-whois
-progress
