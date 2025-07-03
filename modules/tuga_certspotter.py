@@ -13,8 +13,8 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # Import internal functions
 from utils.tuga_functions import write_file
-from utils.tuga_functions import DeleteDuplicate
-from utils.tuga_colors import G, Y, B, R, W
+#from utils.tuga_functions import DeleteDuplicate
+#from utils.tuga_colors import G, Y, B, R, W
 
 # ----------------------------------------------------------------------------------------------------------
 class Certspotter:

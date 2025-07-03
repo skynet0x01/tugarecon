@@ -15,8 +15,8 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 from modules import tuga_useragents #random user-agent
 # Import internal functions
 from utils.tuga_functions import write_file
-from utils.tuga_functions import DeleteDuplicate
-from utils.tuga_colors import G, Y, B, R, W
+#from utils.tuga_functions import DeleteDuplicate
+#from utils.tuga_colors import G, Y, B, R, W
 
 # ----------------------------------------------------------------------------------------------------------
 class Alienvault:
