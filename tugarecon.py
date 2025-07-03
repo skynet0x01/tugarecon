@@ -22,7 +22,7 @@ from utils.tuga_results import main_work_subdirs
 #from tuga_bruteforce import TugaBruteForce
 
 from tuga_bruteforce import TugaBruteForce
-import asyncio
+#import asyncio
 
 # ----------------------------------------------------------------------------------------------------------
 # Import internal modules
@@ -50,6 +50,7 @@ def parse_args():
         python3 {sys.argv[0]} -d google.com                                 (Default: All modules, except bruteforce)
         python3 {sys.argv[0]} -d google.com --enum ssl                      (One or more modules)
         python3 {sys.argv[0]} -d google.com --bruteforce                    (Use first_names.txt, and next_names.txt)
+        python3 {sys.argv[0]} -r                                            (View saved domains in results)
 
         Donations are welcome. This will help improved features, frequent updates and better overall support.
         (https://github.com/skynet0x01/tugarecon)
@@ -57,7 +58,7 @@ def parse_args():
     parser = argparse.ArgumentParser(epilog=Examples, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser._optionals.title = "OPTIONS"
     parser.add_argument('-d', '--domain', required=True)
-    parser.add_argument('-r', '--results', nargs=0, action=override(data_results), help='View saved domains')
+    parser.add_argument('-r', '--results', nargs=0, action=override(data_results), help='View saved domains results')
     parser.add_argument('--enum', nargs='*', help='<optional> Perform enumerations and network mapping')
     parser.add_argument('-b', '--bruteforce', help='Enable the bruteforce scan', action='store_true')
     parser.add_argument('-t', '--threads', metavar='', help="Number of workers to use to scan the domain. Default is 150", default=150, type=int)
