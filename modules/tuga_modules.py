@@ -2,6 +2,7 @@
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
 # Coded By skynet0x01
+# ----------------------------------------------------------------------------------------------------------
 # import modules
 import time
 # Import internal modules
@@ -13,7 +14,7 @@ from modules import tuga_alienvault
 from modules import tuga_threatminer
 from modules import tuga_omnisint
 from modules import tuga_sublist3r
-from utils.tuga_colors import G, Y, B, R, W
+from utils.tuga_colors import G, R, W
 
 
 # ----------------------------------------------------------------------------------------------------------

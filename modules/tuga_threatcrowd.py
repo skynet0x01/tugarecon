@@ -3,7 +3,7 @@
 # Bug Bounty Recon, search for subdomains and save in to a file
 # Coded By skynet0x01
 # import modules
-################################################################################
+# ----------------------------------------------------------------------------------------------------------
 import time
 import requests
 import json
@@ -12,12 +12,14 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # Import internal modules
-from modules import tuga_useragents #random user-agent
+#from modules import tuga_useragents #random user-agent
 # Import internal functions
 from utils.tuga_functions import write_file
-from utils.tuga_functions import DeleteDuplicate
-from utils.tuga_colors import G, Y, B, R, W
-################################################################################
+#from utils.tuga_functions import DeleteDuplicate
+#from utils.tuga_colors import G, Y, B, R, W
+
+
+# ----------------------------------------------------------------------------------------------------------
 class Threatcrowd:
 
     def __init__(self, target):
@@ -30,7 +32,9 @@ class Threatcrowd:
             self.enumerate(self.response, target) # Call the function enumerate
         else:
             pass
-################################################################################
+        
+        
+# ----------------------------------------------------------------------------------------------------------
     def engine_url(self):
         try:
             response = requests.get(f'https://threatcrowd.org/searchApi/v2/domain/report/?domain={self.target}').text
@@ -38,7 +42,9 @@ class Threatcrowd:
         except requests.ConnectionError:
             response = 1
             return response
-################################################################################
+        
+        
+# ----------------------------------------------------------------------------------------------------------
     def enumerate(self, response, target):
         subdomains = []
         subdomainscount = 0
@@ -55,4 +61,5 @@ class Threatcrowd:
                 write_file(subdomains, target)
         except Exception as e:
             pass
-                #################################
+# ----------------------------------------------------------------------------------------------------------
+

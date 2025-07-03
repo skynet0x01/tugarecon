@@ -2,6 +2,7 @@
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
 # Coded By skynet0x01
+# ----------------------------------------------------------------------------------------------------------
 # import modules
 import time
 import requests
@@ -11,12 +12,14 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # Import internal modules
-from modules import tuga_useragents #random user-agent
+#from modules import tuga_useragents #random user-agent
 # Import internal functions
 from utils.tuga_functions import write_file
-from utils.tuga_functions import DeleteDuplicate
-from utils.tuga_colors import G, Y, B, R, W
-################################################################################
+#from utils.tuga_functions import DeleteDuplicate
+#from utils.tuga_colors import G, Y, B, R, W
+
+
+# ----------------------------------------------------------------------------------------------------------
 class Threatminer:
     def __init__(self, target):
         self.target = target
@@ -28,7 +31,9 @@ class Threatminer:
             self.enumerate(self.response, target) # Call the function enumerate
         else:
             pass
-################################################################################
+        
+        
+# ----------------------------------------------------------------------------------------------------------
     def engine_url(self):
         try:
             response = requests.get(f'https://api.threatminer.org/v2/domain.php?q={self.target}&rt=5').text
@@ -36,7 +41,9 @@ class Threatminer:
         except requests.ConnectionError:
             response = 1
             return response
-################################################################################
+        
+        
+# ----------------------------------------------------------------------------------------------------------
     def enumerate(self, response, target):
         subdomains = []
         self.subdomainscount = 0
@@ -52,4 +59,5 @@ class Threatminer:
                 write_file(subdomains, target)
         except Exception as e:
             pass
-        #################################
+# ----------------------------------------------------------------------------------------------------------
+
