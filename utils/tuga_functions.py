@@ -85,8 +85,6 @@ def ReadFile(target, start_time):
 # ----------------------------------------------------------------------------------------------------------
 
 
-
-
 def BruteForceReadFile(target, start_time):
     date = str(datetime.datetime.now().date())
     pwd = os.getcwd()

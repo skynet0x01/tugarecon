@@ -2,10 +2,11 @@
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
 # Coded By skynet0x01
-################################################################################
+# ----------------------------------------------------------------------------------------------------------
 import os
 from utils.tuga_colors import G, Y, B, R, W
 
+# ----------------------------------------------------------------------------------------------------------
 def main_work_subdirs():
     rootdir = "results"
     print("\nResults: ")

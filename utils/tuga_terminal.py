@@ -1,3 +1,10 @@
+#!/usr/bin/python3
+# TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
+# Bug Bounty Recon, search for subdomains and save in to a file
+# Coded By skynet0x01
+
+
+# ----------------------------------------------------------------------------------------------------------
 #### getTerminalSize()
 
 __all__ = ['getTerminalSize']
@@ -38,6 +45,8 @@ def _getTerminalSize_linux():
             return None
     return int(cr[1]), int(cr[0])
 
+
+# ----------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     sizex, sizey = getTerminalSize()
     print('width =', sizex, 'height =', sizey)
