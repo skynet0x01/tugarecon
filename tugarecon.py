@@ -46,7 +46,8 @@ def override(func):
 # ----------------------------------------------------------------------------------------------------------
 # parse the arguments
 def parse_args():
-    Examples = Y + '''modules: certspotter, hackertarget, ssl, threatcrowd, alienvault, threatminer, omnisint, sublist3r\n''' + ''' [**]Examples: ''' + W + f'''
+    Examples = (Y + '''modules: certspotter, hackertarget, ssl, threatcrowd, alienvault, threatminer, omnisint, sublist3r\n'''
+                + ''' [**]Examples:\n ''' + W + f'''
         python3 {sys.argv[0]} -d google.com                                 (Default: All modules, except bruteforce)
         python3 {sys.argv[0]} -d google.com --enum ssl                      (One or more modules)
         python3 {sys.argv[0]} -d google.com --bruteforce                    (Use first_names.txt, and next_names.txt)
@@ -54,7 +55,7 @@ def parse_args():
 
         Donations are welcome. This will help improved features, frequent updates and better overall support.
         (https://github.com/skynet0x01/tugarecon)
-        '''
+        ''')
     parser = argparse.ArgumentParser(epilog=Examples, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser._optionals.title = "OPTIONS"
     parser.add_argument('-d', '--domain', required=True)
