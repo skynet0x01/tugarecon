@@ -2,6 +2,7 @@
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
 # Coded By skynet0x01
+# ----------------------------------------------------------------------------------------------------------
 # import modules
 import time
 import requests
@@ -16,7 +17,8 @@ from modules import tuga_useragents #random user-agent
 from utils.tuga_functions import write_file
 from utils.tuga_functions import DeleteDuplicate
 from utils.tuga_colors import G, Y, B, R, W
-################################################################################
+
+# ----------------------------------------------------------------------------------------------------------
 class Alienvault:
     def __init__(self, target):
         self.target = target
@@ -28,7 +30,9 @@ class Alienvault:
             self.enumerate(self.response, target) # Call the function enumerate
         else:
             pass
-################################################################################
+        
+        
+# ----------------------------------------------------------------------------------------------------------
     def engine_url(self):
         try:
             response = requests.get(f'https://otx.alienvault.com/api/v1/indicators/domain/{self.target}/passive_dns').text
@@ -36,7 +40,9 @@ class Alienvault:
         except requests.ConnectionError:
             response = 1
             return response
-################################################################################
+        
+        
+# ----------------------------------------------------------------------------------------------------------
     def enumerate(self, response, target):
         subdomains = []
         self.subdomainscount = 0
@@ -52,4 +58,5 @@ class Alienvault:
                 write_file(subdomains, target)
         except Exception as e:
             pass
-        #################################
+# ----------------------------------------------------------------------------------------------------------
+
