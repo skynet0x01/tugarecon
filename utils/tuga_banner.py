@@ -3,6 +3,9 @@
 # Bug Bounty Recon, search for subdomains and save in to a file
 # Coded By skynet0x01 2020-2025
 ################################################################################
+import warnings
+warnings.filterwarnings("ignore", category=SyntaxWarning)
+
 # Import internal functions
 from utils.tuga_colors import Y, R, W
 
