@@ -83,7 +83,7 @@ def parse_args():
     parser.add_argument('-r', '--results', nargs=0, action=override(data_results), help='View saved domains results')
     parser.add_argument('--enum', nargs='*', help='<optional> Perform enumerations and network mapping')
     parser.add_argument('-b', '--bruteforce', help='Enable the bruteforce scan', action='store_true')
-    parser.add_argument('-t', '--threads', metavar='', help="Number of workers to use to scan the domain. Default is 150", default=150, type=int)
+    parser.add_argument('-t', '--threads', metavar='', help="Number of workers to use to scan the domain. Default is 250", default=250, type=int)
     #parser.add_argument('--full', dest='full_scan', default=False, action='store_true', help='Full scan, NAMES FILE first_names_full.txt will be used to brute')
     return parser.parse_args()
 
