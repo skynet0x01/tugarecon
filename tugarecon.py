@@ -3,6 +3,26 @@
 # Bug Bounty Recon, search for subdomains and save in to a file
 # Coded By skynet0x01 2020-2025
 
+# This file is part of TugaRecon, developed by skynet0x01 in 2020-2025.
+#
+# Copyright (C) 2025 skynet0x01
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+# Patent Restriction Notice:
+# No patents may be claimed or enforced on this software or any derivative.
+# Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
+
 
 # ----------------------------------------------------------------------------------------------------------
 # import go here :)
@@ -51,7 +71,8 @@ def parse_args():
         python3 {sys.argv[0]} -d google.com                                 (Default: All modules, except bruteforce)
         python3 {sys.argv[0]} -d google.com --enum ssl                      (One or more modules)
         python3 {sys.argv[0]} -d google.com --bruteforce                    (Use first_names.txt, and next_names.txt)
-        python3 {sys.argv[0]} -r                                            (View saved domains in results)
+        python3 {sys.argv[0]} -d google.com -b                              (Use first_names.txt, and next_names.txt)
+        python3 {sys.argv[0]} -r                                            (View your saved work in results)
 
         Donations are welcome. This will help improved features, frequent updates and better overall support.
         (https://github.com/skynet0x01/tugarecon)
@@ -107,6 +128,8 @@ def internet_on():
 # ----------------------------------------------------------------------------------------------------------
 def start_bruteforce(args, target, enum, threads, bruteforce, results):
     # bruteforce fast scan
+    
+    
     if bruteforce:
         print("\nWait for results...! (It might take a while for the results appear) ")
         print(G + "**************************************************************\n" + W)
@@ -117,6 +140,12 @@ def start_bruteforce(args, target, enum, threads, bruteforce, results):
         #subdomains_test.outfile.flush()
         #subdomains_test.outfile.close()
         sys.exit()
+        # try:
+        #     subdomains_test = TugaBruteForce(options=args)
+        #     subdomains_test.run()
+        # except KeyboardInterrupt:
+        #     print("\n[!] Exiting on user interrupt.")
+        #     sys.exit(0)
     # END bruteforce fast scan
     
     

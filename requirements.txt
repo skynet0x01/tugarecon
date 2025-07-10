@@ -3,5 +3,9 @@ whois>=1.20240129.2
 requests>=2.32.3
 urllib3>=2.4.0
 progress>=1.6
-multiprocess>=0.70.18
 argparse>=1.4.0
+pyvis>=0.3.2
+
+matplotlib>=3.10.3
+networkx>=3.5
+ipwhois>=1.3.0
