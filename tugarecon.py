@@ -39,9 +39,8 @@ from utils.tuga_banner import banner
 from utils.tuga_functions import ReadFile, DeleteDuplicate, mapping_domain
 from utils.tuga_dns import DNS_Record_Types, bscan_whois_look
 from utils.tuga_results import main_work_subdirs
-#from tuga_bruteforce import TugaBruteForce
-
 from tuga_bruteforce import TugaBruteForce
+from tuga_network_map import tuga_map
 #import asyncio
 
 # ----------------------------------------------------------------------------------------------------------
@@ -66,25 +65,75 @@ def override(func):
 # ----------------------------------------------------------------------------------------------------------
 # parse the arguments
 def parse_args():
-    Examples = (Y + '''modules: certspotter, hackertarget, ssl, threatcrowd, alienvault, threatminer, omnisint, sublist3r\n'''
-                + ''' [**]Examples:\n ''' + W + f'''
-        python3 {sys.argv[0]} -d google.com                                 (Default: All modules, except bruteforce)
-        python3 {sys.argv[0]} -d google.com --enum ssl                      (One or more modules)
-        python3 {sys.argv[0]} -d google.com --bruteforce                    (Use first_names.txt, and next_names.txt)
-        python3 {sys.argv[0]} -d google.com -b                              (Use first_names.txt, and next_names.txt)
-        python3 {sys.argv[0]} -r                                            (View your saved work in results)
+    Examples = (Y + '''
+────────────────────────────────────────────────────────────
+ Available Modules:
+────────────────────────────────────────────────────────────
+  • certspotter     • hackertarget   • ssl           • threatcrowd
+  • alienvault      • threatminer    • omnisint      • sublist3r
 
-        Donations are welcome. This will help improved features, frequent updates and better overall support.
-        (https://github.com/skynet0x01/tugarecon)
-        ''')
-    parser = argparse.ArgumentParser(epilog=Examples, formatter_class=argparse.RawDescriptionHelpFormatter)
+────────────────────────────────────────────────────────────
+ Examples of Usage:
+────────────────────────────────────────────────────────────
+  ▶ Enumerate all modules (except bruteforce):
+      python3 {0} -d google.com
+
+  ▶ Use a specific module (e.g., ssl):
+      python3 {0} -d google.com --enum ssl
+
+  ▶ Bruteforce subdomains using wordlists:
+      python3 {0} -d google.com --bruteforce
+      python3 {0} -d google.com -b
+
+  ▶ View saved results:
+      python3 {0} -r
+
+  ▶ Generate network graph (with ASN clusters):
+      python3 {0} -d google.com -m
+
+────────────────────────────────────────────────────────────
+ Donations are welcome ♥
+ Help improve features, updates, and support:
+ → https://github.com/skynet0x01/tugarecon
+────────────────────────────────────────────────────────────
+'''.format(sys.argv[0]) + W)
+
+    parser = argparse.ArgumentParser(
+        epilog=Examples,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser._optionals.title = "OPTIONS"
-    parser.add_argument('-d', '--domain', required=True)
-    parser.add_argument('-r', '--results', nargs=0, action=override(data_results), help='View saved domains results')
-    parser.add_argument('--enum', nargs='*', help='<optional> Perform enumerations and network mapping')
-    parser.add_argument('-b', '--bruteforce', help='Enable the bruteforce scan', action='store_true')
-    parser.add_argument('-t', '--threads', metavar='', help="Number of workers to use to scan the domain. Default is 250", default=250, type=int)
-    #parser.add_argument('--full', dest='full_scan', default=False, action='store_true', help='Full scan, NAMES FILE first_names_full.txt will be used to brute')
+
+    parser.add_argument(
+        '-d', '--domain', required=True,
+        help='Domain to enumerate (e.g., example.com)'
+    )
+
+    parser.add_argument(
+        '-r', '--results', nargs=0,
+        action=override(data_results),
+        help='Show previously saved results for domains'
+    )
+
+    parser.add_argument(
+        '-e', '--enum', nargs='*',
+        help='[Optional] Select specific modules for enumeration (e.g., ssl, certspotter)'
+    )
+
+    parser.add_argument(
+        '-b', '--bruteforce', action='store_true',
+        help='Enable brute force subdomain discovery using wordlists'
+    )
+
+    parser.add_argument(
+        '-t', '--threads', metavar='', type=int, default=250,
+        help='Number of concurrent threads to use (default: 250)'
+    )
+
+    parser.add_argument(
+        '-m', '--map', action='store_true',
+        help='Generate network map with ASN clusters and grouped device icons'
+    )
     return parser.parse_args()
 
 
@@ -126,7 +175,7 @@ def internet_on():
 
 
 # ----------------------------------------------------------------------------------------------------------
-def start_bruteforce(args, target, enum, threads, bruteforce, results):
+def start_bruteforce(args, target, enum, threads, bruteforce, savemap, results):
     # bruteforce fast scan
     
     
@@ -135,20 +184,14 @@ def start_bruteforce(args, target, enum, threads, bruteforce, results):
         print(G + "**************************************************************\n" + W)
         subdomains_test = TugaBruteForce(options=args)
         subdomains_test.run()
-        #subdomains_test = TugaBruteForceAsync(options=args)
-        #asyncio.run(subdomains_test.run())
-        #subdomains_test.outfile.flush()
-        #subdomains_test.outfile.close()
         sys.exit()
-        # try:
-        #     subdomains_test = TugaBruteForce(options=args)
-        #     subdomains_test.run()
-        # except KeyboardInterrupt:
-        #     print("\n[!] Exiting on user interrupt.")
-        #     sys.exit(0)
     # END bruteforce fast scan
     
-    
+    # ----------------------------------------------------------------------------------------------------------
+    # Save map domain (png file)
+    if savemap is not False:
+        tuga_map(target)
+        sys.exit()
     # ----------------------------------------------------------------------------------------------------------
     # Modules scan: certspotter, hackertarget, ssl, threatcrowd,
     #               alienvault, threatminer, omnisint, Sublist3r
@@ -195,9 +238,11 @@ def start_bruteforce(args, target, enum, threads, bruteforce, results):
                     enums = [indicate(target) for indicate in chosenEnums]
                     DeleteDuplicate(target)
                     ReadFile(target, start_time)
-        # Save map domain (png file)
-        #if savemap is not False:
-        #    mapping_domain(target)
+        
+        # # Save map domain (png file)
+        # if savemap is not False:
+        #     tuga_map(target)
+        
     except KeyboardInterrupt:
         print(G + "**************************************************************" + W)
         print("\nTugaRecon interrupted by user\n")
@@ -209,15 +254,14 @@ def menu_bruteforce():
     banner()
     args = parse_args()  # args = parser.parse_args()
     target = parse_url(args.domain)
-    #internet_on()
     DNS_Record_Types(target)
     bscan_whois_look(target)
     enum = args.enum
     bruteforce = args.bruteforce
     threads = args.threads
-    #savemap = args.savemap
     results = args.results
-    start_bruteforce(args, target, enum, threads, bruteforce, results)
+    savemap = args.map
+    start_bruteforce(args, target, enum, threads, bruteforce, savemap, results)
     
 
 

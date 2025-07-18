@@ -17,7 +17,7 @@ def banner():
              /_  __/_  ______ _____ _/ __ \___  _________  ____
               / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \
              / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /
-            /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  Version 2.1
+            /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/  Version 2.3
                       /____/                               # Coded By skynet0x01 #
     """ + W)
     print(Y + "TugaRecon, tribute to Portuguese explorers reminding glorious past of this country. 2020-2025\n" + W)
