@@ -60,19 +60,24 @@ Generate network map with ASN clusters and grouped device icons
 ────────────────────────────────────────────────────────────
 
   ▶ Enumerate all modules (except bruteforce):
+  
       python3 tugarecon.py -d google.com
 
   ▶ Use a specific module (e.g., ssl):
+  
       python3 tugarecon.py -d google.com --enum ssl
 
   ▶ Bruteforce subdomains using wordlists:
+  
       python3 tugarecon.py -d google.com --bruteforce
       python3 tugarecon.py -d google.com -b
 
   ▶ View saved results:
+  
       python3 tugarecon.py -r
 
   ▶ Generate network graph (with ASN clusters):
+  
       python3 tugarecon.py -d google.com -m
 
 
