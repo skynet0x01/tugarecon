@@ -34,10 +34,9 @@ And much more... :)
 
 Generate network map with ASN clusters and grouped device icons
 
-<img width="745" height="541" alt="tugarecon" src="https://github.com/user-attachments/assets/2af6193c-fb52-4150-abda-10367033eefa" />
-<img width="568" height="536" alt="tugarecon_1" src="https://github.com/user-attachments/assets/0c2c3153-7337-4e00-b916-261f45c030af" />
+<img  width="545" height="341" alt="tugarecon" src="https://github.com/user-attachments/assets/2af6193c-fb52-4150-abda-10367033eefa" />
 
-
+<img width="368" height="336" alt="tugarecon_1" src="https://github.com/user-attachments/assets/0c2c3153-7337-4e00-b916-261f45c030af" />
 
 
 ## Installation
@@ -46,14 +45,20 @@ Generate network map with ASN clusters and grouped device icons
 - pip install -r requirements.txt
 
 ────────────────────────────────────────────────────────────
+
  Available Modules:
+ 
 ────────────────────────────────────────────────────────────
+
   • certspotter     • hackertarget   • ssl           • threatcrowd
   • alienvault      • threatminer    • omnisint      • sublist3r
 
 ────────────────────────────────────────────────────────────
+
  Examples of Usage:
+ 
 ────────────────────────────────────────────────────────────
+
   ▶ Enumerate all modules (except bruteforce):
       python3 tugarecon.py -d google.com
 
@@ -70,7 +75,9 @@ Generate network map with ASN clusters and grouped device icons
   ▶ Generate network graph (with ASN clusters):
       python3 tugarecon.py -d google.com -m
 
+
 ────────────────────────────────────────────────────────────
+
 
 ## Dependencies
 You need to install [dnspython](http://www.dnspython.org) to do DNS query
