@@ -35,7 +35,6 @@ from datetime import datetime
 from ipwhois import IPWhois
 from utils.tuga_colors import R, W, Y
 
-
 # ----------------------------------------------------------------------------------------------------------
 def read_subdomains(file_path):
     with open(file_path, 'r') as f:
