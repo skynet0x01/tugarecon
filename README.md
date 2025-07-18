@@ -48,14 +48,14 @@ python3 tugarecon.py -d example.com
 
 ### Common Options
 
-| Option           | Description                                 |
-|------------------|---------------------------------------------|
-| `-d DOMAIN`      | Target domain (required)                    |
-| `--bruteforce`   | Enable subdomain brute-forcing              |
-| `--full`         | Run all available modules                   |
-| `--savemap`      | Save interactive map of discovered hosts    |
-| `--output FILE`  | Specify output filename                     |
-| `--help`         | Show full list of options                   |
+| Option       | Description                                 |
+|--------------|---------------------------------------------|
+| `-d DOMAIN`  | Target domain (required)                    |
+| `--bruteforce` | Enable subdomain brute-forcing              |
+| `--full`     | Run all available modules                   |
+| `--map`      | Save interactive map of discovered hosts    |
+| `--output FILE` | Specify output filename                     |
+| `--help`     | Show full list of options                   |
 
 ---
 
@@ -99,8 +99,9 @@ tugarecon/
 │   ├── hackertarget.py
 │   └── ...
 ├── wordlists/
-│   └── top1mil.txt
-├── output/
+│   ├── first_names.txt
+│   └── next_names.txt
+├── results/
 ├── tugarecon.py
 ├── requirements.txt
 └── README.md
@@ -154,14 +155,21 @@ Cybersecurity Researcher & Tool Developer
 
 This project is licensed under the [MIT License](LICENSE).
 
-### DONATIONS:
-Donations are welcome. This will help improved features, frequent updates and better overall support.
+### 💖 Support & Donations
 
-  - BTC: 18Zg2qiypXRj7QnGWCpcXrKywmcfKkcUSs
-  - ETH: 0x177c81746009cd7ab02adf85d28fbf27aca7a240
-  - LTC: Le1jfoWqVoEJtm4BYbQRJbggiauMQNqjWy
-  - Doge: DSnRY69q1k6xhFkKULSTcSCQdJpVuGeB7k
-  - ONE: one1cv90mednznu629p3jr7gqgmqd6qcm368stalwp
-  - SOL: 5yRzoxDp17B5XEHSzmgTHWY4NYTWnk7s4qT48t941wyP
+If you find this project useful, consider supporting its continued development.  
+Your contributions help add new features, improve stability, and keep the tool updated.
+
+**🔗 Donate with your favorite cryptocurrency:**
+
+- **Bitcoin (BTC):** `18Zg2qiypXRj7QnGWCpcXrKywmcfKkcUSs`
+- **Ethereum (ETH):** `0x177c81746009cd7ab02adf85d28fbf27aca7a240`
+- **Litecoin (LTC):** `Le1jfoWqVoEJtm4BYbQRJbggiauMQNqjWy`
+- **Dogecoin (DOGE):** `DSnRY69q1k6xhFkKULSTcSCQdJpVuGeB7k`
+- **Harmony (ONE):** `one1cv90mednznu629p3jr7gqgmqd6qcm368stalwp`
+- **Solana (SOL):** `5yRzoxDp17B5XEHSzmgTHWY4NYTWnk7s4qT48t941wyP`
+
+Every contribution, no matter how small, makes a big difference. Thank you!
+
 
    ![tugarecon](https://user-images.githubusercontent.com/39160972/75924110-45d8e300-5e5e-11ea-8832-55c08ecc2902.jpg)
