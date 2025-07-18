@@ -34,9 +34,9 @@ And much more... :)
 
 Generate network map with ASN clusters and grouped device icons
 
-<img  width="545" height="341" alt="tugarecon" src="https://github.com/user-attachments/assets/2af6193c-fb52-4150-abda-10367033eefa" />
+<img  width="445" height="241" alt="tugarecon" src="https://github.com/user-attachments/assets/2af6193c-fb52-4150-abda-10367033eefa" />
 
-<img width="368" height="336" alt="tugarecon_1" src="https://github.com/user-attachments/assets/0c2c3153-7337-4e00-b916-261f45c030af" />
+<img width="268" height="236" alt="tugarecon_1" src="https://github.com/user-attachments/assets/0c2c3153-7337-4e00-b916-261f45c030af" />
 
 
 ## Installation
