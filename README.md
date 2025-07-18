@@ -1,105 +1,158 @@
 # TugaRecon
-<a href="https://github.com/skynet0x01/tugarecon/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/skynet0x01/tugarecon?style=for-the-badge"></a>
-<a href="https://github.com/skynet0x01/tugarecon/network"><img alt="GitHub forks" src="https://img.shields.io/github/forks/skynet0x01/tugarecon?style=for-the-badge"></a>
-<a href="https://github.com/skynet0x01/tugarecon/blob/master/LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/skynet0x01/tugarecon?style=for-the-badge"></a>
+![version](https://img.shields.io/badge/version-1.30-blue)
+![python](https://img.shields.io/badge/python-3.8%2B-yellow)
+![license](https://img.shields.io/github/license/skynet0x01/tugarecon)
+![issues](https://img.shields.io/github/issues/skynet0x01/tugarecon)
+![stars](https://img.shields.io/github/stars/skynet0x01/tugarecon?style=social)
 
-                               ______                  ____
-                              /_  __/_  ______ _____ _/ __ \___  _________  ____
-                               / / / / / / __ `/ __ `/ /_/ / _ \/ ___/ __ \/ __ \
-                              / / / /_/ / /_/ / /_/ / _, _/  __/ /__/ /_/ / / / /
-                             /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/
-                                       /____/    # Coded By skynet0x01 #
+> **TugaRecon** is an advanced subdomain enumeration and DNS reconnaissance tool built for security researchers, penetration testers, and OSINT professionals.  
+> It combines multiple passive and active modules to extract, verify, and map subdomains of a target domain efficiently.
 
-*** 18-07-2025 ***
-NEWS: New version available 2.3
+---
+> **TugaRecon**, tribute to Portuguese explorers reminding glorious past of this country.
 
-Tugarecon is a python tool designed to enumerate subdomains using modules. It helps penetration testers and bug hunters collect and gather subdomains for the domain they are targeting.  Bruteforce was integrated was a module to increase the possibility of finding more subdomains using bruteforce with an improved wordlist.
-TugaRecon, tribute to Portuguese explorers reminding glorious past of this country.
+>During the 15th and 16th centuries, Portuguese explorers were at the forefront of European overseas exploration, which led them to reach India, establish multiple trading posts in Asia and Africa, and settle what would become Brazil, creating one of the most powerful empires.
 
-During the 15th and 16th centuries, Portuguese explorers were at the forefront of European overseas exploration, which led them to reach India, establish multiple trading posts in Asia and Africa, and settle what would become Brazil, creating one of the most powerful empires.
+>skynet0x01
 
-skynet0x01
+## 🚀 Features
 
-More modules will be added!
-And much more... :)
+- 🔍 Passive and active subdomain enumeration using various OSINT sources
+- 📡 Built-in brute-force mode using custom wordlists
+- 🌐 DNS resolution with fallback mechanisms
+- 🧠 Multi-module integration (Certspotter, DNSDumpster, HackerTarget, etc.)
+- 🗺️ Optional subdomain map generation (interactive or visual)
+- 📁 Clean output in `.txt`, `.json`, `.html`, or `.csv`
+- 🔒 No API keys required for most modules
 
-# Screenshots
+---
 
-![tugarecon_bughunters](https://user-images.githubusercontent.com/39160972/162957618-02e38cff-942a-4ea5-983b-d3c21eca1f9b.png)
+## 📦 Installation
 
-![tugarecon1](https://user-images.githubusercontent.com/39160972/162959038-5fbfc6df-8f18-4c91-b037-0097e6338d9e.png)
+```bash
+git clone https://github.com/skynet0x01/tugarecon.git
+cd tugarecon
+pip3 install -r requirements.txt
+```
 
-Generate network map with ASN clusters and grouped device icons
+> ✅ Recommended: Run in a Python virtual environment  
+> `python3 -m venv venv && source venv/bin/activate`
 
-<img  width="445" height="241" alt="tugarecon" src="https://github.com/user-attachments/assets/2af6193c-fb52-4150-abda-10367033eefa" />
+---
 
-<img width="268" height="236" alt="tugarecon_1" src="https://github.com/user-attachments/assets/0c2c3153-7337-4e00-b916-261f45c030af" />
+## ⚙️ Basic Usage
 
+```bash
+python3 tugarecon.py -d example.com
+```
 
-## Installation
+### Common Options
 
-- git clone https://github.com/skynet0x01/tugarecon.git
-- pip install -r requirements.txt
+| Option           | Description                                 |
+|------------------|---------------------------------------------|
+| `-d DOMAIN`      | Target domain (required)                    |
+| `--bruteforce`   | Enable subdomain brute-forcing              |
+| `--full`         | Run all available modules                   |
+| `--savemap`      | Save interactive map of discovered hosts    |
+| `--output FILE`  | Specify output filename                     |
+| `--help`         | Show full list of options                   |
 
-────────────────────────────────────────────────────────────
+---
 
- Available Modules:
- 
-────────────────────────────────────────────────────────────
+## 🔎 Example
 
-  • certspotter     • hackertarget   • ssl           • threatcrowd
-  • alienvault      • threatminer    • omnisint      • sublist3r
+```bash
+python3 tugarecon.py -d google.pt --map
+```
 
-────────────────────────────────────────────────────────────
+📁 Output:
 
- Examples of Usage:
- 
-────────────────────────────────────────────────────────────
+```
+output/
+├── tugarecon/results/google.com/2025-07-18/subdomains_clustered.svg
+├── tugarecon/results/google.com/2025-07-18/subdomains_clustered.pdf
+├── tugarecon/results/google.com/2025-07-18/tuga_bruteforce.txt
+└── tugarecon/results/google.com/2025-07-18/subdomains.txt
+```
 
-  ▶ Enumerate all modules (except bruteforce):
-  
-      python3 tugarecon.py -d google.com
+---
 
-  ▶ Use a specific module (e.g., ssl):
-  
-      python3 tugarecon.py -d google.com --enum ssl
+## 🧩 Modules Overview
 
-  ▶ Bruteforce subdomains using wordlists:
-  
-      python3 tugarecon.py -d google.com --bruteforce
-      python3 tugarecon.py -d google.com -b
+| Module         | Type      | Source/Functionality                     |
+|----------------|-----------|------------------------------------------|
+| `certspotter`  | Passive   | Queries certificate transparency logs     |
+| `hackertarget` | Passive   | Uses HackerTarget public API             |
+| `dnsdumpster`  | Passive   | Extracts data from dnsdumpster.com       |
+| `bruteforce`   | Active    | Dictionary-based subdomain brute-force   |
+| `dnsresolve`   | Resolver  | Resolves IPs with optional fallback DNS  |
+| `mapbuilder`   | Visual    | Generates HTML/Graphviz subdomain maps   |
 
-  ▶ View saved results:
-  
-      python3 tugarecon.py -r
+---
 
-  ▶ Generate network graph (with ASN clusters):
-  
-      python3 tugarecon.py -d google.com -m
+## 📁 Project Structure
 
+```
+tugarecon/
+├── modules/
+│   ├── certspotter.py
+│   ├── hackertarget.py
+│   └── ...
+├── wordlists/
+│   └── top1mil.txt
+├── output/
+├── tugarecon.py
+├── requirements.txt
+└── README.md
+```
 
-────────────────────────────────────────────────────────────
+---
 
+## 🧠 Roadmap
 
-## Dependencies
-You need to install [dnspython](http://www.dnspython.org) to do DNS query
+- [ ] Add support for export to PDF/SVG maps
+- [ ] Integrate `httpx` to detect live HTTP/HTTPS services
+- [ ] ASN-based grouping in visual maps
+- [ ] Web-based frontend interface for remote analysis
 
-        dnspython>=1.16.0
-        argparse
-        sys
-        time
-        datetime
-        urllib3
-        requests
-        webbrowser
-        os
-        pathlib
-        json
-        threading
-        re 
-        queue
-        whois
-        progress
+---
+
+## 📸 Example Map Output
+
+<p align="center">
+
+  <img width="568" height="536" alt="Example Subdomain Map" src="https://github.com/user-attachments/assets/0b6acee3-b716-4e4b-8c88-c72a7b005d1b" />
+
+</p>
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions!  
+Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file before submitting pull requests.
+
+---
+
+## 🧪 Related Tools
+
+- [Sublist3r](https://github.com/aboul3la/Sublist3r)
+- [Amass](https://github.com/owasp-amass/amass)
+- [DNSMap](https://github.com/makefu/dnsmap)
+
+---
+
+## 👤 Author
+
+**Skynet0x01**  
+Cybersecurity Researcher & Tool Developer  
+🌍 Portugal  
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
 
 ### DONATIONS:
 Donations are welcome. This will help improved features, frequent updates and better overall support.
