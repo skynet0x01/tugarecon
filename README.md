@@ -10,8 +10,8 @@
                              /_/  \__,_/\__, /\__,_/_/ |_|\___/\___/\____/_/ /_/
                                        /____/    # Coded By skynet0x01 #
 
-*** 02-06-2025 ***
-NEWS: New version available 2.0
+*** 18-07-2025 ***
+NEWS: New version available 2.3
 
 Tugarecon is a python tool designed to enumerate subdomains using modules. It helps penetration testers and bug hunters collect and gather subdomains for the domain they are targeting.  Bruteforce was integrated was a module to increase the possibility of finding more subdomains using bruteforce with an improved wordlist.
 TugaRecon, tribute to Portuguese explorers reminding glorious past of this country.
@@ -21,7 +21,7 @@ During the 15th and 16th centuries, Portuguese explorers were at the forefront o
 skynet0x01
 
 # Version
-NEW *********** 2.0 
+NEW *********** 2.3 
 
 More modules will be added!
 And much more... :)
@@ -32,29 +32,45 @@ And much more... :)
 
 ![tugarecon1](https://user-images.githubusercontent.com/39160972/162959038-5fbfc6df-8f18-4c91-b037-0097e6338d9e.png)
 
+Generate network map with ASN clusters and grouped device icons
+
+<img width="745" height="541" alt="tugarecon" src="https://github.com/user-attachments/assets/2af6193c-fb52-4150-abda-10367033eefa" />
+<img width="568" height="536" alt="tugarecon_1" src="https://github.com/user-attachments/assets/0c2c3153-7337-4e00-b916-261f45c030af" />
+
+
+
 
 ## Installation
 
 - git clone https://github.com/skynet0x01/tugarecon.git
 - pip install -r requirements.txt
 
-## Usage
+────────────────────────────────────────────────────────────
+ Available Modules:
+────────────────────────────────────────────────────────────
+  • certspotter     • hackertarget   • ssl           • threatcrowd
+  • alienvault      • threatminer    • omnisint      • sublist3r
 
-        python3 tugarecon.py -d google.com
-        python3 tugarecon.py -d google.com -b 
-        python3 tugarecon.py -r
+────────────────────────────────────────────────────────────
+ Examples of Usage:
+────────────────────────────────────────────────────────────
+  ▶ Enumerate all modules (except bruteforce):
+      python3 tugarecon.py -d google.com
 
-## Modules
+  ▶ Use a specific module (e.g., ssl):
+      python3 tugarecon.py -d google.com --enum ssl
 
-    bruteforce (tuga_bruteforce - wordlist)
-    certspotter
-    ssl
-    hackertarget
-    threatcrowd
-    Alienvault
-    Threatminer
-    Omnisint
-    API Sublist3r
+  ▶ Bruteforce subdomains using wordlists:
+      python3 tugarecon.py -d google.com --bruteforce
+      python3 tugarecon.py -d google.com -b
+
+  ▶ View saved results:
+      python3 tugarecon.py -r
+
+  ▶ Generate network graph (with ASN clusters):
+      python3 tugarecon.py -d google.com -m
+
+────────────────────────────────────────────────────────────
 
 ## Dependencies
 You need to install [dnspython](http://www.dnspython.org) to do DNS query
