@@ -1,5 +1,5 @@
 # TugaRecon
-![version](https://img.shields.io/badge/version-2.30-blue)
+![version](https://img.shields.io/badge/version-1.30-blue)
 ![python](https://img.shields.io/badge/python-3.8%2B-yellow)
 ![license](https://img.shields.io/github/license/skynet0x01/tugarecon)
 ![issues](https://img.shields.io/github/issues/skynet0x01/tugarecon)
@@ -54,7 +54,6 @@ python3 tugarecon.py -d example.com
 | `--bruteforce` | Enable subdomain brute-forcing              |
 | `--full`     | Run all available modules                   |
 | `--map`      | Save interactive map of discovered hosts    |
-| `--output FILE` | Specify output filename                     |
 | `--help`     | Show full list of options                   |
 
 ---

@@ -39,7 +39,7 @@ from utils.tuga_banner import banner
 from utils.tuga_functions import ReadFile, DeleteDuplicate, mapping_domain
 from utils.tuga_dns import DNS_Record_Types, bscan_whois_look
 from utils.tuga_results import main_work_subdirs
-from tuga_bruteforce import TugaBruteForce
+from tuga_bruteforce_21out2025 import TugaBruteForce
 from tuga_network_map import tuga_map
 #import asyncio
 
@@ -268,7 +268,6 @@ def menu_bruteforce():
 # ----------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     menu_bruteforce()
-    
     
 # ----------------------------------------------------------------------------------------------------------
 
