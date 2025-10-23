@@ -27,6 +27,44 @@
 
 ---
 
+## ⚠️ Legal Notice
+
+**Use TugaRecon only on targets you have explicit permission to test.** The author is not responsible for misuse. Unauthorized use of this tool may be illegal.
+
+---
+
+## 📄 License
+
+This project is licensed under **GNU GPLv3**. The source file headers include the GPLv3 license and a patent restriction clause — the `README` has been updated to reflect that.  
+> If you prefer to use the MIT license, update the license headers in the source files accordingly to keep legal consistency.
+
+---
+## 📦 Requirements & Dependencies
+
+Minimum requirements:
+- Python 3.8+
+
+Main dependencies (install via `pip install -r requirements.txt`):
+
+```
+dnspython>=2.7.0
+whois>=1.20240129.2
+requests>=2.32.3
+urllib3>=2.4.0
+progress>=1.6
+argparse>=1.4.0
+pyvis>=0.3.2
+matplotlib>=3.10.3
+networkx>=3.5
+ipwhois>=1.3.0
+graphviz>=0.20.3
+signal
+multiprocess
+tldextract>=5.1.2
+colorama>=0.4.6
+lxml>=5.2.2
+```
+
 ## 📦 Installation
 
 ```bash
@@ -46,56 +84,94 @@ pip3 install -r requirements.txt
 python3 tugarecon.py -d example.com
 ```
 
-### Common Options
+### Main options
 
-| Option       | Description                                 |
-|--------------|---------------------------------------------|
-| `-d DOMAIN`  | Target domain (required)                    |
-| `--bruteforce` | Enable subdomain brute-forcing              |
-| `--full`     | Run all available modules                   |
-| `--map`      | Save interactive map of discovered hosts    |
-| `--help`     | Show full list of options                   |
+| Option         | Description |
+|--------------:|----------|
+| `-d, --domain`   | Target domain (required), e.g.: `example.com` |
+| `-b, --bruteforce` | Enable brute-force mode (uses internal wordlists under `wordlists/`) |
+| `-e, --enum`    | Select specific modules (e.g.: `--enum ssl certspotter`) — if omitted, all supported modules run |
+| `-t, --threads` | Number of concurrent threads (default: 250) |
+| `-m, --map`     | Generate a network/visual map of the domain |
+| `-r, --results` | Show previously saved results (invoked without arguments) |
+
+> Note: The previous README mentioned a `--full` flag; the current behavior is: if `--enum` is not passed, all configured modules run by default.
 
 ---
 
-## 🔎 Example
+## 🔎 Examples
+
+Run all modules (default):
 
 ```bash
-python3 tugarecon.py -d google.pt --map
+python3 tugarecon.py -d google.pt
 ```
 
-📁 Output:
+Run specific modules only:
+
+```bash
+python3 tugarecon.py -d example.com --enum certspotter hackertarget
+```
+
+Brute-force using internal wordlists:
+
+```bash
+python3 tugarecon.py -d example.com --bruteforce
+# or
+python3 tugarecon.py -d example.com -b
+```
+
+Generate a visual map (relies on the existing visualization utilities):
+
+```bash
+python3 tugarecon.py -d example.com -m
+```
+
+View saved results (shortcut):
+
+```bash
+python3 tugarecon.py -r
+```
+
+### Typical output
 
 ```
 output/
-├── tugarecon/results/google.com/2025-07-18/subdomains_clustered.svg
-├── tugarecon/results/google.com/2025-07-18/subdomains_clustered.pdf
-├── tugarecon/results/google.com/2025-07-18/tuga_bruteforce.txt
-└── tugarecon/results/google.com/2025-07-18/subdomains.txt
+├── tugarecon/results/example.com/2025-07-18/subdomains_clustered.svg
+├── tugarecon/results/example.com/2025-07-18/subdomains_clustered.pdf
+├── tugarecon/results/example.com/2025-07-18/tuga_bruteforce.txt
+└── tugarecon/results/example.com/2025-07-18/subdomains.txt
 ```
 
 ---
 
-## 🧩 Modules Overview
+## 🧩 Modules (overview)
 
-| Module         | Type      | Source/Functionality                     |
-|----------------|-----------|------------------------------------------|
-| `certspotter`  | Passive   | Queries certificate transparency logs     |
-| `hackertarget` | Passive   | Uses HackerTarget public API             |
-| `dnsdumpster`  | Passive   | Extracts data from dnsdumpster.com       |
-| `bruteforce`   | Active    | Dictionary-based subdomain brute-force   |
-| `dnsresolve`   | Resolver  | Resolves IPs with optional fallback DNS  |
-| `mapbuilder`   | Visual    | Generates HTML/Graphviz subdomain maps   |
+| Module         | Type      | Function / Source |
+|---------------:|----------:|-------------------|
+| `certspotter`  | Passive   | Certificate Transparency logs |
+| `hackertarget` | Passive   | HackerTarget public API |
+| `dnsdumpster`  | Passive   | Extraction from dnsdumpster.com |
+| `bruteforce`   | Active    | Dictionary-based brute-force using wordlists |
+| `dnsresolve`   | Resolver  | Resolve IPs with fallback DNS |
+| `mapbuilder`   | Visual    | Generate maps (HTML / Graphviz / pyvis) |
+
+> The full list of modules is inside `modules/` and can be extended.
 
 ---
+---
 
-## 📁 Project Structure
+## 🛠 Project structure
 
 ```
 tugarecon/
 ├── modules/
 │   ├── certspotter.py
 │   ├── hackertarget.py
+│   └── ...
+├── utils/
+│   ├── tuga_colors.py
+│   ├── tuga_banner.py
 │   └── ...
 ├── wordlists/
 │   ├── first_names.txt
@@ -106,14 +182,14 @@ tugarecon/
 └── README.md
 ```
 
+## 🧭 Roadmap (excerpt)
+
+- [ ] Export to PDF/SVG maps (better integration)
+- [ ] Integrate `httpx` for active HTTP/HTTPS service detection
+- [ ] ASN-based grouping on visual maps
+- [ ] Web frontend for remote analysis
+
 ---
-
-## 🧠 Roadmap
-
-- [ ] Add support for export to PDF/SVG maps
-- [ ] Integrate `httpx` to detect live HTTP/HTTPS services
-- [ ] ASN-based grouping in visual maps
-- [ ] Web-based frontend interface for remote analysis
 
 ---
 
@@ -172,3 +248,9 @@ Every contribution, no matter how small, makes a big difference. Thank you!
 
 
    ![tugarecon](https://user-images.githubusercontent.com/39160972/75924110-45d8e300-5e5e-11ea-8832-55c08ecc2902.jpg)
+
+---
+
+### Final note
+This README has been updated to match the current behavior of `tugarecon.py` (flags/usage) and to resolve the license inconsistency. If you prefer the MIT license instead of GPLv3, tell me and I can update the source file headers or switch the README to reflect MIT licensing.
+
