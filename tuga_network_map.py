@@ -192,16 +192,26 @@ def shorten_label(text, max_len=30):
     return '\n'.join(['.'.join(parts[i:i+2]) for i in range(0, len(parts), 2)])
 
 # ----------------------------------------------------------------------------------------------------------
-# Fetch SSL certificate synchronously
+# ----------------------------------------------------------------------------------------------------------
+# Fetch SSL certificate synchronously (TLS 1.2+ enforced)
 def fetch_cert_sync(host, port=443, timeout=5):
     try:
         ctx = ssl.create_default_context()
+
+        # 🔒 Força protocolos seguros apenas (TLS 1.2 ou superior)
+        if hasattr(ssl, "TLSVersion"):
+            ctx.minimum_version = ssl.TLSVersion.TLSv1_2
+        else:
+            # fallback para versões mais antigas do Python
+            ctx.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
+
         with socket.create_connection((host, port), timeout=timeout) as sock:
             with ctx.wrap_socket(sock, server_hostname=host) as ss:
                 der = ss.getpeercert(binary_form=True)
                 return der
     except Exception:
         return None
+
 
 # ----------------------------------------------------------------------------------------------------------
 # Get certificate SANs asynchronously
@@ -307,7 +317,7 @@ def build_graph_with_clusters(subdomain_ip_map, host_sources=None, cert_map=None
         'footer',
         label="mapa gerado por: https://github.com/skynet0x01/tugarecon",
         shape='plaintext',
-        fontsize='12'
+        fontsize='14'
     )
     graph.add_node(footer_node)
 
