@@ -38,7 +38,6 @@ import re
 import importlib
 import traceback
 
-    PYVIS_AVAILABLE = True
 from datetime import datetime
 from ipwhois import IPWhois
 from utils.tuga_colors import R, W, Y
