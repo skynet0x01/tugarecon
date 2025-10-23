@@ -21,7 +21,7 @@
 
 <p align="center">
 
-  <img width="798" height="565" alt="tugarecon" src="https://github.com/user-attachments/assets/2cc45ccb-dae8-4358-8576-ff5f5966f735" />
+  <img width="803" height="575" alt="tugarecon" src="https://github.com/user-attachments/assets/7e7461e7-ff6c-4132-9356-b8f8cab6bc15" />
 </p>
 
 ---
