@@ -36,7 +36,6 @@
 ## 📄 License
 
 This project is licensed under **GNU GPLv3**. The source file headers include the GPLv3 license and a patent restriction clause — the `README` has been updated to reflect that.  
-> If you prefer to use the MIT license, update the license headers in the source files accordingly to keep legal consistency.
 
 ---
 ## 📦 Requirements & Dependencies
