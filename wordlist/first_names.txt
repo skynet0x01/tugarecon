@@ -25992,11 +25992,14 @@ grg
 grh
 gri
 grid
+gridcontrol
+gridcontrolfusion
 gridlogic
 gridlogic.energy
 gridlogic-eng
 gridlogic-eng.powerhub
 gridlogic-eng.powerhub.energy
+gridview.corp
 grj
 grk
 grl
@@ -28863,6 +28866,7 @@ ilr
 ils
 ilt
 ilu
+iluminacaopublica
 ilv
 ilw
 ilx
@@ -39595,6 +39599,9 @@ openvz
 openx
 oper
 opera
+operacoes
+operador
+operador-redebt
 operating
 operating-reserve
 operatingreserve
@@ -46896,6 +46903,8 @@ smalltits
 smart
 smart1
 smart2
+smartgrids
+smartgrids.corp
 smarthost
 smartphone
 smartrelay
@@ -48131,6 +48140,10 @@ szy
 t
 t0
 t01
+t01-msappconfig
+t01-msappconfig.online
+t01-msdynamicforms
+t01-msdynamicforms.online
 t02
 t03
 t04
