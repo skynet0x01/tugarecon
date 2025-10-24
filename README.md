@@ -77,6 +77,7 @@ graphviz>=0.20.3
 tldextract>=5.1.2
 colorama>=0.4.6
 lxml>=5.2.2
+beautifulsoup4
 ```
 
 ## 📦 Installation
@@ -161,14 +162,15 @@ output/
 
 ## 🧩 Modules (overview)
 
-| Module         | Type      | Function / Source |
-|---------------:|----------:|-------------------|
-| `certspotter`  | Passive   | Certificate Transparency logs |
-| `hackertarget` | Passive   | HackerTarget public API |
-| `dnsdumpster`  | Passive   | Extraction from dnsdumpster.com |
-| `bruteforce`   | Active    | Dictionary-based brute-force using wordlists |
-| `dnsresolve`   | Resolver  | Resolve IPs with fallback DNS |
-| `mapbuilder`   | Visual    | Generate maps (HTML / Graphviz / pyvis) |
+| Module         | Type      | Function / Source                                      |
+|---------------:|----------:|--------------------------------------------------------|
+| `certspotter`  | Passive   | Certificate Transparency logs                          |
+| `hackertarget` | Passive   | HackerTarget public API                                |
+| `alienvault`  | Passive   | Collaborative platform for global threat intelligence. |
+| `DNSDumpster`  | Passive   | Extraction from dnsdumpster. ** New **                 |
+| `bruteforce`   | Active    | Dictionary-based brute-force using wordlists           |
+| `dnsresolve`   | Resolver  | Resolve IPs with fallback DNS                          |
+| `mapbuilder`   | Visual    | Generate maps (HTML / Graphviz / pyvis)                |
 
 > The full list of modules is inside `modules/` and can be extended.
 
