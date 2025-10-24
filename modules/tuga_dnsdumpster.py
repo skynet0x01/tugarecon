@@ -134,7 +134,7 @@ class DNSDUMPSTER:
             for match in matches:
                 # normaliza: tira espaços e pontuações indesejadas
                 sub = match.strip().strip('.,;:"\'()[]{}<>')
-                # evita incluir apenas o domínio sem subdomínio (se quiseres incluir target.com, mantém)
+                # evita incluir apenas o domínio sem subdomínio
                 # aqui incluímos também o próprio target (caso apareça)
                 if sub and sub not in subdomains_found:
                     subdomains_found.add(sub)
