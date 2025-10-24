@@ -18,3 +18,4 @@ graphviz>=0.20.3
 tldextract>=5.1.2
 colorama>=0.4.6
 lxml>=5.2.2
+beautifulsoup4

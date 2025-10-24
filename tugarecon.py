@@ -46,7 +46,7 @@ from tuga_network_map import tuga_map
 # ----------------------------------------------------------------------------------------------------------
 # Import internal modules
 from modules.tuga_modules import tuga_certspotter, tuga_crt, tuga_hackertarget, tuga_threatcrowd, \
-                                 tuga_alienvault, tuga_threatminer, tuga_omnisint, tuga_sublist3r
+                                 tuga_alienvault, tuga_threatminer, tuga_omnisint, tuga_sublist3r, tuga_dnsdumpster
 from modules.tuga_modules import queries
 
 
@@ -177,8 +177,8 @@ def internet_on():
 # ----------------------------------------------------------------------------------------------------------
 def start_bruteforce(args, target, enum, threads, bruteforce, savemap, results):
     # bruteforce fast scan
-    
-    
+
+
     if bruteforce:
         print("\nWait for results...! (It might take a while for the results appear) ")
         print(G + "**************************************************************\n" + W)
@@ -186,7 +186,7 @@ def start_bruteforce(args, target, enum, threads, bruteforce, savemap, results):
         subdomains_test.run()
         sys.exit()
     # END bruteforce fast scan
-    
+
     # ----------------------------------------------------------------------------------------------------------
     # Save map domain (png file)
     if savemap is not False:
@@ -205,7 +205,8 @@ def start_bruteforce(args, target, enum, threads, bruteforce, savemap, results):
                              'alienvault': tuga_alienvault.Alienvault,
                              'threatminer': tuga_threatminer.Threatminer,
                              'omnisint': tuga_omnisint.Omnisint,
-                             'sublist3r': tuga_sublist3r.Sublist3r
+                             'sublist3r': tuga_sublist3r.Sublist3r,
+                             'dnsdumpster': tuga_dnsdumpster.DNSDUMPSTER
                             }
         chosenEnums = []
 
@@ -214,7 +215,7 @@ def start_bruteforce(args, target, enum, threads, bruteforce, savemap, results):
             queries(target)
             chosenEnums = [tuga_certspotter.Certspotter, tuga_crt.CRT, tuga_hackertarget.Hackertarget,
                            tuga_threatcrowd.Threatcrowd, tuga_alienvault.Alienvault, tuga_threatminer.Threatminer,
-                           tuga_omnisint.Omnisint, tuga_sublist3r.Sublist3r]
+                           tuga_omnisint.Omnisint, tuga_sublist3r.Sublist3r, tuga_dnsdumpster.DNSDUMPSTER]
             # Start super fast enumeration
             print("Running free OSINT engines...\n")
             print("Wait for results...! (It might take a while)")
@@ -238,11 +239,11 @@ def start_bruteforce(args, target, enum, threads, bruteforce, savemap, results):
                     enums = [indicate(target) for indicate in chosenEnums]
                     DeleteDuplicate(target)
                     ReadFile(target, start_time)
-        
+
         # # Save map domain (png file)
         # if savemap is not False:
         #     tuga_map(target)
-        
+
     except KeyboardInterrupt:
         print(G + "**************************************************************" + W)
         print("\nTugaRecon interrupted by user\n")
@@ -262,12 +263,12 @@ def menu_bruteforce():
     results = args.results
     savemap = args.map
     start_bruteforce(args, target, enum, threads, bruteforce, savemap, results)
-    
+
 
 
 # ----------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     menu_bruteforce()
-    
+
 # ----------------------------------------------------------------------------------------------------------
 
