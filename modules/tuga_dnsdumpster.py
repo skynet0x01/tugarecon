@@ -61,8 +61,8 @@ class DNSDUMPSTER:
 # ----------------------------------------------------------------------------------------------------------
     def engine_url(self):
         """
-        Contacta o site dnsdumpster.com: faz GET para obter csrf token + cookies,
-        depois faz POST com o domínio alvo e devolve o HTML resultante.
+        Verificar o site dnsdumpster.com: fazer GET para obter csrf token + cookies,
+        depois fazer POST com o domínio alvo e devolve o HTML resultante.
         Em caso de erro de conexão devolve 1.
         """
         session = requests.Session()
