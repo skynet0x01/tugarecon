@@ -165,12 +165,12 @@ class DNSDUMPSTER:
                                     pass
 
         except Exception:
-            # falha silenciosa, segue sem interromper (similar ao teu padrão)
+            # falha silenciosa, segue sem interromper
             pass
 
         # opcional: podes registar o tempo gasto (não escrito em ficheiro aqui)
         elapsed = time.time() - start_time
-        # se precisares de usar estes valores fora, podes atribuí-los a self
+
         self.elapsed = elapsed
         self.subdomains = sorted(subdomains_found)
 
