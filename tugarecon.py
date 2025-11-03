@@ -41,7 +41,6 @@ from utils.tuga_dns import DNS_Record_Types, bscan_whois_look
 from utils.tuga_results import main_work_subdirs
 from tuga_bruteforce import TugaBruteForce
 from tuga_network_map import tuga_map
-#import asyncio
 
 # ----------------------------------------------------------------------------------------------------------
 # Import internal modules
@@ -158,21 +157,6 @@ def parse_url(url):
 
 
 # ----------------------------------------------------------------------------------------------------------
-def internet_on():
-    url = "https://www.google.com"
-    test_timeout = 2
-    try:
-        request = requests.get(url, timeout=test_timeout)
-        print("Connection established... Wait!\n")
-        time.sleep(0.5)
-    except (requests.ConnectionError, requests.Timeout) as exception:
-        print("No internet connection. Check the network...\n")
-        exit(1)
-    except KeyboardInterrupt:
-        print(G + "**************************************************************" + W)
-        print("\nTugaRecon interrupted by user\n")
-        sys.exit()
-
 
 # ----------------------------------------------------------------------------------------------------------
 def start_bruteforce(args, target, enum, threads, bruteforce, savemap, results):
@@ -213,9 +197,11 @@ def start_bruteforce(args, target, enum, threads, bruteforce, savemap, results):
         if enum is None: # Run all modules
             start_time = time.time()
             queries(target)
+
             chosenEnums = [tuga_certspotter.Certspotter, tuga_crt.CRT, tuga_hackertarget.Hackertarget,
                            tuga_threatcrowd.Threatcrowd, tuga_alienvault.Alienvault, tuga_threatminer.Threatminer,
                            tuga_omnisint.Omnisint, tuga_sublist3r.Sublist3r, tuga_dnsdumpster.DNSDUMPSTER]
+
             # Start super fast enumeration
             print("Running free OSINT engines...\n")
             print("Wait for results...! (It might take a while)")
