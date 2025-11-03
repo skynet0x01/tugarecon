@@ -71,6 +71,9 @@ class TugaBruteForce:
         self.spinner_index = 0  # Index to animate spinner in console
 
     # ----------------------------------------------------------------------------------------------------------
+    '''
+    Load firt sub-names, second-subnames and DNS servers.
+    '''
 
     def load_first_sub_names(self):
         # Load first wordlist and enqueue each subdomain candidate
