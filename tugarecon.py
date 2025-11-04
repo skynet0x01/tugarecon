@@ -155,9 +155,6 @@ def parse_url(url):
         #sys.exit(1)
     return host
 
-
-# ----------------------------------------------------------------------------------------------------------
-
 # ----------------------------------------------------------------------------------------------------------
 def start_bruteforce(args, target, enum, threads, bruteforce, savemap, results):
     # bruteforce fast scan

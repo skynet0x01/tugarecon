@@ -163,7 +163,7 @@ class TugaBruteForce:
         """
         with self.print_lock:
             sys.stdout.write('\r' + ' ' * 120 + '\r')  # Clear line (maior largura)
-            domain_col_width = 60  # ajusta se precisares de mais/menos espaço 45
+            domain_col_width = 60  # ajusta se for necessário de mais/menos espaço 45
             ips_display = ", ".join(ips) if ips else "-"
             # domain left-aligned em campo fixo, ips após esse campo
             print(f"{G}[*] {count}:{W}   {domain.ljust(domain_col_width)} {ips_display}")
@@ -188,7 +188,6 @@ class TugaBruteForce:
         try:
             signal.signal(signal.SIGINT, signal.SIG_IGN)
         except Exception:
-            # Em algumas plataformas (por ex. Windows) isto pode lançar; ignoramos.
             pass
 
         try:
