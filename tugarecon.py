@@ -1,4 +1,5 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
+
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
 # Coded By skynet0x01 2020-2025
@@ -156,7 +157,7 @@ def parse_url(url):
     return host
 
 # ----------------------------------------------------------------------------------------------------------
-def start_bruteforce(args, target, enum, threads, bruteforce, savemap, results):
+def start_tugarecon(args, target, enum, threads, bruteforce, savemap, results):
     # bruteforce fast scan
 
 
@@ -245,7 +246,7 @@ def menu_bruteforce():
     threads = args.threads
     results = args.results
     savemap = args.map
-    start_bruteforce(args, target, enum, threads, bruteforce, savemap, results)
+    start_tugarecon(args, target, enum, threads, bruteforce, savemap, results)
 
 
 
