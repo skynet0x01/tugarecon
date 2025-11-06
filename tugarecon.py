@@ -235,7 +235,7 @@ def start_tugarecon(args, target, enum, threads, bruteforce, savemap, results):
 
 
 # ----------------------------------------------------------------------------------------------------------
-def menu_bruteforce():
+def menu_tugarecon():
     banner()
     args = parse_args()  # args = parser.parse_args()
     target = parse_url(args.domain)
@@ -252,7 +252,7 @@ def menu_bruteforce():
 
 # ----------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    menu_bruteforce()
+    menu_tugarecon()
 
 # ----------------------------------------------------------------------------------------------------------
 
