@@ -57,20 +57,6 @@ Instead of relying exclusively on static dictionaries, TugaRecon analyzes enumer
    - Duplicates are automatically avoided
 5. Subsequent brute‑force runs benefit from a higher probability of valid discoveries.
 
----
-### How it works
-
-1. Run a standard enumeration:
-   ```bash
-   python3 tugarecon.py -d example.com
-   ```
-2. All discovered subdomains are analyzed internally.
-3. Meaningful tokens and structural patterns are extracted.
-4. New entries are appended to existing wordlists (e.g. `wordlists/first_names.txt`):
-   - Existing entries are preserved
-   - Duplicates are automatically avoided
-5. Subsequent brute‑force runs benefit from a higher probability of valid discoveries.
-
 ### Recommended workflow
 
 ```bash
@@ -78,7 +64,7 @@ Instead of relying exclusively on static dictionaries, TugaRecon analyzes enumer
 python3 tugarecon.py -d example.com
 
 # Step 2 — Brute‑force using enriched wordlists
-python3 tugarecon.py -d example.com --bruteforce
+python3 tugarecon.py -d example.com -b
 ```
 
 Running brute‑force after the learning phase significantly improves results, especially in enterprise or segmented infrastructures.
