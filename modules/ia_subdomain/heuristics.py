@@ -28,6 +28,10 @@
 # Conhecimento operacional comum (heurísticas)
 # Isto NÃO aprende: isto codifica hábitos reais de infra
 
+# ------------------------------------------------------------
+# Heuristic token expansion for adaptive subdomain generation
+# ------------------------------------------------------------
+
 ENVIRONMENTS = [
     "dev", "test", "testing",
     "qa", "uat",
@@ -62,28 +66,66 @@ QUALIFIERS = [
 ]
 
 API_LIKE_TOKENS = {
-    "api", "apis", "rest", "graphql", "service", "services"
+    "api", "apis", "rest", "graphql",
+    "service", "services"
+}
+
+# Tokens fortemente associados a software de gestão
+MANAGEMENT_TOKENS = {
+    # Generic management
+    "admin", "portal", "dashboard", "console", "panel", "manager",
+
+    # ERP / CRM / ITSM
+    "erp", "crm", "sap", "s4", "hana", "odoo",
+    "servicenow", "snow", "jira", "confluence",
+
+    # Identity / access
+    "auth", "login", "sso", "iam", "id", "identity",
+    "keycloak", "okta",
+
+    # Infrastructure / monitoring
+    "grafana", "prometheus", "kibana", "elastic",
+    "zabbix", "nagios",
+
+    # CI/CD & code management
+    "git", "gitlab", "jenkins", "ci", "cd",
+    "registry", "nexus", "harbor",
+
+    # Network / internal IT
+    "vpn", "proxy", "firewall", "fw", "mdm"
 }
 
 
 def expand(token: str) -> list[str]:
     """
-    Gera expansões realistas para um token conhecido.
-    Evita explosão combinatória desnecessária.
+    Gera expansões realistas e inteligentes para um token conhecido.
+    - Evita explosão combinatória
+    - Aplica versões apenas onde faz sentido
+    - Usa heurísticas baseadas em software de gestão real
     """
-    results = []
+    token = token.lower()
+    results: set[str] = set()
 
-    # Ambientes
+    # 1. Ambientes (sempre seguros)
     for env in ENVIRONMENTS:
-        results.append(f"{token}-{env}")
+        results.add(f"{token}-{env}")
 
-    # Versões apenas para tokens tipo API
-    if token.lower() in API_LIKE_TOKENS:
+    # 2. Versões apenas para APIs e serviços versionáveis
+    if token in API_LIKE_TOKENS:
         for v in VERSIONS:
-            results.append(f"{token}-{v}")
+            results.add(f"{token}-{v}")
+            for env in ENVIRONMENTS:
+                results.add(f"{token}-{v}-{env}")
 
-    # Qualificadores
+    # 3. Qualificadores (limitados)
     for q in QUALIFIERS:
-        results.append(f"{token}-{q}")
+        results.add(f"{token}-{q}")
 
-    return results
+    # 4. Heurística especial para software de gestão
+    if token in MANAGEMENT_TOKENS:
+        for env in ("dev", "qa", "uat", "prod"):
+            results.add(f"{token}-{env}")
+        for q in ("internal", "admin", "corp"):
+            results.add(f"{token}-{q}")
+
+    return sorted(results)
