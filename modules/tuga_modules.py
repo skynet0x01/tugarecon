@@ -53,5 +53,6 @@ def queries(target):
     print(R + "[-] Searching " + target + " in Omnisint" + W)
     print(R + "[-] Searching " + target + " in DNSDumpster" + W)
     print(R + "[-] Searching " + target + " in API Sublist3r\n" + W)
+    print(G + "[IA] Intelligence‑Assisted Wordlist Enrichment\n" + W)
     #time.sleep(0.5)
     return (0)

@@ -32,6 +32,10 @@ import sys
 import time
 import urllib3
 import requests
+
+import os
+from datetime import datetime
+
 from progress.bar import IncrementalBar
 
 # Import internal functions
@@ -48,6 +52,8 @@ from tuga_network_map import tuga_map
 from modules.tuga_modules import tuga_certspotter, tuga_crt, tuga_hackertarget, tuga_threatcrowd, \
                                  tuga_alienvault, tuga_threatminer, tuga_omnisint, tuga_sublist3r, tuga_dnsdumpster
 from modules.tuga_modules import queries
+from modules.ia_subdomain.ia_generator import IASubdomainGenerator
+
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -157,6 +163,44 @@ def parse_url(url):
     return host
 
 # ----------------------------------------------------------------------------------------------------------
+def enrich_wordlist_from_ia(ia_subdomains, wordlist_path="wordlist/first_names.txt"):
+    """
+    Adiciona novos tokens à wordlist sem apagar nada
+    e sem repetir entradas existentes.
+    """
+
+    # Ler wordlist existente
+    try:
+        with open(wordlist_path, "r") as f:
+            existing = set(line.strip().lower() for line in f if line.strip())
+    except FileNotFoundError:
+        existing = set()
+
+    new_tokens = set()
+
+    for sub in ia_subdomains:
+        parts = sub.replace("-", ".").split(".")
+        for p in parts:
+            p = p.strip().lower()
+            if len(p) < 2:
+                continue
+            if not p.isalnum():
+                continue
+            if p not in existing:
+                new_tokens.add(p)
+
+    if not new_tokens:
+        print("[IA] No new tokens to add to wordlist")
+        return
+
+    # Append seguro
+    with open(wordlist_path, "a") as f:
+        for token in sorted(new_tokens):
+            f.write(token + "\n")
+
+    print(f"[IA] Added {len(new_tokens)} new tokens to {wordlist_path}")
+
+# ----------------------------------------------------------------------------------------------------------
 def start_tugarecon(args, target, enum, threads, bruteforce, savemap, results):
     # bruteforce fast scan
 
@@ -213,6 +257,57 @@ def start_tugarecon(args, target, enum, threads, bruteforce, savemap, results):
             print(G + "\n**************************************************************\n" + W)
             DeleteDuplicate(target)
             ReadFile(target, start_time)
+
+            # ---- IA subdomain generation ----
+            # ---- IA subdomain generation ----
+            base_dir = f"results/{target}"
+
+            if not os.path.isdir(base_dir):
+                print("[IA] No results directory found")
+                return
+
+            # escolher a pasta de data mais recente
+            dates = []
+            for d in os.listdir(base_dir):
+                full = os.path.join(base_dir, d)
+                if os.path.isdir(full):
+                    try:
+                        datetime.strptime(d, "%Y-%m-%d")
+                        dates.append(d)
+                    except ValueError:
+                        pass
+
+            if not dates:
+                print("[IA] No dated result folders found")
+                return
+
+            latest_date = sorted(dates)[-1]
+            subdomains_file = os.path.join(base_dir, latest_date, "subdomains.txt")
+
+            if not os.path.isfile(subdomains_file):
+                print("[IA] subdomains.txt not found")
+                return
+
+            # ler subdomínios COMPLETOS, mas aprender só o label
+            found_subdomains = []
+            with open(subdomains_file, "r") as f:
+                for line in f:
+                    sub = line.strip()
+                    if not sub:
+                        continue
+                    found_subdomains.append(sub)
+
+            print(f"[IA] Training with {len(found_subdomains)} subdomains")
+
+            if len(found_subdomains) < 2:
+                print("[IA] Not enough data to generate patterns")
+                return
+
+            # gerar IA (IA devolve APENAS labels)
+            ia = IASubdomainGenerator(limit=1000)
+            ia_candidates = ia.generate(found_subdomains)
+            enrich_wordlist_from_ia(ia_candidates)
+
         else: # Perform enumerations
             for engine in enum:
                 if engine.lower() in supported_engines:
@@ -223,6 +318,56 @@ def start_tugarecon(args, target, enum, threads, bruteforce, savemap, results):
                     enums = [indicate(target) for indicate in chosenEnums]
                     DeleteDuplicate(target)
                     ReadFile(target, start_time)
+
+                    # ---- IA subdomain generation ----
+                    # ---- IA subdomain generation ----
+                    base_dir = f"results/{target}"
+
+                    if not os.path.isdir(base_dir):
+                        print("[IA] No results directory found")
+                        return
+
+                    # escolher a pasta de data mais recente
+                    dates = []
+                    for d in os.listdir(base_dir):
+                        full = os.path.join(base_dir, d)
+                        if os.path.isdir(full):
+                            try:
+                                datetime.strptime(d, "%Y-%m-%d")
+                                dates.append(d)
+                            except ValueError:
+                                pass
+
+                    if not dates:
+                        print("[IA] No dated result folders found")
+                        return
+
+                    latest_date = sorted(dates)[-1]
+                    subdomains_file = os.path.join(base_dir, latest_date, "subdomains.txt")
+
+                    if not os.path.isfile(subdomains_file):
+                        print("[IA] subdomains.txt not found")
+                        return
+
+                    # ler subdomínios COMPLETOS, mas aprender só o label
+                    found_subdomains = []
+                    with open(subdomains_file, "r") as f:
+                        for line in f:
+                            sub = line.strip()
+                            if not sub:
+                                continue
+                            found_subdomains.append(sub)
+
+                    print(f"[IA] Training with {len(found_subdomains)} subdomains")
+
+                    if len(found_subdomains) < 2:
+                        print("[IA] Not enough data to generate patterns")
+                        return
+
+                    # gerar IA (IA devolve APENAS labels)
+                    ia = IASubdomainGenerator(limit=1000)
+                    ia_candidates = ia.generate(found_subdomains)
+                    enrich_wordlist_from_ia(ia_candidates)
 
         # # Save map domain (png file)
         # if savemap is not False:

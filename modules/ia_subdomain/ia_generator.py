@@ -1,0 +1,38 @@
+from .pattern_model import PatternModel
+from .heuristics import expand
+
+
+class IASubdomainGenerator:
+    def __init__(self, limit: int = 500):
+        self.model = PatternModel()
+        self.limit = limit
+
+    def generate(self, known_subdomains: list[str]) -> list[str]:
+        """
+        Recebe subdomínios SEM o domínio (ex: 'api-prod')
+        Retorna apenas nomes de subdomínio (sem '.example.com')
+        """
+        self.model.train(known_subdomains)
+
+        candidates = set()
+
+        # Tokens frequentes
+        for token in self.model.top_tokens(10):
+            token = token.strip().lower()
+            if not token:
+                continue
+
+            candidates.add(token)
+
+            for expanded in expand(token):
+                candidates.add(expanded)
+
+        # Bigramas (ordem importa)
+        for a, b in self.model.top_bigrams(10):
+            a, b = a.lower(), b.lower()
+            candidates.add(f"{a}-{b}")
+            candidates.add(f"{b}-{a}")
+
+        # Limitar e ordenar (determinístico)
+        final = sorted(candidates)
+        return final[:self.limit]

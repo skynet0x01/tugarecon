@@ -1,5 +1,5 @@
 # TugaRecon
-![version](https://img.shields.io/badge/version-2.40-blue)
+![version](https://img.shields.io/badge/version-2.50-blue)
 ![python](https://img.shields.io/badge/python-3.8%2B-yellow)
 ![license](https://img.shields.io/github/license/skynet0x01/tugarecon)
 ![issues](https://img.shields.io/github/issues/skynet0x01/tugarecon)
@@ -28,14 +28,82 @@
 
 ## 🚀 Features
 
-- 🔍 Passive and active subdomain enumeration using various OSINT sources
-- 📡 Built-in brute-force mode using custom wordlists
-- 🌐 DNS resolution with fallback mechanisms
-- 🧠 Multi-module integration (Certspotter, DNSDumpster, HackerTarget, etc.)
-- 🗺️ Optional subdomain map generation (interactive or visual)
-- 📁 Clean output in `.txt`, `.json`, `.html`, or `.csv`
-- 🔒 No API keys required for most modules
+- 🔍 Passive and active subdomain enumeration using multiple OSINT sources  
+- 📡 Built-in brute-force mode using customizable wordlists  
+- 🌐 DNS resolution with fallback mechanisms  
+- 🧠 Multi-module integration (Certspotter, DNSDumpster, HackerTarget, etc.)  
+- 🗺️ Optional subdomain map generation (interactive or visual)  
+- 📁 Clean output formats: `.txt`, `.json`, `.html`, `.csv`  
+- 🔒 No API keys required for most modules  
+- 🧠 **Adaptive / Intelligence‑Assisted Wordlist Enrichment**  
 
+---
+## 🧠 Adaptive / Intelligence‑Assisted Wordlist Enrichment
+
+TugaRecon includes an **adaptive intelligence mechanism** designed to enhance brute‑force efficiency by learning from previously discovered subdomains.
+
+Instead of relying exclusively on static dictionaries, TugaRecon analyzes enumeration results and **automatically enriches its internal wordlists** with relevant tokens and naming patterns.
+
+### How it works
+
+1. Run a standard enumeration:
+   ```bash
+   python3 tugarecon.py -d example.com
+   ```
+2. All discovered subdomains are analyzed internally.
+3. Meaningful tokens and structural patterns are extracted.
+4. New entries are appended to existing wordlists (e.g. `wordlists/first_names.txt`):
+   - Existing entries are preserved
+   - Duplicates are automatically avoided
+5. Subsequent brute‑force runs benefit from a higher probability of valid discoveries.
+
+---
+### How it works
+
+1. Run a standard enumeration:
+   ```bash
+   python3 tugarecon.py -d example.com
+   ```
+2. All discovered subdomains are analyzed internally.
+3. Meaningful tokens and structural patterns are extracted.
+4. New entries are appended to existing wordlists (e.g. `wordlists/first_names.txt`):
+   - Existing entries are preserved
+   - Duplicates are automatically avoided
+5. Subsequent brute‑force runs benefit from a higher probability of valid discoveries.
+
+### Recommended workflow
+
+```bash
+# Step 1 — Enumeration & learning phase
+python3 tugarecon.py -d example.com
+
+# Step 2 — Brute‑force using enriched wordlists
+python3 tugarecon.py -d example.com --bruteforce
+```
+
+Running brute‑force after the learning phase significantly improves results, especially in enterprise or segmented infrastructures.
+
+### Key characteristics
+
+- Wordlists are only extended, never overwritten  
+- Duplicate entries are avoided automatically  
+- Fully automatic and transparent to the user  
+- Improves results progressively over time  
+- Domain‑agnostic and reusable across different targets  
+
+### Why this matters
+
+Traditional brute‑force techniques depend on static wordlists.  
+Modern infrastructures evolve continuously and follow internal naming conventions.
+
+By learning directly from discovered assets, TugaRecon adapts to:
+
+- Environment naming (dev, qa, staging, prod, etc.)  
+- Versioned services (v1, v2, api-v3)  
+- Internal qualifiers (internal, secure, private)  
+- Organization‑specific patterns  
+
+The result is less noise, fewer blind guesses, and more accurate discoveries, transforming TugaRecon into an evolving reconnaissance framework rather than a static scanner.
 ---
 
 ## ⚠️ Legal Notice

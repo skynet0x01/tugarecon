@@ -142,7 +142,7 @@ class TugaBruteForce:
                 continue
 
         return None
-# ----------------------------------------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------------------------------
 
 
     def print_testing(self, domain):
@@ -153,7 +153,7 @@ class TugaBruteForce:
             msg = f"Testing {spinner_char} : {domain}"
             sys.stdout.write('\r' + msg.ljust(80))
             sys.stdout.flush()
-# ----------------------------------------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------------------------------
 
 
     def print_valid(self, count, domain, ips):
@@ -168,7 +168,7 @@ class TugaBruteForce:
             # domain left-aligned em campo fixo, ips após esse campo
             print(f"{G}[*] {count}:{W}   {domain.ljust(domain_col_width)} {ips_display}")
             sys.stdout.flush()
-# ----------------------------------------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------------------------------
 
 
     def log_error(self, domain, message):
@@ -179,6 +179,8 @@ class TugaBruteForce:
             with open(log_file, 'a') as f:
                 f.write(f"[{timestamp}] DNS Error for {domain}: {message}\n")
 
+
+    # ----------------------------------------------------------------------------------------------------------
     def scan_subdomains(self):
         """
         Worker process: ignora SIGINT (Ctrl+C) para evitar tracebacks nos filhos.
@@ -241,6 +243,8 @@ class TugaBruteForce:
             self.log_error("scan_subdomains", f"Unhandled exception in worker: {e}")
             return
 
+
+    # ----------------------------------------------------------------------------------------------------------
     def start_process(self):
         """
         Create workers and perform joins in short cycles
@@ -303,8 +307,8 @@ class TugaBruteForce:
                     pass
             raise
 
-# ----------------------------------------------------------------------------------------------------------
 
+# ----------------------------------------------------------------------------------------------------------
     def run(self):
         # Entry point to start scanning and handle keyboard interrupts gracefully
         try:
