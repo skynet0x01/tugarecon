@@ -119,3 +119,11 @@ o2a
 uea01
 uea02
 uea10
+adc
+idc
+in
+jp
+oracle
+uk
+us
+us1
