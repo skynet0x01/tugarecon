@@ -35,7 +35,6 @@ import requests
 
 import os
 from datetime import datetime
-
 from progress.bar import IncrementalBar
 
 # Import internal functions
@@ -316,6 +315,7 @@ def start_tugarecon(args, target, enum, threads, bruteforce, savemap, results):
                     start_time = time.time()
                     # Start the enumeration
                     enums = [indicate(target) for indicate in chosenEnums]
+
                     DeleteDuplicate(target)
                     ReadFile(target, start_time)
 

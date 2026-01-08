@@ -35,12 +35,55 @@ import datetime
 from pathlib import Path # Future: Nedd to change to pathlib2
 
 from utils.tuga_colors import G, Y, R, W
+from modules.ia_subdomain.semantic import classify
+
+# ----------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------
+def print_semantic_results(classified):
+    """
+    Pretty-print semantic classification results with colorized risk.
+    """
+
+    RISK_ORDER = {
+        "HIGH": 3,
+        "MEDIUM": 2,
+        "LOW": 1
+    }
+
+    RISK_COLOR = {
+        "HIGH": R,
+        "MEDIUM": Y,
+        "LOW": G
+    }
+
+    classified = sorted(
+        classified,
+        key=lambda x: RISK_ORDER.get(x["risk_hint"], 0),
+        reverse=True
+    )
+
+    print("\n[🧠] Semantic Classification Results\n")
+
+    for idx, item in enumerate(classified, 1):
+        risk = item["risk_hint"]
+        color = RISK_COLOR.get(risk, W)
+
+        tags = ", ".join(item["tags"]) if item["tags"] else "-"
+
+        print(
+            f"[{idx:04d}] "
+            f"[{color}{risk:^6}{W}] "
+            f"{item['subdomain']:<60} "
+            f"tags: {tags:<25} "
+            f"→ {item['reason']}"
+        )
 
 
 # ----------------------------------------------------------------------------------------------------------
 def write_file(subdomains, target):
     date = str(datetime.datetime.now().date())
     pwd = os.getcwd()
+
     # saving subdomains results to output file
     folder = os.path.join(pwd, "results/" + target + "/" + date)
     try:
@@ -93,12 +136,12 @@ def ReadFile(target, start_time):
     pwd = os.getcwd()
     folder = os.path.join(pwd, "results/" + target + "/" + date)
     file = open("results/" + target + "/" + date + "/" + "subdomains.txt", 'r')
+
     lines = file.readlines()
 
-    for index, line in enumerate(lines):
-        print("     [*] {}:  {}".format(index, line.strip()))
-    file.close()
-    print(Y + "\n[*] Total Subdomains Found: {}".format(index) + W)
+    classified = [classify(s) for s in lines]
+    print_semantic_results(classified)
+
     print(Y + f"[**]TugaRecon: Subdomains have been found in %s seconds" % (time.time() - start_time) +"\n"+ W)
     print(Y + "\n[+] Output Result" + W)
     print(G + "**************************************************************" + W)

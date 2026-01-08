@@ -30,12 +30,14 @@ import requests
 import json
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # Import internal modules
-from modules import tuga_useragents #random user-agent
+from modules import tuga_useragents  #random user-agent
 # Import internal functions
 from utils.tuga_functions import write_file
+
 
 # ----------------------------------------------------------------------------------------------------------
 class Alienvault:
@@ -43,25 +45,24 @@ class Alienvault:
         self.target = target
         self.module_name = "Alienvault"
         self.engine = "alienvault"
-        self.response = self.engine_url() # URL
+        self.response = self.engine_url()  # URL
 
         if self.response != 1:
-            self.enumerate(self.response, target) # Call the function enumerate
+            self.enumerate(self.response, target)  # Call the function enumerate
         else:
             pass
-        
-        
-# ----------------------------------------------------------------------------------------------------------
+
+    # ----------------------------------------------------------------------------------------------------------
     def engine_url(self):
         try:
-            response = requests.get(f'https://otx.alienvault.com/api/v1/indicators/domain/{self.target}/passive_dns').text
+            response = requests.get(
+                f'https://otx.alienvault.com/api/v1/indicators/domain/{self.target}/passive_dns').text
             return response
         except requests.ConnectionError:
             response = 1
             return response
-        
-        
-# ----------------------------------------------------------------------------------------------------------
+
+    # ----------------------------------------------------------------------------------------------------------
     def enumerate(self, response, target):
         subdomains = []
         self.subdomainscount = 0
@@ -78,4 +79,3 @@ class Alienvault:
         except Exception as e:
             pass
 # ----------------------------------------------------------------------------------------------------------
-
