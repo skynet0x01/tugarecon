@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
-# Coded By skynet0x01 2020-2025
+# Coded By skynet0x01 2020-2026
 
 # This file is part of TugaRecon, developed by skynet0x01 in 2020-2025.
 #
-# Copyright (C) 2025 skynet0x01
+# Copyright (C) 2026 skynet0x01
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,12 +31,8 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-# Import internal modules
-from modules import tuga_useragents #random user-agent
 # Import internal functions
-from utils.tuga_functions import write_file
-#from utils.tuga_functions import DeleteDuplicate
-#from utils.tuga_colors import G, Y, B, R, W
+from utils.tuga_save import write_file
 
 
 # ----------------------------------------------------------------------------------------------------------

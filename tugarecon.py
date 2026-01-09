@@ -2,11 +2,11 @@
 
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
-# Coded By skynet0x01 2020-2025
+# Coded By skynet0x01 2020-2026
 
-# This file is part of TugaRecon, developed by skynet0x01 in 2020-2025.
+# This file is part of TugaRecon, developed by skynet0x01 in 2020-2026.
 #
-# Copyright (C) 2025 skynet0x01
+# Copyright (C) 2026 skynet0x01
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,8 @@ from progress.bar import IncrementalBar
 # Import internal functions
 from utils.tuga_colors import G, Y, W
 from utils.tuga_banner import banner
-from utils.tuga_functions import ReadFile, DeleteDuplicate, mapping_domain
+#from utils.tuga_functions import ReadFile, DeleteDuplicate
+from utils.tuga_save import ReadFile, DeleteDuplicate
 from utils.tuga_dns import DNS_Record_Types, bscan_whois_look
 from utils.tuga_results import main_work_subdirs
 from tuga_bruteforce import TugaBruteForce
@@ -52,13 +53,14 @@ from modules.tuga_modules import tuga_certspotter, tuga_crt, tuga_hackertarget, 
                                  tuga_alienvault, tuga_threatminer, tuga_omnisint, tuga_sublist3r, tuga_dnsdumpster
 from modules.tuga_modules import queries
 from modules.ia_subdomain.ia_generator import IASubdomainGenerator
+from modules.ia_subdomain.ia_wordlist import enrich_wordlist_from_ia
 
 
 
 # ----------------------------------------------------------------------------------------------------------
 def data_results():
     main_work_subdirs()
-    print(G + "**************************************************************\n" + W)
+    print(G + "────────────────────────────────────────────────────────────" + W)
 def override(func):
     class OverrideAction(argparse.Action):
         def __call__(self, parser, namespace, values, option_string):
@@ -156,48 +158,11 @@ def parse_url(url):
         print('[*] Network unstable... !? ')
     except KeyboardInterrupt:
         print("\nTugaRecon interrupted by user\n")
-        print(G + "**************************************************************" + W)
+        print(G + "────────────────────────────────────────────────────────────" + W)
         quit()
         #sys.exit(1)
     return host
 
-# ----------------------------------------------------------------------------------------------------------
-def enrich_wordlist_from_ia(ia_subdomains, wordlist_path="wordlist/first_names.txt"):
-    """
-    Adiciona novos tokens à wordlist sem apagar nada
-    e sem repetir entradas existentes.
-    """
-
-    # Ler wordlist existente
-    try:
-        with open(wordlist_path, "r") as f:
-            existing = set(line.strip().lower() for line in f if line.strip())
-    except FileNotFoundError:
-        existing = set()
-
-    new_tokens = set()
-
-    for sub in ia_subdomains:
-        parts = sub.replace("-", ".").split(".")
-        for p in parts:
-            p = p.strip().lower()
-            if len(p) < 2:
-                continue
-            if not p.isalnum():
-                continue
-            if p not in existing:
-                new_tokens.add(p)
-
-    if not new_tokens:
-        print("[IA] No new tokens to add to wordlist")
-        return
-
-    # Append seguro
-    with open(wordlist_path, "a") as f:
-        for token in sorted(new_tokens):
-            f.write(token + "\n")
-
-    print(f"[IA] Added {len(new_tokens)} new tokens to {wordlist_path}")
 
 # ----------------------------------------------------------------------------------------------------------
 def start_tugarecon(args, target, enum, threads, bruteforce, savemap, results):
@@ -206,7 +171,7 @@ def start_tugarecon(args, target, enum, threads, bruteforce, savemap, results):
 
     if bruteforce:
         print("\nWait for results...! (It might take a while for the results appear) ")
-        print(G + "**************************************************************\n" + W)
+        print(G + "────────────────────────────────────────────────────────────\n" + W)
         subdomains_test = TugaBruteForce(options=args)
         subdomains_test.run()
         sys.exit()
@@ -246,14 +211,15 @@ def start_tugarecon(args, target, enum, threads, bruteforce, savemap, results):
             # Start super fast enumeration
             print("Running free OSINT engines...\n")
             print("Wait for results...! (It might take a while)")
-            print(G + "**************************************************************\n" + W)
+            print(G + "────────────────────────────────────────────────────────────\n" + W)
             bar = IncrementalBar('Processing', max = len(chosenEnums))
             #enums = [indicate(target) for indicate in chosenEnums]
             for indicate in chosenEnums:
                 enums = indicate(target)
                 bar.next()
             bar.finish()
-            print(G + "\n**************************************************************\n" + W)
+            print(G + "\n────────────────────────────────────────────────────────────\n" + W)
+
             DeleteDuplicate(target)
             ReadFile(target, start_time)
 
@@ -369,12 +335,8 @@ def start_tugarecon(args, target, enum, threads, bruteforce, savemap, results):
                     ia_candidates = ia.generate(found_subdomains)
                     enrich_wordlist_from_ia(ia_candidates)
 
-        # # Save map domain (png file)
-        # if savemap is not False:
-        #     tuga_map(target)
-
     except KeyboardInterrupt:
-        print(G + "**************************************************************" + W)
+        print(G + "────────────────────────────────────────────────────────────" + W)
         print("\nTugaRecon interrupted by user\n")
         sys.exit()
 

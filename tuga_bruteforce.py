@@ -34,6 +34,8 @@ import signal
 
 from multiprocessing import Queue, Process, freeze_support, Value, Lock
 from utils.tuga_colors import G, Y, R, W
+from modules.ia_subdomain.semantic import classify
+from utils.tuga_functions import  print_semantic_results
 # ----------------------------------------------------------------------------------------------------------
 
 
@@ -165,6 +167,7 @@ class TugaBruteForce:
             sys.stdout.write('\r' + ' ' * 120 + '\r')  # Clear line (maior largura)
             domain_col_width = 60  # ajusta se for necessário de mais/menos espaço 45
             ips_display = ", ".join(ips) if ips else "-"
+
             # domain left-aligned em campo fixo, ips após esse campo
             print(f"{G}[*] {count}:{W}   {domain.ljust(domain_col_width)} {ips_display}")
             sys.stdout.flush()
