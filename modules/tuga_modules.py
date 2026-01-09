@@ -3,9 +3,9 @@
 # Bug Bounty Recon, search for subdomains and save in to a file
 # Coded By skynet0x01 2020-2025
 
-# This file is part of TugaRecon, developed by skynet0x01 in 2020-2025.
+# This file is part of TugaRecon, developed by skynet0x01 in 2020-2026.
 #
-# Copyright (C) 2025 skynet0x01
+# Copyright (C) 2026 skynet0x01
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
