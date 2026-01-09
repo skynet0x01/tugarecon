@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
-# Coded By skynet0x01 2020-2025
+# Coded By skynet0x01 2020-2026
 
 # This file is part of TugaRecon, developed by skynet0x01 in 2020-2026.
 #
