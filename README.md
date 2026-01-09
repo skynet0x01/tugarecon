@@ -36,6 +36,7 @@
 - 📁 Clean output formats: `.txt`, `.json`, `.html`, `.csv`  
 - 🔒 No API keys required for most modules  
 - 🧠 **Adaptive / Intelligence‑Assisted Wordlist Enrichment**  
+- 🎯 **Impact Scoring & Asset Prioritization (NEW)**  
 
 ---
 ## 🧠 Adaptive / Intelligence‑Assisted Wordlist Enrichment
@@ -89,9 +90,36 @@ By learning directly from discovered assets, TugaRecon adapts to:
 - Internal qualifiers (internal, secure, private)  
 - Organization‑specific patterns  
 
-The result is less noise, fewer blind guesses, and more accurate discoveries, transforming TugaRecon into an evolving reconnaissance framework rather than a static scanner.
----
 
+### The result is less noise, fewer blind guesses, and more accurate discoveries, transforming TugaRecon into an evolving reconnaissance framework rather than a static scanner.               
+ 
+---
+🎯 Impact Scoring & Asset Prioritization (NEW)
+- TugaRecon introduces an impact scoring system to help analysts quickly identify high‑value and high‑risk subdomains.
+- Each discovered subdomain is evaluated using semantic indicators extracted from its structure and naming patterns.
+- Signals considered
+- Administrative exposure (admin, panel, manage)
+- Authentication services (auth, login, sso)
+- Production or critical environments (prod, core, primary)
+- Sensitive roles (api, gateway, billing)
+
+### Impact levels
+
+- CRITICAL — Administrative or production exposure
+- HIGH — Authentication or security‑sensitive services
+- MEDIUM — Internal or semi‑exposed infrastructure
+- LOW — Static or non‑actionable assets
+
+Example output
+```bash
+[0001] [CRITICAL] impact=100   admin.prod.example.com
+[0002] [HIGH    ] impact=75    auth.example.com
+[0019] [LOW     ] impact=0     jpg-data.us.oracle.com
+```
+
+###  Impact scoring allows security teams to prioritize what matters first, reducing triage time and focusing efforts on the most relevant assets.                                                                                 
+
+---
 ## ⚠️ Legal Notice
 
 **Use TugaRecon only on targets you have explicit permission to test.** The author is not responsible for misuse. Unauthorized use of this tool may be illegal.
