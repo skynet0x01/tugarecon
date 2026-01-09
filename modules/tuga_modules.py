@@ -42,8 +42,11 @@ from utils.tuga_colors import G, R, W
 # ----------------------------------------------------------------------------------------------------------
 # Run all Modules...
 def queries(target):
+    print("")
+    print(G + "────────────────────────────────────────────────────────────" + W)
     print(G + "Enumerating subdomains for " + target + " ...\n" + W)
     time.sleep(1)
+    print(G + "────────────────────────────────────────────────────────────" + W)
     print(R + "[-] Searching " + target + " in CertsPotter " + W)
     print(R + "[-] Searching " + target + " in SSL Certificates " + W)
     print(R + "[-] Searching " + target + " in HackerTarget " + W)
@@ -53,6 +56,8 @@ def queries(target):
     print(R + "[-] Searching " + target + " in Omnisint" + W)
     print(R + "[-] Searching " + target + " in DNSDumpster" + W)
     print(R + "[-] Searching " + target + " in API Sublist3r\n" + W)
+    print(G + "────────────────────────────────────────────────────────────" + W)
+    print("")
     print(G + "[IA] Intelligence‑Assisted Wordlist Enrichment\n" + W)
     #time.sleep(0.5)
     return (0)

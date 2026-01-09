@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save in to a file
-# Coded By skynet0x01 2020-2025
+# Coded By skynet0x01 2020-2026
 
 # This file is part of TugaRecon, developed by skynet0x01 in 2020-2025.
 #
-# Copyright (C) 2025 skynet0x01
+# Copyright (C) 2026 skynet0x01
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ from utils.tuga_colors import G, Y, B, R, W
 # ----------------------------------------------------------------------------------------------------------
 def DNS_Record_Types(target):
     print(G + "\n[+] DNS Record Types..." + W)
-    print(G + "**************************************************************" + W)
+    print(G + "────────────────────────────────────────────────────────────" + W)
 
     record_types = ['A', 'AAAA', 'AFSDB', 'NS', 'CNAME', 'MX', 'PTR', 'SOA', 'CERT',
                     'HINFO', 'MINFO', 'TLSA', 'SPF', 'KEY', 'NXT', 'CAA', 'TXT', 'MD',
@@ -58,12 +58,13 @@ def DNS_Record_Types(target):
             pass
         except dns.resolver.NXDOMAIN:
             print(f'{target} does not exist.')
-            print(G + "**************************************************************\n" + W)
+            print(G + "────────────────────────────────────────────────────────────\n" + W)
             quit()
         except KeyboardInterrupt:
             print("\nTugaRecon interrupted by user\n")
             quit()
-    print(G + "**************************************************************" + W)
+    print("")
+    print(G + "────────────────────────────────────────────────────────────" + W)
 # ----------------------------------------------------------------------------------------------------------
 def bscan_whois_look(target):
     try:
@@ -71,14 +72,13 @@ def bscan_whois_look(target):
         domain = whois.query(target)
         data = domain.__dict__
         dict.append(data)
-        #print(domain.__dict__, "\n")
-        #print(domain.name, "\n")
         print("Domain expiration: ", domain.expiration_date)
-        print(G + "**************************************************************\n" + W)
+        print(G + "────────────────────────────────────────────────────────────\n" + W)
         for dict_line in dict:
             for k, v in dict_line.items():
                 print(k + ": " + v)
-        print(G + "**************************************************************\n" + W)
+        print(G + "────────────────────────────────────────────────────────────\n" + W)
+        print("")
     except KeyboardInterrupt:
         print("\nTugaRecon interrupted by user\n")
         quit()
