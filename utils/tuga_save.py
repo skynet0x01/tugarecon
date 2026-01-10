@@ -37,6 +37,7 @@ from modules.ia_subdomain.impact_score import compute_impact_score
 # ----------------------------------------------------------------------------------------------------------
 def write_high_value_targets(results, target):
     date = str(datetime.datetime.now().date())
+    pwd = os.getcwd()
 
     high_value = [
         r for r in results
@@ -47,9 +48,11 @@ def write_high_value_targets(results, target):
     if not high_value:
         return
 
-    output_file = f"results/" + target + "/" + date + "/" + "high_value_targets.txt"
+    folder = os.path.join(pwd, "results/" + target + "/" + date + "/" + "high_value_targets.txt")
 
-    with open(output_file, "w") as f:
+    #output_file = "results/" + target + "/" + date + "/" + "high_value_targets.txt"
+
+    with open(folder, "w") as f:
         for r in high_value:
             f.write(
                 f"{r['subdomain']:<50} "
@@ -134,6 +137,8 @@ def ReadFile(target, start_time):
     date = str(datetime.datetime.now().date())
     pwd = os.getcwd()
     folder = os.path.join(pwd, "results/" + target + "/" + date)
+    os.makedirs(folder, exist_ok=True)
+
     file = open("results/" + target + "/" + date + "/" + "subdomains.txt", 'r')
 
     lines = file.readlines()
@@ -149,13 +154,14 @@ def ReadFile(target, start_time):
         results.append(scored)
 
     print_semantic_results(classified)
+    write_high_value_targets(results, target)
 
     print(Y + f"[**]TugaRecon: Subdomains have been found in %s seconds" % (time.time() - start_time) +"\n"+ W)
     print(Y + "\n[+] Output Result" + W)
     print(G + "────────────────────────────────────────────────────────────" + W)
     print(R + "         ->->-> " + W, folder + "\n")
 
-    write_high_value_targets(results, target)
+    #write_high_value_targets(results, target)
 
 
 # ----------------------------------------------------------------------------------------------------------
