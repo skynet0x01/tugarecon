@@ -34,6 +34,7 @@ from utils.tuga_functions import print_semantic_results
 from modules.ia_subdomain.semantic import classify
 from modules.ia_subdomain.impact_score import compute_impact_score
 
+
 # ----------------------------------------------------------------------------------------------------------
 def write_high_value_targets(results, target):
     date = str(datetime.datetime.now().date())
@@ -41,8 +42,8 @@ def write_high_value_targets(results, target):
 
     high_value = [
         r for r in results
-        if r.get("impact_score", 0) >= 35
-        or r.get("priority") in ("CRITICAL", "HIGH")
+        if r.get("impact_score", 0) >= 40
+           or r.get("priority") in ("CRITICAL", "HIGH")
     ]
 
     if not high_value:
@@ -63,7 +64,7 @@ def write_high_value_targets(results, target):
 
 
 # ----------------------------------------------------------------------------------------------------------
-def write_file_bruteforce(subdomains, target): # 26/05/2025
+def write_file_bruteforce(subdomains, target):  # 26/05/2025
     date = str(datetime.datetime.now().date())
     pwd = os.getcwd()
     # saving subdomains results to output file
@@ -98,7 +99,6 @@ def BruteForceReadFile(target, start_time):
     print(R + "         ->->-> " + W, folder + "\n")
 
 
-
 # ----------------------------------------------------------------------------------------------------------
 def write_file(subdomains, target):
     date = str(datetime.datetime.now().date())
@@ -127,7 +127,7 @@ def DeleteDuplicate(target):
     for line in content_set:
         cleandata.write(line)
     try:
-        os.remove("results/"+ target + "/" + "tmp.txt")
+        os.remove("results/" + target + "/" + "tmp.txt")
     except OSError:
         pass
 
@@ -154,14 +154,14 @@ def ReadFile(target, start_time):
         results.append(scored)
 
     print_semantic_results(classified)
+    # GUARDA RESULTADOS
     write_high_value_targets(results, target)
 
-    print(Y + f"[**]TugaRecon: Subdomains have been found in %s seconds" % (time.time() - start_time) +"\n"+ W)
+    print(Y + f"[**]TugaRecon: Subdomains have been found in %s seconds" % (time.time() - start_time) + "\n" + W)
     print(Y + "\n[+] Output Result" + W)
     print(G + "────────────────────────────────────────────────────────────" + W)
     print(R + "         ->->-> " + W, folder + "\n")
 
     #write_high_value_targets(results, target)
-
 
 # ----------------------------------------------------------------------------------------------------------
