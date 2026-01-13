@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
-# Bug Bounty Recon, search for subdomains and save in to a file
-# Coded By skynet0x01 2020-2025
+# Bug Bounty Recon, search for subdomains and save into a file
+# Coded By skynet0x01 2020-2026
 
 # This file is part of TugaRecon, developed by skynet0x01 in 2020-2025.
 #
-# Copyright (C) 2025 skynet0x01
+# Copyright (C) 2026 skynet0x01
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,17 +22,20 @@
 # Patent Restriction Notice:
 # No patents may be claimed or enforced on this software or any derivative.
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
-
-# import go here
+# ----------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------
 import os
 import time
 import datetime
 
 from utils.tuga_colors import G, Y, R, W
-from utils.tuga_functions import print_semantic_results
+from utils.tuga_functions import print_semantic_results, print_semantic_results_grouped
 from modules.ia_subdomain.semantic import classify
 from modules.ia_subdomain.impact_score import compute_impact_score
+from modules.ia_subdomain.scan_diff_view import print_scan_diff
+from utils.tuga_exporters import export_json, export_priority_lists
+from utils.tuga_scan_diff import diff_scans, export_diff, get_previous_scan_date
+
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -134,16 +137,21 @@ def DeleteDuplicate(target):
 
 # ----------------------------------------------------------------------------------------------------------
 def ReadFile(target, start_time):
+    # Define paths
     date = str(datetime.datetime.now().date())
-    pwd = os.getcwd()
-    folder = os.path.join(pwd, "results/" + target + "/" + date)
+    folder = os.path.join("results", target, date)
     os.makedirs(folder, exist_ok=True)
 
-    file = open("results/" + target + "/" + date + "/" + "subdomains.txt", 'r')
+    subdomains_path = os.path.join(folder, "subdomains.txt")
+    if not os.path.exists(subdomains_path):
+        print(R + f"[!] No subdomains file found for {target} on {date}" + W)
+        return
 
-    lines = file.readlines()
+    # Read subdomains
+    with open(subdomains_path, "r") as file:
+        lines = file.readlines()
 
-    #classified = [classify(s) for s in lines]
+    # Classify and compute impact scores
     classified = []
     results = []
 
@@ -153,15 +161,31 @@ def ReadFile(target, start_time):
         classified.append(scored)
         results.append(scored)
 
-    print_semantic_results(classified)
-    # GUARDA RESULTADOS
+    # Print semantic results
+    #print_semantic_results(classified)
+    print_semantic_results_grouped(classified)
+
+    # Save results
     write_high_value_targets(results, target)
+    export_json(results, target, date)
+    export_priority_lists(results, target)
 
-    print(Y + f"[**]TugaRecon: Subdomains have been found in %s seconds" % (time.time() - start_time) + "\n" + W)
-    print(Y + "\n[+] Output Result" + W)
+    # Compare with previous scan
+    today = date
+    prev_date = get_previous_scan_date(target, today)
+
+    if prev_date:
+        diff = diff_scans(target, prev_date, today)
+        export_diff(diff, target, today)
+        print_scan_diff(diff)
+        print(G + f"[Δ] Diff generated against {prev_date}" + W)
+    else:
+        print(Y + "[Δ] No previous scan found (baseline created)" + W)
+
+    # Summary
+    elapsed = time.time() - start_time
+    print(Y + f"[**] TugaRecon: Scan completed in {elapsed:.2f} seconds\n" + W)
+    print(Y + "[+] Output directory" + W)
     print(G + "────────────────────────────────────────────────────────────" + W)
-    print(R + "         ->->-> " + W, folder + "\n")
-
-    #write_high_value_targets(results, target)
-
+    print(R + "         ->->-> " + W + folder + "\n")
 # ----------------------------------------------------------------------------------------------------------

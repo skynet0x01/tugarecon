@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
-# Bug Bounty Recon, search for subdomains and save in to a file
+# Bug Bounty Recon, search for subdomains and save into a file
 # Coded By skynet0x01 2020-2026
 
 # This file is part of TugaRecon, developed by skynet0x01 in 2020-2025.
@@ -22,8 +22,6 @@
 # Patent Restriction Notice:
 # No patents may be claimed or enforced on this software or any derivative.
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
-
-# import go here
 # ----------------------------------------------------------------------------------------------------------
 import datetime
 from utils.tuga_colors import G, Y, R, W
@@ -71,3 +69,51 @@ def print_semantic_results(classified):
     print()
 
 # ----------------------------------------------------------------------------------------------------------
+def print_semantic_results_grouped(results):
+    high_medium = []
+    low = []
+
+    for r in results:
+        priority = r.get("priority", "LOW")
+        impact = r.get("impact", 0)
+
+        r["_priority"] = priority
+        r["_impact"] = impact
+
+        if priority in ("HIGH", "MEDIUM"):
+            high_medium.append(r)
+        else:
+            low.append(r)
+
+    print("\n" + "─" * 60)
+    print("[🧠] Semantic & Impact Classification")
+    print("─" * 60)
+
+    if high_medium:
+        print("\n[ HIGH | MEDIUM PRIORITY ]")
+        print("-" * 80)
+        print(" #   PRIORITY   IMPACT   SUBDOMAIN")
+        print("-" * 80)
+
+        for i, r in enumerate(high_medium, 1):
+            tags = ", ".join(r.get("tags", [])) or "-"
+            sub = r.get("subdomain", "unknown")
+
+            print(
+                f"{i:3}   {r['_priority']:<7}   {r['_impact']:>6}   "
+                f"{sub:<45} [{tags}]"
+            )
+
+    if low:
+        print("\n" + "─" * 60)
+        print("[ LOW PRIORITY ]")
+        print("-" * 80)
+
+        offset = len(high_medium)
+        for i, r in enumerate(low, offset + 1):
+            sub = r.get("subdomain", "unknown")
+
+            print(
+                f"{i:3}   {r['_priority']:<7}   {r['_impact']:>6}   "
+                f"{sub}"
+            )

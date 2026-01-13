@@ -26,35 +26,127 @@
 
 
 # ----------------------------------------------------------------------------------------------------------
-# import go here :)
+import os
 import argparse  # parse arguments
 import sys
 import time
 import urllib3
 import requests
+import json
 
-import os
 from datetime import datetime
 from progress.bar import IncrementalBar
 
 # Import internal functions
 from utils.tuga_colors import G, Y, W
 from utils.tuga_banner import banner
-#from utils.tuga_functions import ReadFile, DeleteDuplicate
 from utils.tuga_save import ReadFile, DeleteDuplicate
 from utils.tuga_dns import DNS_Record_Types, bscan_whois_look
 from utils.tuga_results import main_work_subdirs
 from tuga_bruteforce import TugaBruteForce
 from tuga_network_map import tuga_map
 
-# ----------------------------------------------------------------------------------------------------------
 # Import internal modules
 from modules.tuga_modules import tuga_certspotter, tuga_crt, tuga_hackertarget, tuga_threatcrowd, \
                                  tuga_alienvault, tuga_threatminer, tuga_omnisint, tuga_sublist3r, tuga_dnsdumpster
 from modules.tuga_modules import queries
+
 from modules.ia_subdomain.ia_generator import IASubdomainGenerator
 from modules.ia_subdomain.ia_wordlist import enrich_wordlist_from_ia
+from modules.ia_subdomain.bruteforce_hint import generate_hints
 
+from modules.intelligence.snapshot import load_previous_snapshot, build_snapshot, save_snapshot
+from utils.temporal_view import print_top_temporal
+from utils.temporal_analysis import analyze_temporal_state
+
+
+# ----------------------------------------------------------------------------------------------------------
+def run_temporal_intelligence(scan_dir):
+    semantic_file = os.path.join(scan_dir, "semantic_results.json")
+    if not os.path.isfile(semantic_file):
+        return
+
+    with open(semantic_file, "r") as f:
+        classified_results = json.load(f)
+
+    previous_snapshot = load_previous_snapshot(scan_dir)
+    snapshot = build_snapshot(classified_results, previous_snapshot)
+    save_snapshot(scan_dir, snapshot)
+
+    temporal_states = analyze_temporal_state(snapshot, previous_snapshot)
+
+    temporal_rank = []
+
+    for state, subs in temporal_states.items():
+        score_map = {
+            "ESCALATED": 4,
+            "NEW": 3,
+            "STABLE": 2,
+            "FLAPPING": 1
+        }
+
+        for sub in subs:
+            temporal_rank.append({
+                "subdomain": sub,
+                "state": state,
+                "score": score_map.get(state, 0)
+            })
+
+    # temporal_rank = []
+    # for state, subs in temporal_states.items():
+    #     for sub in subs:
+    #         temporal_rank.append({
+    #             "subdomain": sub,
+    #             "state": state,
+    #             "score": (
+    #                 4 if state == "ESCALATED" else
+    #                 3 if state == "NEW" else
+    #                 2 if state == "STABLE" else
+    #                 1 if state == "FLAPPING" else
+    #                 0
+    #             )
+    #         })
+
+    temporal_rank.sort(key=lambda x: x["score"], reverse=True)
+    print_top_temporal(temporal_rank, limit=20)
+
+    print("[IA] Snapshot saved (temporal memory updated)")
+
+
+# ----------------------------------------------------------------------------------------------------------
+def run_ia_training(target):
+    base_dir = f"results/{target}"
+    if not os.path.isdir(base_dir):
+        return
+
+    dates = []
+    for d in os.listdir(base_dir):
+        try:
+            datetime.strptime(d, "%Y-%m-%d")
+            dates.append(d)
+        except ValueError:
+            pass
+
+    if not dates:
+        return
+
+    latest_date = sorted(dates)[-1]
+    subdomains_file = os.path.join(base_dir, latest_date, "subdomains.txt")
+    if not os.path.isfile(subdomains_file):
+        return
+
+    with open(subdomains_file) as f:
+        found_subdomains = [l.strip() for l in f if l.strip()]
+
+    if len(found_subdomains) < 2:
+        print("[IA] Not enough data to generate patterns")
+        return
+
+    print(f"[IA] Training with {len(found_subdomains)} subdomains")
+
+    ia = IASubdomainGenerator(limit=1000)
+    ia_candidates = ia.generate(found_subdomains)
+    enrich_wordlist_from_ia(ia_candidates)
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -166,180 +258,76 @@ def parse_url(url):
 
 # ----------------------------------------------------------------------------------------------------------
 def start_tugarecon(args, target, enum, threads, bruteforce, savemap, results):
-    # bruteforce fast scan
 
-
+    # ───────── BRUTEFORCE ─────────
     if bruteforce:
-        print("\nWait for results...! (It might take a while for the results appear) ")
+        print("\nWait for results...! (It might take a while)")
         print(G + "────────────────────────────────────────────────────────────\n" + W)
-        subdomains_test = TugaBruteForce(options=args)
-        subdomains_test.run()
-        sys.exit()
-    # END bruteforce fast scan
 
-    # ----------------------------------------------------------------------------------------------------------
-    # Save map domain (png file)
-    if savemap is not False:
+        if hasattr(args, "semantic_results") and args.semantic_results:
+            args.semantic_hints = generate_hints(args.semantic_results)
+            print(f"[IA] Generated {len(args.semantic_hints)} semantic hints")
+        else:
+            args.semantic_hints = []
+
+        TugaBruteForce(options=args).run()
+        sys.exit()
+
+    # ───────── MAP ─────────
+    if savemap:
         tuga_map(target)
         sys.exit()
-    # ----------------------------------------------------------------------------------------------------------
-    # Modules scan: certspotter, hackertarget, ssl, threatcrowd,
-    #               alienvault, threatminer, omnisint, Sublist3r
-    # ----------------------------------------------------------------------------------------------------------
+
+    # ───────── ENUMERATION ─────────
     try:
-        # <Module required> Perform enumerations and network mapping
-        supported_engines = {'certspotter': tuga_certspotter.Certspotter,
-                             'ssl': tuga_crt.CRT,
-                             'hackertarget': tuga_hackertarget.Hackertarget,
-                             'threatcrowd': tuga_threatcrowd.Threatcrowd,
-                             'alienvault': tuga_alienvault.Alienvault,
-                             'threatminer': tuga_threatminer.Threatminer,
-                             'omnisint': tuga_omnisint.Omnisint,
-                             'sublist3r': tuga_sublist3r.Sublist3r,
-                             'dnsdumpster': tuga_dnsdumpster.DNSDUMPSTER
-                            }
-        chosenEnums = []
+        supported_engines = {
+            'certspotter': tuga_certspotter.Certspotter,
+            'ssl': tuga_crt.CRT,
+            'hackertarget': tuga_hackertarget.Hackertarget,
+            'threatcrowd': tuga_threatcrowd.Threatcrowd,
+            'alienvault': tuga_alienvault.Alienvault,
+            'threatminer': tuga_threatminer.Threatminer,
+            'omnisint': tuga_omnisint.Omnisint,
+            'sublist3r': tuga_sublist3r.Sublist3r,
+            'dnsdumpster': tuga_dnsdumpster.DNSDUMPSTER
+        }
 
-        if enum is None: # Run all modules
-            start_time = time.time()
-            queries(target)
+        chosenEnums = (
+            list(supported_engines.values())
+            if enum is None
+            else [supported_engines[e.lower()] for e in enum if e.lower() in supported_engines]
+        )
 
-            chosenEnums = [tuga_certspotter.Certspotter, tuga_crt.CRT, tuga_hackertarget.Hackertarget,
-                           tuga_threatcrowd.Threatcrowd, tuga_alienvault.Alienvault, tuga_threatminer.Threatminer,
-                           tuga_omnisint.Omnisint, tuga_sublist3r.Sublist3r, tuga_dnsdumpster.DNSDUMPSTER]
+        start_time = time.time()
+        queries(target)
 
-            # Start super fast enumeration
-            print("Running free OSINT engines...\n")
-            print("Wait for results...! (It might take a while)")
-            print(G + "────────────────────────────────────────────────────────────\n" + W)
-            bar = IncrementalBar('Processing', max = len(chosenEnums))
-            #enums = [indicate(target) for indicate in chosenEnums]
-            for indicate in chosenEnums:
-                enums = indicate(target)
-                bar.next()
-            bar.finish()
-            print(G + "\n────────────────────────────────────────────────────────────\n" + W)
+        print("Running free OSINT engines...\n")
+        bar = IncrementalBar('Processing', max=len(chosenEnums))
 
-            DeleteDuplicate(target)
-            ReadFile(target, start_time)
+        for engine in chosenEnums:
+            engine(target)
+            bar.next()
 
-            # ---- IA subdomain generation ----
-            # ---- IA subdomain generation ----
-            base_dir = f"results/{target}"
+        bar.finish()
+        print(G + "\n────────────────────────────────────────────────────────────\n" + W)
 
-            if not os.path.isdir(base_dir):
-                print("[IA] No results directory found")
-                return
+        DeleteDuplicate(target)
+        ReadFile(target, start_time)
 
-            # escolher a pasta de data mais recente
-            dates = []
-            for d in os.listdir(base_dir):
-                full = os.path.join(base_dir, d)
-                if os.path.isdir(full):
-                    try:
-                        datetime.strptime(d, "%Y-%m-%d")
-                        dates.append(d)
-                    except ValueError:
-                        pass
+        # ───────── INTELLIGENCE ─────────
+        scan_dir = f"results/{target}/{datetime.now().date()}"
 
-            if not dates:
-                print("[IA] No dated result folders found")
-                return
+        try:
+            run_temporal_intelligence(scan_dir)
+        except Exception as e:
+            print(f"[IA] Snapshot failed: {e}")
 
-            latest_date = sorted(dates)[-1]
-            subdomains_file = os.path.join(base_dir, latest_date, "subdomains.txt")
-
-            if not os.path.isfile(subdomains_file):
-                print("[IA] subdomains.txt not found")
-                return
-
-            # ler subdomínios COMPLETOS, mas aprender só o label
-            found_subdomains = []
-            with open(subdomains_file, "r") as f:
-                for line in f:
-                    sub = line.strip()
-                    if not sub:
-                        continue
-                    found_subdomains.append(sub)
-
-            print(f"[IA] Training with {len(found_subdomains)} subdomains")
-
-            if len(found_subdomains) < 2:
-                print("[IA] Not enough data to generate patterns")
-                return
-
-            # gerar IA (IA devolve APENAS labels)
-            ia = IASubdomainGenerator(limit=1000)
-            ia_candidates = ia.generate(found_subdomains)
-            enrich_wordlist_from_ia(ia_candidates)
-
-        else: # Perform enumerations
-            for engine in enum:
-                if engine.lower() in supported_engines:
-                    chosenEnums.append(supported_engines[engine.lower()])
-                    print("\nWait for results...!\n")
-                    start_time = time.time()
-                    # Start the enumeration
-                    enums = [indicate(target) for indicate in chosenEnums]
-
-                    DeleteDuplicate(target)
-                    ReadFile(target, start_time)
-
-                    # ---- IA subdomain generation ----
-                    # ---- IA subdomain generation ----
-                    base_dir = f"results/{target}"
-
-                    if not os.path.isdir(base_dir):
-                        print("[IA] No results directory found")
-                        return
-
-                    # escolher a pasta de data mais recente
-                    dates = []
-                    for d in os.listdir(base_dir):
-                        full = os.path.join(base_dir, d)
-                        if os.path.isdir(full):
-                            try:
-                                datetime.strptime(d, "%Y-%m-%d")
-                                dates.append(d)
-                            except ValueError:
-                                pass
-
-                    if not dates:
-                        print("[IA] No dated result folders found")
-                        return
-
-                    latest_date = sorted(dates)[-1]
-                    subdomains_file = os.path.join(base_dir, latest_date, "subdomains.txt")
-
-                    if not os.path.isfile(subdomains_file):
-                        print("[IA] subdomains.txt not found")
-                        return
-
-                    # ler subdomínios COMPLETOS, mas aprender só o label
-                    found_subdomains = []
-                    with open(subdomains_file, "r") as f:
-                        for line in f:
-                            sub = line.strip()
-                            if not sub:
-                                continue
-                            found_subdomains.append(sub)
-
-                    print(f"[IA] Training with {len(found_subdomains)} subdomains")
-
-                    if len(found_subdomains) < 2:
-                        print("[IA] Not enough data to generate patterns")
-                        return
-
-                    # gerar IA (IA devolve APENAS labels)
-                    ia = IASubdomainGenerator(limit=1000)
-                    ia_candidates = ia.generate(found_subdomains)
-                    enrich_wordlist_from_ia(ia_candidates)
+        run_ia_training(target)
 
     except KeyboardInterrupt:
         print(G + "────────────────────────────────────────────────────────────" + W)
         print("\nTugaRecon interrupted by user\n")
         sys.exit()
-
 
 # ----------------------------------------------------------------------------------------------------------
 def menu_tugarecon():
@@ -356,10 +344,9 @@ def menu_tugarecon():
     start_tugarecon(args, target, enum, threads, bruteforce, savemap, results)
 
 
-
 # ----------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     menu_tugarecon()
 
-# ----------------------------------------------------------------------------------------------------------
 
+# ----------------------------------------------------------------------------------------------------------

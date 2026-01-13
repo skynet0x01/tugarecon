@@ -31,11 +31,14 @@ import time
 import datetime
 import sys
 import signal
+from uuid import uuid4
+
 
 from multiprocessing import Queue, Process, freeze_support, Value, Lock
 from utils.tuga_colors import G, Y, R, W
-from modules.ia_subdomain.semantic import classify
-from utils.tuga_functions import  print_semantic_results
+from modules.ia_subdomain.bruteforce_hint import generate_hints
+
+
 # ----------------------------------------------------------------------------------------------------------
 
 
@@ -56,6 +59,15 @@ class TugaBruteForce:
         self.subdomains_count = Value('i', 0)  # Shared counter for found subdomains
         self.print_lock = Lock()  # Lock to synchronize console output
 
+        # ---- SEMANTIC INIT (CRÍTICO) ----
+        self.semantic_hints = []
+
+        if hasattr(options, "semantic_results") and options.semantic_results:
+            try:
+                self.semantic_hints = generate_hints(options.semantic_results)
+            except Exception:
+                self.semantic_hints = []
+
         self.load_first_sub_names()  # Load first wordlist into queue
         self.second_sub_names = self.load_second_sub_names()  # Load second wordlist into list
 
@@ -72,16 +84,43 @@ class TugaBruteForce:
 
         self.spinner_index = 0  # Index to animate spinner in console
 
+        self.resolvers = []
+        for server in self.online_dns_servers:
+            r = dns.resolver.Resolver(configure=False)
+            r.nameservers = [server]
+            r.lifetime = 1.6
+            self.resolvers.append(r)
+
+        self.wildcard_ips = self.detect_wildcard()
+        #self.semantic_hints = options.semantic_results if hasattr(options, "semantic_results") else []
+
     # ----------------------------------------------------------------------------------------------------------
     '''
     Load firt sub-names, second-subnames and DNS servers.
     '''
 
+    # def load_first_sub_names(self):
+    #     # Load first wordlist and enqueue each subdomain candidate
+    #     with open(self.first_wordlist, 'r') as file:
+    #         for linha in file:
+    #             self.first_sub_names.put(linha.strip())
+
     def load_first_sub_names(self):
-        # Load first wordlist and enqueue each subdomain candidate
+        seen = set()
+
+        # 1️⃣ semantic hints primeiro (prioridade máxima)
+        for h in getattr(self, "semantic_hints", []):
+            if h not in seen:
+                self.first_sub_names.put(h)
+                seen.add(h)
+
+        # 2️⃣ wordlist normal
         with open(self.first_wordlist, 'r') as file:
             for linha in file:
-                self.first_sub_names.put(linha.strip())
+                w = linha.strip()
+                if w not in seen:
+                    self.first_sub_names.put(w)
+                    seen.add(w)
 
     def load_second_sub_names(self):
         # Load second wordlist into a list for fast iteration
@@ -115,37 +154,45 @@ class TugaBruteForce:
         # Fallback to all servers if none respond
         return online if online else self.dns_servers
 
-
     def resolve_fast(self, domain):
         """
-            Attempts to resolve the domain using the DNS servers in a round-robin fashion.
-            Returns a list of IPs (strings) if it resolves successfully, or None
-            if it cannot be resolved by any of the servers.
+        Resolve domain using pre-created resolvers (round-robin).
+        Returns list of IPs or None.
         """
-        dns_count = len(self.online_dns_servers)
+
+        dns_count = len(self.resolvers)
 
         for attempt in range(dns_count):
             with self.dns_index_lock:
                 idx = self.dns_index.value
-                dns_server = self.online_dns_servers[idx]
+                resolver = self.resolvers[idx]
                 self.dns_index.value = (idx + 1) % dns_count
-
-            resolver = dns.resolver.Resolver()
-            resolver.nameservers = [dns_server]
-            resolver.lifetime = 1.6
 
             try:
                 answer = resolver.resolve(domain, "A")
-                # Extrai todos os IPs (como strings)
                 ips = [rdata.to_text() for rdata in answer]
+
+                # 🔍 WILDCARD FILTER (AQUI)
+                if ips and set(ips) == self.wildcard_ips:
+                    #self.log_error(domain, "Wildcard DNS detected")
+                    return None
+
                 return ips
+
+
             except Exception as e:
-                self.log_error(domain, f"{e} (DNS {dns_server})")
+                self.log_error(domain, f"{e}")
                 continue
 
-        return None
-    # ----------------------------------------------------------------------------------------------------------
 
+        return None
+
+    # ----------------------------------------------------------------------------------------------------------
+    def detect_wildcard(self):
+        test = f"{uuid4().hex}.{self.target}"
+        ips = self.resolve_fast(test)
+        return set(ips) if ips else set()
+    # ----------------------------------------------------------------------------------------------------------
 
     def print_testing(self, domain):
         # Show rotating spinner with current testing domain on the same console line
@@ -181,7 +228,16 @@ class TugaBruteForce:
         with self.print_lock:  # avoid concurrent writes
             with open(log_file, 'a') as f:
                 f.write(f"[{timestamp}] DNS Error for {domain}: {message}\n")
+    # ----------------------------------------------------------------------------------------------------------
 
+    def handle_valid_subdomain(self, domain, ips):
+        with self.subdomains_count.get_lock():
+            count = self.subdomains_count.value
+            self.subdomains_count.value += 1
+
+        self.print_valid(count, domain, ips)
+        self.outfile.write(f"{domain}\t{','.join(ips)}\n")
+        self.outfile.flush()
 
     # ----------------------------------------------------------------------------------------------------------
     def scan_subdomains(self):
@@ -196,7 +252,9 @@ class TugaBruteForce:
             pass
 
         try:
-            with open(self.outfile_path, 'a') as f:
+            with open(self.outfile_path, 'a') as self.outfile:
+
+            #with open(self.outfile_path, 'a') as f:
                 while not self.first_sub_names.empty():
                     try:
                         first = self.first_sub_names.get(timeout=0.1)
@@ -214,12 +272,8 @@ class TugaBruteForce:
                         continue
 
                     if ips:
-                        with self.subdomains_count.get_lock():
-                            count = self.subdomains_count.value
-                            self.subdomains_count.value += 1
-                        self.print_valid(count, sub1, ips)
-                        f.write(f"{sub1}\t{','.join(ips)}\n")
-                        f.flush()
+                        # Test first-level subdomains
+                        self.handle_valid_subdomain(sub1, ips)
 
                         # Test second-level subdomains
                         for second in self.second_sub_names:
@@ -232,12 +286,8 @@ class TugaBruteForce:
                                 continue
 
                             if ips2:
-                                with self.subdomains_count.get_lock():
-                                    count = self.subdomains_count.value
-                                    self.subdomains_count.value += 1
-                                self.print_valid(count, sub2, ips2)
-                                f.write(f"{sub2}\t{','.join(ips2)}\n")
-                                f.flush()
+                                self.handle_valid_subdomain(sub2, ips2)
+
         except KeyboardInterrupt:
             # Rare case: if we receive a local KeyboardInterrupt, terminate gracefully.
             return

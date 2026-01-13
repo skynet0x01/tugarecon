@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 # TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
 # Bug Bounty Recon, search for subdomains and save into a file
-# Coded By skynet0x01 2020-2025
+# Coded By skynet0x01 2020-2026
 
 # This file is part of TugaRecon, developed by skynet0x01 in 2020-2025.
 #
-# Copyright (C) 2025 skynet0x01
+# Copyright (C) 2026 skynet0x01
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -346,9 +346,11 @@ def export_pyvis(network_summary, latest_path):
 # Main async workflow
 async def main_async(sub_file, brut_file, latest_path):
     host_sources, hosts = merge_sources(sub_file, brut_file)
+    print("")
     print(f"[+] Resolving {len(hosts)} hosts...")
     ip_map = await resolve_all_ips(hosts)
     if not ip_map:
+        print("")
         print("[-] No hosts resolved")
         return
     await prefetch_network_info(set(ip_map.values()))

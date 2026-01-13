@@ -23,29 +23,47 @@
 # No patents may be claimed or enforced on this software or any derivative.
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
 # ----------------------------------------------------------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------
-from collections import Counter
-import re
+import json
+import os
+import datetime
+
+def export_json(results: list, target: str, date: str,
+                filename="semantic_results.json"):
+    base = f"results/{target}/{date}"
+    os.makedirs(base, exist_ok=True)
+
+    path = os.path.join(base, filename)
+
+    with open(path, "w") as f:
+        json.dump(results, f, indent=2)
+
+    return path
 
 
-class PatternModel:
-    def __init__(self):
-        self.tokens = Counter()
-        self.bigrams = Counter()
+def export_priority_lists(results: list, target: str):
+    date = str(datetime.datetime.now().date())
+    base = f"results/{target}/{date}"
+    os.makedirs(base, exist_ok=True)
 
-    def train(self, subdomains: list[str]):
-        for sub in subdomains:
-            parts = re.split(r"[.-]", sub)
-            parts = [p for p in parts if p]
+    buckets = {
+        "CRITICAL": [],
+        "HIGH": []
+    }
 
-            for p in parts:
-                self.tokens[p] += 1
+    for r in results:
+        p = r.get("priority")
+        if p in buckets:
+            buckets[p].append(r)
 
-            for i in range(len(parts) - 1):
-                self.bigrams[(parts[i], parts[i + 1])] += 1
+    for level, items in buckets.items():
+        if not items:
+            continue
 
-    def top_tokens(self, n: int = 10) -> list[str]:
-        return [t for t, _ in self.tokens.most_common(n)]
-
-    def top_bigrams(self, n: int = 10) -> list[tuple[str, str]]:
-        return [b for b, _ in self.bigrams.most_common(n)]
+        path = os.path.join(base, f"{level.lower()}_targets.txt")
+        with open(path, "w") as f:
+            for r in items:
+                f.write(
+                    f"{r['subdomain']:<65} "
+                    f"impact={r['impact_score']:>3} "
+                    f"tags={','.join(r['tags'])}\n"
+                )
