@@ -58,12 +58,14 @@ from modules.ia_subdomain.ia_wordlist import enrich_wordlist_from_ia
 from modules.ia_subdomain.bruteforce_hint import generate_hints
 
 from modules.intelligence.snapshot import load_previous_snapshot, build_snapshot, save_snapshot
+from modules.intelligence.decision_engine import decide_action
 
 
 # ----------------------------------------------------------------------------------------------------------
 def run_temporal_intelligence(scan_dir):
     semantic_file = os.path.join(scan_dir, "semantic_results.json")
     if not os.path.isfile(semantic_file):
+        print("[IA] Semantic results not found, skipping temporal intelligence.")
         return
 
     with open(semantic_file, "r") as f:
@@ -86,32 +88,46 @@ def run_temporal_intelligence(scan_dir):
                 temporal_state=state
             )
 
+            # Decide action (assumindo que tens esta função definida)
+            action = decide_action(
+                subdomain=sub,
+                impact=sub_data.get("impact", 0),
+                temporal_state=state,
+                temporal_score=score
+            )
+
             temporal_rank.append({
                 "subdomain": sub,
                 "state": state,
                 "impact": sub_data.get("impact", 0),
-                "score": score
+                "score": score,
+                "action": action
             })
 
-    # for state, subs in temporal_states.items():
-    #     score_map = {
-    #         "ESCALATED": 4,
-    #         "NEW": 3,
-    #         "STABLE": 2,
-    #         "FLAPPING": 1
-    #     }
-    #
-    #     for sub in subs:
-    #         temporal_rank.append({
-    #             "subdomain": sub,
-    #             "state": state,
-    #             "score": score_map.get(state, 0)
-    #         })
-
+    # Ordena pelo score
     temporal_rank.sort(key=lambda x: x["score"], reverse=True)
-    print_top_temporal(temporal_rank, limit=20)
 
-    print("[IA] Snapshot saved (temporal memory updated)")
+    # ───────── Temporal Risk View ─────────
+    removed = temporal_states.get("DORMANT", [])
+
+    if not temporal_rank:
+        print("\n──────────────────────────────────────────────────────────────────────")
+        print("[🧠] Temporal Risk View – Top Targets")
+        print("──────────────────────────────────────────────────────────────────────")
+        print("✓ No actionable temporal risk detected")
+        print("\nReason:")
+        print(" • No NEW subdomains with impact")
+        print(" • No ESCALATED subdomains")
+        print(" • All changes classified as LOW or DORMANT")
+        print("──────────────────────────────────────────────────────────────────────")
+    else:
+        # Passa também a lista de removidos
+        print_top_temporal(temporal_rank, removed_list=removed, limit=20)
+
+    # ───────── Temporal Change Log ─────────
+    print_top_temporal(temporal_rank, removed_list=removed, limit=20)
+    print("\n[IA] Snapshot saved (temporal memory updated)")
+
 
 
 # ----------------------------------------------------------------------------------------------------------

@@ -372,3 +372,8 @@ central
 ec2
 opendatasoft
 southeast
+euw1
+stg
+tripx
+usw2
+apac
