@@ -1,5 +1,5 @@
 # TugaRecon
-![version](https://img.shields.io/badge/version-2.60-blue)
+![version](https://img.shields.io/badge/version-2.51-blue)
 ![python](https://img.shields.io/badge/python-3.8%2B-yellow)
 ![license](https://img.shields.io/github/license/skynet0x01/tugarecon)
 ![issues](https://img.shields.io/github/issues/skynet0x01/tugarecon)
