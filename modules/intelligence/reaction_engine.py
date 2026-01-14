@@ -26,29 +26,45 @@
 
 
 # ----------------------------------------------------------------------------------------------------------
-import subprocess
 import os
+import json
+from modules.intelligence.reactions.tls_reaction import run_tls_reaction
+from modules.intelligence.reactions.headers_reaction import run_headers
+from modules.intelligence.reactions.httpx_reaction import run_httpx
 
 
-# ----------------------------------------------------------------------------------------------------------
+REACTION_MAP = {
+    "HTTPX": [run_httpx, run_tls_reaction, run_headers],
+    "HTTP": [run_httpx],
+    "DEEP_HTTP_PROBE": [run_httpx, run_tls_reaction, run_headers],
+    "HEADER_ANALYSIS": [run_headers],
+    "TLS_ONLY": [run_tls_reaction],
+}
+
 def react(entry, output_dir):
-    """
-    Executa reações automáticas com base na ação decidida
-    """
     sub = entry["subdomain"]
     action = entry["action"]
 
-    if action == "DEEP_HTTP_PROBE":
-        run_httpx(sub, output_dir)
+    sub_dir = os.path.join(output_dir, sub.replace("/", "_"))
+    os.makedirs(sub_dir, exist_ok=True)
 
-    elif action == "TLS_INSPECTION":
-        run_tls(sub, output_dir)
+    metadata = {
+        "subdomain": sub,
+        "state": entry["state"],
+        "impact": entry["impact"],
+        "score": entry["score"],
+        "action": action,
+    }
 
-    elif action == "HEADER_ANALYSIS":
-        run_headers(sub, output_dir)
+    with open(os.path.join(sub_dir, "metadata.json"), "w") as f:
+        json.dump(metadata, f, indent=2)
 
-    elif action == "IGNORE":
-        return
+    for reaction in REACTION_MAP.get(action, []):
+        try:
+            reaction(sub, sub_dir)
+        except Exception as e:
+            with open(os.path.join(sub_dir, "error.log"), "a") as f:
+                f.write(str(e) + "\n")
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -89,7 +105,7 @@ def decide_action(subdomain, impact, temporal_state, temporal_score):
     if temporal_state == "NEW" and impact >= 20:
         return "HEADER_ANALYSIS"
 
-    if temporal_state == "FLAPPING":
-        return "WATCH"
+    if temporal_state == "NEW" and impact < 20:
+        return "TLS_ONLY"
 
     return "IGNORE"

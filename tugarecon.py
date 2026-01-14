@@ -123,7 +123,8 @@ def run_temporal_intelligence(scan_dir):
         print("──────────────────────────────────────────────────────────────────────")
     else:
         # Passa também a lista de removidos
-        print_top_temporal(temporal_rank, removed_list=removed, limit=20)
+        #print_top_temporal(temporal_rank, removed_list=removed, limit=20)
+        print("")
 
     # ───────── Reações automáticas ─────────
     output_dir = os.path.join(scan_dir, "reactions")
