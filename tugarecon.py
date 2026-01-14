@@ -33,7 +33,6 @@ import time
 import urllib3
 import requests
 import json
-
 from datetime import datetime
 from progress.bar import IncrementalBar
 
@@ -43,21 +42,22 @@ from utils.tuga_banner import banner
 from utils.tuga_save import ReadFile, DeleteDuplicate
 from utils.tuga_dns import DNS_Record_Types, bscan_whois_look
 from utils.tuga_results import main_work_subdirs
+from utils.temporal_view import print_top_temporal
+from utils.temporal_analysis import analyze_temporal_state
+from utils.temporal_score import compute_temporal_score
 from tuga_bruteforce import TugaBruteForce
 from tuga_network_map import tuga_map
 
 # Import internal modules
+from modules.tuga_modules import queries
 from modules.tuga_modules import tuga_certspotter, tuga_crt, tuga_hackertarget, tuga_threatcrowd, \
                                  tuga_alienvault, tuga_threatminer, tuga_omnisint, tuga_sublist3r, tuga_dnsdumpster
-from modules.tuga_modules import queries
 
 from modules.ia_subdomain.ia_generator import IASubdomainGenerator
 from modules.ia_subdomain.ia_wordlist import enrich_wordlist_from_ia
 from modules.ia_subdomain.bruteforce_hint import generate_hints
 
 from modules.intelligence.snapshot import load_previous_snapshot, build_snapshot, save_snapshot
-from utils.temporal_view import print_top_temporal
-from utils.temporal_analysis import analyze_temporal_state
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -78,33 +78,34 @@ def run_temporal_intelligence(scan_dir):
     temporal_rank = []
 
     for state, subs in temporal_states.items():
-        score_map = {
-            "ESCALATED": 4,
-            "NEW": 3,
-            "STABLE": 2,
-            "FLAPPING": 1
-        }
-
         for sub in subs:
+            sub_data = snapshot["subdomains"].get(sub, {})
+
+            score = compute_temporal_score(
+                subdomain_data=sub_data,
+                temporal_state=state
+            )
+
             temporal_rank.append({
                 "subdomain": sub,
                 "state": state,
-                "score": score_map.get(state, 0)
+                "impact": sub_data.get("impact", 0),
+                "score": score
             })
 
-    # temporal_rank = []
     # for state, subs in temporal_states.items():
+    #     score_map = {
+    #         "ESCALATED": 4,
+    #         "NEW": 3,
+    #         "STABLE": 2,
+    #         "FLAPPING": 1
+    #     }
+    #
     #     for sub in subs:
     #         temporal_rank.append({
     #             "subdomain": sub,
     #             "state": state,
-    #             "score": (
-    #                 4 if state == "ESCALATED" else
-    #                 3 if state == "NEW" else
-    #                 2 if state == "STABLE" else
-    #                 1 if state == "FLAPPING" else
-    #                 0
-    #             )
+    #             "score": score_map.get(state, 0)
     #         })
 
     temporal_rank.sort(key=lambda x: x["score"], reverse=True)
