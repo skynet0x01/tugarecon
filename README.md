@@ -1,24 +1,30 @@
 # TugaRecon
+
 ![version](https://img.shields.io/badge/version-2.51-blue)
 ![python](https://img.shields.io/badge/python-3.8%2B-yellow)
 ![license](https://img.shields.io/github/license/skynet0x01/tugarecon)
 ![issues](https://img.shields.io/github/issues/skynet0x01/tugarecon)
 ![stars](https://img.shields.io/github/stars/skynet0x01/tugarecon?style=social)
 
-> **TugaRecon** is an advanced subdomain enumeration, DNS reconnaissance and intelligence framework built for security researchers, penetration testers and OSINT professionals.  
-> It combines passive OSINT, active discovery, semantic analysis and **temporal intelligence** to continuously improve asset discovery and prioritization.
-
----
-> **TugaRecon** is a tribute to Portuguese explorers — curiosity, persistence and mapping the unknown.
-
->During the 15th and 16th centuries, Portuguese explorers were at the forefront of global discovery, creating maps where none existed.  
->TugaRecon follows the same philosophy — explore, map, learn, and evolve.
-
->skynet0x01
+> **TugaRecon** is an advanced subdomain reconnaissance and intelligence framework built for security researchers, penetration testers and OSINT professionals.  
+> It combines OSINT enumeration, semantic analysis, **temporal intelligence** and **automated reactions** to continuously improve asset discovery and prioritization.
 
 ---
 
-## 📸 TugaRecon
+## 🧭 Philosophy
+
+**TugaRecon** is a tribute to Portuguese explorers.
+
+During the 15th and 16th centuries, Portuguese navigators mapped the unknown, learned from each voyage and refined future expeditions.  
+TugaRecon follows the same principle:
+
+> **Explore → Map → Learn → Remember → React**
+
+— *skynet0x01*
+
+---
+
+## 📸 Preview
 
 <p align="center">
   <img width="803" height="575" alt="tugarecon" src="https://github.com/user-attachments/assets/7e7461e7-ff6c-4132-9356-b8f8cab6bc15" />
@@ -26,160 +32,137 @@
 
 ---
 
-## 🚀 Features
+## 🚀 Core Features
 
-- 🔍 Passive & active subdomain enumeration using multiple OSINT sources  
-- 📡 Built-in brute-force engine with adaptive wordlists  
-- 🌐 DNS resolution with fallback mechanisms  
-- 🧠 Multi-module integration (Certspotter, DNSDumpster, HackerTarget, etc.)  
-- 🗺️ Optional network & infrastructure map generation  
-- 📁 Clean outputs: `.txt`, `.json`, `.csv`, `.svg`, `.pdf`  
-- 🔒 No API keys required for most modules  
-- 🧠 **Adaptive / Intelligence-Assisted Wordlist Enrichment**  
-- 🎯 **Impact Scoring & Asset Prioritization**  
-- 🕒 **Temporal Intelligence & Asset Memory (NEW)**  
+- 🔍 Passive & active subdomain enumeration (multiple OSINT sources)
+- 📡 Built-in brute-force engine with adaptive wordlists
+- 🌐 DNS resolution with fallback DNS servers
+- 🧠 Semantic analysis & impact scoring
+- 🎯 Asset prioritization by security relevance
+- 🕒 **Temporal Intelligence & asset memory**
+- ⚙️ **Automated reactions to temporal events**
+- 🗺️ Optional ASN / infrastructure network mapping
+- 📁 Clean outputs: `.txt`, `.json`, `.csv`, `.png`, `.svg`, `.pdf`
+- 🔒 No API keys required for most modules
 
 ---
 
-## 🧠 Adaptive / Intelligence-Assisted Wordlist Enrichment
+## 🧠 Adaptive Intelligence & Wordlist Enrichment
 
-TugaRecon includes an **adaptive intelligence mechanism** designed to improve brute-force efficiency by learning from previously discovered subdomains.
+TugaRecon learns from every scan.
 
-Instead of relying only on static dictionaries, TugaRecon analyzes enumeration results and **automatically enriches its internal wordlists** with relevant tokens and naming patterns.
+Instead of relying only on static wordlists, it analyzes discovered subdomains and automatically extracts **meaningful tokens and naming patterns**, enriching its internal dictionaries.
 
-### How it works
-
-1. Run a standard enumeration:
-   ```bash
-   python3 tugarecon.py -d example.com
-   ```
-2. All discovered subdomains are analyzed.
-3. Meaningful tokens and structural patterns are extracted.
-4. Wordlists are enriched automatically:
-   - Existing entries are preserved
-   - Duplicates are avoided
-5. Subsequent brute-force runs become significantly more effective.
-
-### Recommended workflow
+### Workflow
 
 ```bash
-# Step 1 — Enumeration & learning
+# Initial scan (learning phase)
 python3 tugarecon.py -d example.com
 
-# Step 2 — Brute-force with enriched intelligence
+# Brute-force using enriched intelligence
 python3 tugarecon.py -d example.com -b
 ```
 
-### Key characteristics
+### Key properties
 
-- Wordlists are only extended, never overwritten  
-- Fully automatic and transparent  
-- Improves results progressively over time  
-- Domain-agnostic and reusable  
+- Wordlists are **extended**, never overwritten
+- Duplicate-safe and transparent
+- Improves brute-force efficiency over time
+- Domain-agnostic and reusable
 
 ---
 
 ## 🎯 Impact Scoring & Asset Prioritization
 
-TugaRecon evaluates each discovered subdomain using **semantic indicators** extracted from naming patterns and context.
+Each subdomain is evaluated using semantic indicators extracted from its name and context.
 
 ### Signals considered
 
 - Administrative exposure (`admin`, `panel`, `manage`)
 - Authentication services (`auth`, `login`, `sso`)
-- Production or critical environments (`prod`, `core`, `primary`)
+- Critical environments (`prod`, `core`, `primary`)
 - Sensitive roles (`api`, `gateway`, `billing`)
 
 ### Impact levels
 
-- **CRITICAL** — Administrative or production exposure  
-- **HIGH** — Authentication or security-sensitive services  
-- **MEDIUM** — Internal or semi-exposed infrastructure  
-- **LOW** — Static or non-actionable assets  
+| Level | Meaning |
+|------:|--------|
+| **CRITICAL** | Admin or production exposure |
+| **HIGH** | Auth or security-sensitive service |
+| **MEDIUM** | Internal or semi-exposed |
+| **LOW** | Non-actionable |
 
-### Example output
+### Example
 
-```bash
-[0001] [CRITICAL] impact=100   admin.prod.example.com
-[0002] [HIGH    ] impact=75    auth.example.com
-[0019] [LOW     ] impact=0     static-img.example.com
+```text
+[CRITICAL] impact=100   admin.prod.example.com
+[HIGH    ] impact=75    auth.example.com
+[LOW     ] impact=0     static.example.com
 ```
 
-Impact scoring allows analysts to **prioritize what matters first**, reducing triage time and focusing effort on the most relevant assets.
+This allows analysts to **focus immediately on what matters**.
 
 ---
 
-## 🕒 Temporal Intelligence & Asset Memory (NEW)
+## 🕒 Temporal Intelligence & Asset Memory
 
-TugaRecon introduces **temporal awareness**, transforming scans into an evolving intelligence timeline.
+TugaRecon is **stateful**.
 
-Each run creates a **snapshot** of discovered assets and compares it with previous executions.
+Each run creates a snapshot and compares it with previous scans, classifying assets by **temporal state**.
 
-### Temporal states detected
+### Temporal states
 
-- **NEW** — Subdomain discovered for the first time  
-- **STABLE** — Asset unchanged across scans  
-- **ESCALATED** — Impact increased since last snapshot  
-- **DORMANT** — Previously seen, now missing for ≥ 2 days  
+- **NEW** — First time seen
+- **STABLE** — Unchanged across scans
+- **ESCALATED** — Impact increased
+- **FLAPPING** — Appears/disappears
+- **DORMANT** — Previously seen, now missing (≥ 2 days)
 
-### What this enables
-
-- Detect newly exposed services instantly  
-- Identify assets increasing in criticality  
-- Spot disappearing infrastructure (possible decommissioning or defensive action)  
-- Build historical awareness without external databases  
-
-### Example intelligence output
+### Example output
 
 ```text
-TOP TEMPORAL ASSETS
-────────────────────────────────
+[🧠] Temporal Risk View – Top Targets
 ESCALATED  admin.api.example.com
 NEW        auth.prod.example.com
 DORMANT    old-panel.dev.example.com
 ```
 
-Snapshots are stored automatically per target and date, creating **long-term reconnaissance memory**.
+Snapshots are stored per target and date, creating **long-term reconnaissance memory**.
 
 ---
 
-## ⚠️ Legal Notice
+## ⚙️ Automated Reactions (Reaction Engine)
 
-**Use TugaRecon only on targets you own or have explicit permission to test.**  
-The author is not responsible for misuse. Unauthorized use may be illegal.
+Temporal intelligence can trigger **automatic reactions**.
 
----
+When a subdomain becomes relevant (e.g. `ESCALATED`), TugaRecon can automatically execute deeper analysis modules.
 
-## 📦 Requirements & Dependencies
+### Supported reactions
 
-- Python 3.8+
+- HTTP probing (httpx)
+- TLS inspection
+- Security headers analysis
 
-Install dependencies:
+### Example logic
 
-```bash
-pip3 install -r requirements.txt
+```text
+ESCALATED → HTTPX + TLS + HEADERS
+NEW + high impact → HEADERS
+FLAPPING → WATCH
 ```
 
-Main dependencies include:
+### Output structure
 
 ```
-dnspython
-requests
-urllib3
-progress
-pydot
-networkx
-ipwhois
-pyvis
-multiprocess
-pandas
-argparse
-matplotlib
-tldextract
-colorama
-lxml
-beautifulsoup4
+results/<target>/<date>/reactions/
+└── sub.example.com/
+    ├── metadata.json
+    ├── tls.json
+    ├── httpx.txt
+    └── headers.json
 ```
+
+Only **relevant subdomains** generate reactions.
 
 ---
 
@@ -191,8 +174,11 @@ cd tugarecon
 pip3 install -r requirements.txt
 ```
 
-> ✅ Recommended: use a virtual environment  
-> `python3 -m venv venv && source venv/bin/activate`
+> Recommended:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
 ---
 
@@ -207,69 +193,55 @@ python3 tugarecon.py -d example.com
 | Option | Description |
 |------:|------------|
 | `-d, --domain` | Target domain (required) |
-| `-b, --bruteforce` | Enable brute-force discovery |
-| `-e, --enum` | Run specific modules only |
+| `-b, --bruteforce` | Enable brute-force |
+| `-e, --enum` | Run specific OSINT modules |
 | `-t, --threads` | Concurrent threads (default: 250) |
-| `-m, --map` | Generate network / ASN map |
+| `-m, --map` | Generate ASN/network map |
 | `-r, --results` | Show saved results |
 
 ---
 
-## 🔎 Examples
+## 📁 Project Structure (simplified)
 
-```bash
-python3 tugarecon.py -d example.com
-python3 tugarecon.py -d example.com --enum certspotter hackertarget
-python3 tugarecon.py -d example.com -b
-python3 tugarecon.py -d example.com -m
-python3 tugarecon.py -r
+```
+modules/
+├── ia_subdomain/        # Semantic analysis & learning
+├── intelligence/        # Temporal memory & reactions
+│   ├── snapshot.py
+│   ├── decision_engine.py
+│   ├── reaction_engine.py
+│   └── reactions/
+utils/
+├── temporal_analysis.py
+├── temporal_score.py
+├── temporal_view.py
 ```
 
 ---
 
-## 🧩 Project Structure
+## ⚠️ Legal Notice
 
-```
-tugarecon/
-├── modules/
-│   └── intelligence/
-│       └── snapshot.py
-├── utils/
-│   ├── temporal_analysis.py
-│   └── temporal_view.py
-├── wordlists/
-├── results/
-├── tugarecon.py
-└── README.md
-```
-
----
-
-## 🧭 Roadmap
-
-- [ ] HTTP/HTTPS active probing via httpx  
-- [ ] Risk trend graphs per subdomain  
-- [ ] Web dashboard for intelligence history  
-- [ ] Export intelligence reports (PDF)  
+**Use only on targets you own or have explicit authorization to test.**  
+The author assumes no responsibility for misuse.
 
 ---
 
 ## 👤 Author
 
-**Skynet0x01**  
+**skynet0x01**  
 Cybersecurity Researcher & Tool Developer  
-🌍 Portugal  
+🇵🇹 Portugal
 
 ---
 
 ## 📄 License
 
-This project is licensed under **GNU GPLv3**.
+GNU GPLv3
 
 ---
 
-> TugaRecon is not just a scanner — it is a reconnaissance system that learns, remembers and evolves.
-
+> **TugaRecon is not just a scanner.  
+> It is a reconnaissance system that learns, remembers and reacts.**
 
 ### 💖 Support & Donations
 
