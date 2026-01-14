@@ -59,6 +59,7 @@ from modules.ia_subdomain.bruteforce_hint import generate_hints
 
 from modules.intelligence.snapshot import load_previous_snapshot, build_snapshot, save_snapshot
 from modules.intelligence.decision_engine import decide_action
+from modules.intelligence.reaction_engine import react
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -124,10 +125,17 @@ def run_temporal_intelligence(scan_dir):
         # Passa também a lista de removidos
         print_top_temporal(temporal_rank, removed_list=removed, limit=20)
 
+    # ───────── Reações automáticas ─────────
+    output_dir = os.path.join(scan_dir, "reactions")
+    os.makedirs(output_dir, exist_ok=True)
+
+    for entry in temporal_rank:
+        if entry["action"] != "IGNORE":
+            react(entry, output_dir)
+
     # ───────── Temporal Change Log ─────────
     print_top_temporal(temporal_rank, removed_list=removed, limit=20)
     print("\n[IA] Snapshot saved (temporal memory updated)")
-
 
 
 # ----------------------------------------------------------------------------------------------------------

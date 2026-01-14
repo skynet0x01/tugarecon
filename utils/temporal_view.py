@@ -52,7 +52,7 @@ def print_top_temporal(temporal_rank, removed_list=None, limit=20):
 
     # ───────── Header + Legenda ─────────
     print("\n──────────────────────────────────────────────────────────────────────")
-    print("[🧠] Temporal Risk View – Top Targets")
+    print("[🧠] Legend: Temporal Risk View – Top Targets")
     print("──────────────────────────────────────────────────────────────────────")
     print(f"Legend: {R}ESCALATED{W} | {Y}NEW{W} | {G}FLAPPING{W} | {B}DORMANT / LOW{W}")
     print(f"Counts: NEW={counts['NEW']} | ESCALATED={counts['ESCALATED']} | FLAPPING={counts['FLAPPING']} | LOW/DORMANT={counts['LOW_DORMANT']} | REMOVED={counts['REMOVED']}")
