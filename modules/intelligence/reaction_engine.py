@@ -28,6 +28,7 @@
 # ----------------------------------------------------------------------------------------------------------
 import os
 import json
+
 from modules.intelligence.reactions.tls_reaction import run_tls_reaction
 from modules.intelligence.reactions.headers_reaction import run_headers
 from modules.intelligence.reactions.httpx_reaction import run_httpx
@@ -67,45 +68,16 @@ def react(entry, output_dir):
                 f.write(str(e) + "\n")
 
 
-# ----------------------------------------------------------------------------------------------------------
-def run_httpx(subdomain, output_dir):
-    outfile = os.path.join(output_dir, "httpx_escalated.txt")
-
-    cmd = [
-        "httpx",
-        "-u", f"https://{subdomain}",
-        "-status-code",
-        "-title",
-        "-tech-detect",
-        "-ip",
-        "-silent"
-    ]
-
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=20
-        )
-
-        if result.stdout:
-            with open(outfile, "a") as f:
-                f.write(result.stdout)
-
-    except Exception as e:
-        pass
-
 
 # ----------------------------------------------------------------------------------------------------------
 def decide_action(subdomain, impact, temporal_state, temporal_score):
     if temporal_state == "ESCALATED":
-        return "DEEP_HTTP_PROBE"
+        return "HTTPX"
 
     if temporal_state == "NEW" and impact >= 20:
-        return "HEADER_ANALYSIS"
+        return "HTTP"
 
-    if temporal_state == "NEW" and impact < 20:
-        return "TLS_ONLY"
+    if temporal_state == "FLAPPING":
+        return "WATCH"
 
     return "IGNORE"

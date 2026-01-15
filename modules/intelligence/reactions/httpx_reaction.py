@@ -48,3 +48,4 @@ def run_httpx(subdomain, output_dir):
 
     with open(f"{output_dir}/httpx.json", "w") as f:
         json.dump(result, f, indent=2)
+

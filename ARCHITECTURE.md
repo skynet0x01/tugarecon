@@ -4,9 +4,10 @@ This document describes the internal architecture of **TugaRecon**, explaining h
 
 Nothing here is magic. It is deliberate engineering.
 
-──────────────────────────────────────────────────────────────────────────────
+──────────────────────────────
 1. OVERVIEW
-──────────────────────────────────────────────────────────────────────────────
+
+──────────────────────────────
 
 TugaRecon is not a linear scanner.  
 It is a cyclic system with memory.
@@ -31,9 +32,10 @@ NEXT EXECUTION (smarter)
 
 Each run improves the next one.
 
-──────────────────────────────────────────────────────────────────────────────
+──────────────────────────────
 2. ENUMERATION LAYER
-──────────────────────────────────────────────────────────────────────────────
+
+──────────────────────────────
 
 Responsible for discovering subdomains.
 
@@ -49,9 +51,10 @@ Output:
 Typical output:
 results/<target>/<date>/subdomains_raw.txt
 
-──────────────────────────────────────────────────────────────────────────────
+──────────────────────────────
 3. SEMANTIC INTELLIGENCE
-──────────────────────────────────────────────────────────────────────────────
+
+──────────────────────────────
 
 This is where real intelligence begins.
 
@@ -77,9 +80,10 @@ Simplified structure:
   "category": "CRITICAL"
 }
 
-──────────────────────────────────────────────────────────────────────────────
+──────────────────────────────
 4. TEMPORAL INTELLIGENCE (MEMORY)
-──────────────────────────────────────────────────────────────────────────────
+
+──────────────────────────────
 
 This is the core of the system.
 
@@ -103,9 +107,10 @@ current impact: 75
 
 Nothing is deleted. Everything is remembered.
 
-──────────────────────────────────────────────────────────────────────────────
+──────────────────────────────
 5. TEMPORAL SCORING
-──────────────────────────────────────────────────────────────────────────────
+
+──────────────────────────────
 
 Temporal score combines:
 - Semantic impact
@@ -119,9 +124,10 @@ temporal_score = impact × state_weight × stability_factor
 Result:
 An objective temporal risk ranking.
 
-──────────────────────────────────────────────────────────────────────────────
+──────────────────────────────
 6. DECISION ENGINE
-──────────────────────────────────────────────────────────────────────────────
+
+──────────────────────────────
 
 Transforms states into actions.
 
@@ -151,9 +157,10 @@ Output:
   "action": "HTTPX"
 }
 
-──────────────────────────────────────────────────────────────────────────────
+──────────────────────────────
 7. REACTION ENGINE
-──────────────────────────────────────────────────────────────────────────────
+
+──────────────────────────────
 
 Executes actions ONLY for relevant subdomains.
 
@@ -182,9 +189,10 @@ results/<target>/<date>/reactions/<subdomain>/
 Failures are isolated.
 One reaction never breaks the pipeline.
 
-──────────────────────────────────────────────────────────────────────────────
+──────────────────────────────
 8. PERSISTENCE & HISTORY
-──────────────────────────────────────────────────────────────────────────────
+
+──────────────────────────────
 
 Everything is stored by design.
 
@@ -194,9 +202,10 @@ Everything is stored by design.
 
 The system improves over time, even without code changes.
 
-──────────────────────────────────────────────────────────────────────────────
+──────────────────────────────
 9. WHY THIS IS NOT “JUST ANOTHER RECON TOOL”
-──────────────────────────────────────────────────────────────────────────────
+
+──────────────────────────────
 
 Traditional recon:
 - Stateless
@@ -215,9 +224,10 @@ It is the difference between:
 and
 “understanding an attack surface over time”.
 
-──────────────────────────────────────────────────────────────────────────────
+──────────────────────────────
 10. CORE PRINCIPLE
-──────────────────────────────────────────────────────────────────────────────
+
+──────────────────────────────
 
 Exploring is easy.
 Remembering is rare.
