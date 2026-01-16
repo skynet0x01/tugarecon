@@ -1,236 +1,260 @@
-# TugaRecon – Architecture & Internal Flow
+# TugaRecon – Architecture
 
-This document describes the internal architecture of **TugaRecon**, explaining how modules interact, how intelligence evolves over time, and how automated reactions are triggered.
+## 1. Introduction
 
-Nothing here is magic. It is deliberate engineering.
+TugaRecon is a modular reconnaissance and subdomain intelligence framework designed for
+penetration testers and OSINT practitioners.
 
-──────────────────────────────
-1. OVERVIEW
+Its architecture focuses on clarity, extensibility, and temporal awareness, enabling
+both automated reconnaissance and long-term intelligence accumulation.
 
-──────────────────────────────
+The system is intentionally designed as an orchestrated pipeline, not a monolithic tool.
+Each component has a single responsibility and communicates through well-defined data artifacts.
 
-TugaRecon is not a linear scanner.  
-It is a cyclic system with memory.
+---
 
-Conceptual flow:
+## 2. High-Level Design Goals
 
-INPUT
-  ↓
-ENUMERATION
-  ↓
-SEMANTIC INTELLIGENCE
-  ↓
-TEMPORAL INTELLIGENCE (MEMORY)
-  ↓
-DECISION ENGINE
-  ↓
-REACTION ENGINE
-  ↓
-PERSISTENCE
-  ↓
-NEXT EXECUTION (smarter)
+- Modularity – Each functional domain is isolated into its own module.
+- Extensibility – New engines, intelligence strategies, or reactions can be added with minimal changes.
+- Temporal Intelligence – The system remembers previous scans and reasons about change over time.
+- Automation – Actionable intelligence can automatically trigger reactions.
+- Separation of Concerns – Orchestration, data collection, analysis, and reactions are decoupled.
 
-Each run improves the next one.
+---
 
-──────────────────────────────
-2. ENUMERATION LAYER
+## 3. Architectural Overview
 
-──────────────────────────────
++------------------------------------------------------------------+
+|                         TugaRecon CLI                             |
+|------------------------------------------------------------------|
+| - Argument parsing                                                |
+| - Execution flow control                                          |
+| - ScanContext lifecycle                                           |
++----------------------------+-------------------------------------+
+                             |
+                             v
+        +--------------------------------------------------+
+        |                OSINT Enumeration                  |
+        |--------------------------------------------------|
+        | Sublist3r | CRT | Certspotter | AlienVault | ... |
+        +--------------------------------------------------+
+                             |
+                             v
+        +--------------------------------------------------+
+        |        Intelligence & Temporal Analysis           |
+        |--------------------------------------------------|
+        | - Semantic classification                         |
+        | - Snapshot memory                                 |
+        | - Temporal state analysis                          |
+        | - Scoring & decision engine                        |
+        +--------------------------------------------------+
+                             |
+                             v
+        +--------------------------+-----------------------+
+        | Automated Reactions      | Optional Enhancers    |
+        |--------------------------|-----------------------|
+        | - Alerts                 | - IA wordlist growth  |
+        | - Logging                | - Bruteforce hints    |
+        | - Future integrations    | - Network mapping     |
+        +--------------------------+-----------------------+
 
-Responsible for discovering subdomains.
+---
 
-Typical sources:
-- OSINT (crt.sh, passive DNS, search engines)
-- Adaptive brute-force
-- Automatically enriched wordlists
+## 4. Core Components
 
-Output:
-- Raw list of valid subdomains
-- No decisions, no judgment
+### 4.1 CLI Orchestrator (tugarecon.py)
 
-Typical output:
-results/<target>/<date>/subdomains_raw.txt
+The CLI orchestrator is the entry point of the framework.
 
-──────────────────────────────
-3. SEMANTIC INTELLIGENCE
+Responsibilities:
+- Parse CLI arguments
+- Initialize the ScanContext
+- Control the execution pipeline
+- Invoke high-level workflows
 
-──────────────────────────────
+It intentionally avoids implementation details of OSINT, intelligence, or brute-force logic.
 
-This is where real intelligence begins.
+---
 
-Each subdomain is semantically analyzed:
-- Relevant tokens (admin, api, auth, prod, internal, etc.)
-- Functional context inferred from naming
-- Estimated impact (0–100)
+### 4.2 ScanContext
 
-Internal example:
-admin.api.prod.example.com
-→ tokens: [admin, api, prod]
-→ impact: 100
-→ category: CRITICAL
+@dataclass
+class ScanContext:
+    target: str
+    enum: list | None
+    bruteforce: bool
+    threads: int
+    savemap: bool
+    args: argparse.Namespace
 
-Structured output:
-semantic_results.json
+The ScanContext acts as a shared execution state passed across modules.
+It defines what is being scanned, how, and under which conditions.
 
-Simplified structure:
-{
-  "subdomain": "admin.api.example.com",
-  "tokens": ["admin", "api"],
-  "impact": 100,
-  "category": "CRITICAL"
-}
+---
 
-──────────────────────────────
-4. TEMPORAL INTELLIGENCE (MEMORY)
+### 4.3 OSINT Enumeration Modules
 
-──────────────────────────────
+Location:
+modules/OSINT/
 
-This is the core of the system.
+Each OSINT engine:
+- Operates independently
+- Collects subdomains from a specific source
+- Writes results to the scan directory
 
-Each scan creates a snapshot:
-results/<target>/<date>/snapshot.json
+Examples:
+- Sublist3r
+- CRT / Certspotter
+- ThreatCrowd
+- AlienVault
+- DNSDumpster
 
-The current snapshot is compared with the previous one.
+---
 
-Possible temporal states:
-- NEW       → never seen before
-- STABLE    → unchanged
-- ESCALATED → impact increased
-- FLAPPING  → appears/disappears
-- DORMANT   → missing for ≥ N days
+### 4.4 Intelligence & Temporal Analysis
 
-Example:
-auth.example.com
-previous impact: 30
-current impact: 75
-→ state: ESCALATED
+Location:
+modules/Intelligence/
+utils/temporal_*
 
-Nothing is deleted. Everything is remembered.
+This layer transforms raw enumeration data into actionable intelligence.
 
-──────────────────────────────
-5. TEMPORAL SCORING
+Responsibilities:
+- Load previous scan snapshots
+- Build the current snapshot
+- Detect temporal changes
+- Classify subdomains into states:
+  - NEW
+  - ESCALATED
+  - LOW
+  - DORMANT
+- Compute temporal scores
+- Drive decision logic
 
-──────────────────────────────
+This is the memory and reasoning core of TugaRecon.
 
-Temporal score combines:
-- Semantic impact
+---
+
+### 4.5 Snapshot & Temporal Memory
+
+Snapshots are stored per target and date:
+results/<target>/<date>/scan_snapshot.json
+
+Each snapshot represents the system’s understanding of a target at a specific moment.
+
+This enables:
+- Change detection
+- Historical comparison
+- Risk escalation or decay
+
+---
+
+### 4.6 Decision Engine
+
+The decision engine determines what should happen for each subdomain.
+
+Inputs:
+- Impact score
 - Temporal state
-- Change frequency
-- Historical persistence
+- Temporal score
 
-Formula (simplified):
-temporal_score = impact × state_weight × stability_factor
+Outputs:
+- IGNORE
+- Future extensible actions (alerts, scans, notifications)
 
-Result:
-An objective temporal risk ranking.
+Non-action is an explicit decision, not an absence of logic.
 
-──────────────────────────────
-6. DECISION ENGINE
+---
 
-──────────────────────────────
+### 4.7 Reaction Engine
 
-Transforms states into actions.
+Location:
+modules/Intelligence/reaction_engine.py
 
-Example logic:
+Responsibilities:
+- Execute automated reactions
+- Persist reaction artifacts
+- Remain isolated from decision logic
 
-if state == "ESCALATED":
-    action = "HTTPX"
+Reactions are stored in:
+results/<target>/<date>/reactions/
 
-elif state == "NEW" and impact >= 20:
-    action = "HTTP"
+---
 
-elif state == "FLAPPING":
-    action = "WATCH"
+### 4.8 Brute-Force Engine (Optional)
 
-else:
-    action = "IGNORE"
+Location:
+modules/Brute_Force/
 
-The Decision Engine executes nothing.
-It only decides.
+Features:
+- High-performance multithreaded execution
+- Optional IA-generated hints
+- HTTP and HTTPS verification
+- Designed to consume intelligence, not replace it
 
-Output:
-{
-  "subdomain": "...",
-  "state": "...",
-  "impact": 75,
-  "score": 180,
-  "action": "HTTPX"
-}
+---
 
-──────────────────────────────
-7. REACTION ENGINE
+### 4.9 Network Mapping (Optional)
 
-──────────────────────────────
+Location:
+modules/Map/
 
-Executes actions ONLY for relevant subdomains.
+Generates visual representations of discovered infrastructure:
+- Subdomains
+- IP relationships
+- ASN groupings (when applicable)
 
-Input:
-- subdomain
-- action
-- metadata
+Exports:
+- PNG
+- SVG
+- PDF
 
-Example mapping:
+---
 
-REACTION_MAP = {
-    "HTTPX": [run_httpx, run_tls, run_headers],
-    "HTTP":  [run_httpx]
-}
+## 5. Execution Flow
 
-Each subdomain gets its own isolated directory.
+CLI
+ └── ScanContext
+      └── OSINT Enumeration
+           └── Deduplication
+                └── Intelligence & Snapshot
+                     └── Temporal Analysis
+                          └── Decision Engine
+                               ├── Reactions
+                               ├── Reporting
+                               └── Optional Enhancements
 
-Structure:
-results/<target>/<date>/reactions/<subdomain>/
-├── metadata.json
-├── tls.json
-├── httpx.txt
-├── headers.json
-└── error.log (if needed)
+---
 
-Failures are isolated.
-One reaction never breaks the pipeline.
+## 6. Data Flow
 
-──────────────────────────────
-8. PERSISTENCE & HISTORY
+- OSINT modules generate raw subdomain data
+- Results are normalized and deduplicated
+- Snapshots are built and compared temporally
+- Scores and decisions are computed
+- Reactions are executed when required
+- Optional modules extend discovery or visualization
 
-──────────────────────────────
+---
 
-Everything is stored by design.
+## 7. Extensibility Guidelines
 
-- Snapshots are never overwritten
-- Reactions are versioned by date
-- Wordlists are incrementally enriched
+- New OSINT engines → modules/OSINT/
+- New intelligence logic → modules/Intelligence/
+- New reactions → extend reaction_engine
+- No changes required in core CLI logic
 
-The system improves over time, even without code changes.
+---
 
-──────────────────────────────
-9. WHY THIS IS NOT “JUST ANOTHER RECON TOOL”
+## 8. Architectural Philosophy
 
-──────────────────────────────
+TugaRecon is designed as a thinking system, not a simple scanner.
 
-Traditional recon:
-- Stateless
-- Disposable results
-- No learning
+Enumeration discovers.
+Intelligence understands.
+Memory contextualizes.
+Decisions justify action or silence.
+Reactions execute with intent.
 
-TugaRecon:
-- Stateful
-- Historical memory
-- Time-based decisions
-- Automated reactions
-- Real risk prioritization
-
-It is the difference between:
-“listing subdomains”
-and
-“understanding an attack surface over time”.
-
-──────────────────────────────
-10. CORE PRINCIPLE
-
-──────────────────────────────
-
-Exploring is easy.
-Remembering is rare.
-Reacting correctly is engineering.
-
-TugaRecon does all three.
+Growth in complexity must result in more insight, not more noise.
