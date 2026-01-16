@@ -1,41 +1,23 @@
-#!/usr/bin/python3
-# TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
-# Bug Bounty Recon, search for subdomains and save into a file
-# Coded By skynet0x01 2020-2026
-
-# This file is part of TugaRecon, developed by skynet0x01 in 2020-2025.
-#
-# Copyright (C) 2026 skynet0x01
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <https://www.gnu.org/licenses/>.
-#
+# --------------------------------------------------------------------------------------------------
+# TugaRecon
+# Author: Skynet0x01 2020-2026
+# GitHub: https://github.com/skynet0x01/tugarecon
+# License: GNU GPLv3
 # Patent Restriction Notice:
 # No patents may be claimed or enforced on this software or any derivative.
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
-# ----------------------------------------------------------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
 import os
 import time
 import datetime
 
 from utils.tuga_colors import G, Y, R, W
 from utils.tuga_functions import print_semantic_results, print_semantic_results_grouped
-from modules.ia_subdomain.semantic import classify
-from modules.ia_subdomain.impact_score import compute_impact_score
-from modules.ia_subdomain.scan_diff_view import print_scan_diff
+from modules.IA.semantic import classify
+from modules.IA.impact_score import compute_impact_score
+from modules.IA.scan_diff_view import print_scan_diff
 from utils.tuga_exporters import export_json, export_priority_lists
 from utils.tuga_scan_diff import diff_scans, export_diff, get_previous_scan_date
-
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -126,7 +108,7 @@ def DeleteDuplicate(target):
     date = str(datetime.datetime.now().date())
     content = open("results/" + target + "/" + "tmp.txt", 'r').readlines()
     content_set = set(content)
-    cleandata = open("results/" + target + "/" + date + "/" + "subdomains.txt", 'w')
+    cleandata = open("results/" + target + "/" + date + "/" + "osint_subdomains.txt", 'w')
     for line in content_set:
         cleandata.write(line)
     try:
@@ -142,7 +124,7 @@ def ReadFile(target, start_time):
     folder = os.path.join("results", target, date)
     os.makedirs(folder, exist_ok=True)
 
-    subdomains_path = os.path.join(folder, "subdomains.txt")
+    subdomains_path = os.path.join(folder, "osint_subdomains.txt")
     if not os.path.exists(subdomains_path):
         print(R + f"[!] No subdomains file found for {target} on {date}" + W)
         return

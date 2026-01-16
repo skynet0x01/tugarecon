@@ -1,31 +1,12 @@
-#!/usr/bin/python3
-# TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
-# Bug Bounty Recon, search for subdomains and save into a file
-# Coded By skynet0x01 2020-2026
-
-# This file is part of TugaRecon, developed by skynet0x01 in 2020-2025.
-#
-# Copyright (C) 2026 skynet0x01
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <https://www.gnu.org/licenses/>.
-#
+# --------------------------------------------------------------------------------------------------
+# TugaRecon
+# Author: Skynet0x01 2020-2026
+# GitHub: https://github.com/skynet0x01/tugarecon
+# License: GNU GPLv3
 # Patent Restriction Notice:
 # No patents may be claimed or enforced on this software or any derivative.
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
-# ----------------------------------------------------------------------------------------------------------
-
-
-# imports
+# --------------------------------------------------------------------------------------------------
 import os
 import sys
 import asyncio
@@ -383,13 +364,18 @@ def get_latest_date_folder(base_path):
 # ----------------------------------------------------------------------------------------------------------
 # Main map function
 def tuga_map(target):
-    base_path = os.path.join('results',target)
+    base_path = os.path.join('results', target)
     latest_path = get_latest_date_folder(base_path)
     print(Y+f"Using folder: {latest_path}"+W)
 
-    sub_file = os.path.join(latest_path,'subdomains.txt')
+    # create map folder inside latest_path
+    map_path = os.path.join(latest_path, 'map')
+    os.makedirs(map_path, exist_ok=True)
+
+    sub_file = os.path.join(latest_path,'osint_subdomains.txt')
     brut_file = os.path.join(latest_path,'tuga_bruteforce.txt')
 
     if not os.path.isfile(sub_file) and not os.path.isfile(brut_file):
         print(R+"No subdomains/bruteforce files found"+W); sys.exit(1)
-    asyncio.run(main_async(sub_file,brut_file,latest_path))
+    #asyncio.run(main_async(sub_file,brut_file,latest_path))
+    asyncio.run(main_async(sub_file, brut_file, map_path))

@@ -1,120 +1,208 @@
-#!/usr/bin/env python3
-
-# TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
-# Bug Bounty Recon, search for subdomains and save in to a file
-# Coded By skynet0x01 2020-2026
-
-# This file is part of TugaRecon, developed by skynet0x01 in 2020-2026.
-#
-# Copyright (C) 2026 skynet0x01
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <https://www.gnu.org/licenses/>.
-#
+# --------------------------------------------------------------------------------------------------
+# TugaRecon – CLI Orchestrator (Refactored)
+# Author: Skynet0x01 2020-2026
+# GitHub: https://github.com/skynet0x01/tugarecon
+# License: GNU GPLv3
 # Patent Restriction Notice:
 # No patents may be claimed or enforced on this software or any derivative.
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
+# --------------------------------------------------------------------------------------------------
 
+"""
+This file is the main orchestration layer of TugaRecon.
+Responsibilities:
+ - CLI parsing
+ - High-level execution flow
+ - Scan context lifecycle
 
-# ----------------------------------------------------------------------------------------------------------
+It deliberately avoids implementation details of OSINT, IA, Bruteforce or Mapping modules.
+"""
+
 import os
-import argparse  # parse arguments
 import sys
 import time
-import urllib3
-import requests
+import argparse
+import logging
 import json
+
 from datetime import datetime
-from progress.bar import IncrementalBar
+from dataclasses import dataclass, field
 
-# Import internal functions
-from utils.tuga_colors import G, Y, W
 from utils.tuga_banner import banner
-from utils.tuga_save import ReadFile, DeleteDuplicate
-from utils.tuga_dns import DNS_Record_Types, bscan_whois_look
+from utils.tuga_colors import G, W
+from utils.tuga_dns import bscan_whois_look
 from utils.tuga_results import main_work_subdirs
-from utils.temporal_view import print_top_temporal
-from utils.temporal_analysis import analyze_temporal_state
-from utils.temporal_score import compute_temporal_score
-from tuga_bruteforce import TugaBruteForce
-from tuga_network_map import tuga_map
+from utils.tuga_save import ReadFile, DeleteDuplicate
+from modules.IA.trainer import run_ia_training
 
-# Import internal modules
-from modules.tuga_modules import queries
-from modules.tuga_modules import tuga_certspotter, tuga_crt, tuga_hackertarget, tuga_threatcrowd, \
-                                 tuga_alienvault, tuga_threatminer, tuga_omnisint, tuga_sublist3r, tuga_dnsdumpster
-
-from modules.ia_subdomain.ia_generator import IASubdomainGenerator
-from modules.ia_subdomain.ia_wordlist import enrich_wordlist_from_ia
-from modules.ia_subdomain.bruteforce_hint import generate_hints
-
-from modules.intelligence.snapshot import load_previous_snapshot, build_snapshot, save_snapshot
-from modules.intelligence.decision_engine import decide_action
-from modules.intelligence.reaction_engine import react
+# --------------------------------------------------------------------------------------------------
+# Logging
+# --------------------------------------------------------------------------------------------------
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(levelname)s] %(message)s'
+)
+log = logging.getLogger(" tugarecon")
 
 
-# ----------------------------------------------------------------------------------------------------------
-def run_temporal_intelligence(scan_dir):
-    semantic_file = os.path.join(scan_dir, "semantic_results.json")
+# --------------------------------------------------------------------------------------------------
+# Scan Context
+# --------------------------------------------------------------------------------------------------
+@dataclass
+class ScanContext:
+    target: str
+    enum: list | None
+    bruteforce: bool
+    threads: int
+    savemap: bool
+    args: argparse.Namespace
+
+    start_time: float = field(default_factory=time.time)
+    semantic_hints: list = field(default_factory=list)
+
+    @property
+    def scan_dir(self) -> str:
+        return f"results/{self.target}/{datetime.now().date()}"
+
+
+# --------------------------------------------------------------------------------------------------
+# CLI
+# --------------------------------------------------------------------------------------------------
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+
+    parser.add_argument('-d', '--domain', required=True, help='Target domain')
+    parser.add_argument('-e', '--enum', nargs='*', help='Select OSINT modules')
+    parser.add_argument('-b', '--bruteforce', action='store_true', help='Enable bruteforce')
+    parser.add_argument('-t', '--threads', type=int, default=250)
+    parser.add_argument('-m', '--map', action='store_true', help='Generate network map')
+    parser.add_argument('--debug', action='store_true', help='Debug mode')
+
+    return parser.parse_args()
+
+
+# --------------------------------------------------------------------------------------------------
+# Pipelines
+# --------------------------------------------------------------------------------------------------
+def run_bruteforce(ctx: ScanContext) -> None:
+    log.info(" Running brute force module")
+
+    from modules.Brute_Force.tuga_bruteforce import TugaBruteForce
+    from modules.IA.bruteforce_hint import generate_hints
+
+    if hasattr(ctx.args, "semantic_results") and ctx.args.semantic_results:
+        ctx.semantic_hints = generate_hints(ctx.args.semantic_results)
+        log.info(f" Generated {len(ctx.semantic_hints)} IA hints")
+
+    options = {
+        "target": ctx.target,
+        "threads": ctx.threads,
+        "semantic_hints": ctx.semantic_hints,
+    }
+
+    TugaBruteForce(options=options).run()
+
+
+def run_map(ctx: ScanContext) -> None:
+    log.info(" Generating network map")
+    from modules.Map.tuga_network_map import tuga_map
+    tuga_map(ctx.target)
+
+
+def run_enumeration(ctx: ScanContext) -> None:
+    log.info(" Starting OSINT enumeration")
+
+    from progress.bar import IncrementalBar
+    from modules.OSINT.tuga_modules import queries
+    from modules.OSINT import (
+        tuga_sublist3r,
+        tuga_threatcrowd,
+        tuga_crt,
+        tuga_threatminer,
+        tuga_certspotter,
+        tuga_dnsdumpster,
+        tuga_alienvault,
+        tuga_hackertarget,
+        tuga_omnisint,
+    )
+
+    engines = {
+        'certspotter': tuga_certspotter.Certspotter,
+        'ssl': tuga_crt.CRT,
+        'hackertarget': tuga_hackertarget.Hackertarget,
+        'threatcrowd': tuga_threatcrowd.Threatcrowd,
+        'alienvault': tuga_alienvault.Alienvault,
+        'threatminer': tuga_threatminer.Threatminer,
+        'omnisint': tuga_omnisint.Omnisint,
+        'sublist3r': tuga_sublist3r.Sublist3r,
+        'dnsdumpster': tuga_dnsdumpster.DNSDUMPSTER,
+    }
+
+    selected = engines.values() if ctx.enum is None else [
+        engines[e] for e in ctx.enum if e in engines
+    ]
+
+    queries(ctx.target)
+    bar = IncrementalBar('OSINT', max=len(selected))
+
+    for engine in selected:
+        engine(ctx.target)
+        bar.next()
+
+    bar.finish()
+
+    DeleteDuplicate(ctx.target)
+    ReadFile(ctx.target, ctx.start_time)
+
+    # IA learning from OSINT results
+    run_ia_training(ctx.target)
+
+def run_intelligence(ctx: ScanContext) -> None:
+    log.info(" Running temporal intelligence")
+
+    from utils.temporal_analysis import analyze_temporal_state
+    from utils.temporal_score import compute_temporal_score
+    from utils.temporal_view import print_top_temporal
+    from modules.Intelligence.snapshot import load_previous_snapshot, build_snapshot, save_snapshot
+    from modules.Intelligence.decision_engine import decide_action
+    from modules.Intelligence.reaction_engine import react
+
+    semantic_file = os.path.join(ctx.scan_dir, "semantic_results.json")
     if not os.path.isfile(semantic_file):
-        print("[IA] Semantic results not found, skipping temporal intelligence.")
+        log.warning("Semantic results not found, skipping IA")
         return
 
+    previous = load_previous_snapshot(ctx.scan_dir)
+
     with open(semantic_file, "r") as f:
-        classified_results = json.load(f)
+        results = json.load(f)
 
-    previous_snapshot = load_previous_snapshot(scan_dir)
-    snapshot = build_snapshot(classified_results, previous_snapshot)
-    save_snapshot(scan_dir, snapshot)
+    snapshot = build_snapshot(results, previous)
+    save_snapshot(ctx.scan_dir, snapshot)
 
-    temporal_states = analyze_temporal_state(snapshot, previous_snapshot)
+    states = analyze_temporal_state(snapshot, previous)
+    ranking = []
 
-    temporal_rank = []
-
-    for state, subs in temporal_states.items():
+    for state, subs in states.items():
         for sub in subs:
-            sub_data = snapshot["subdomains"].get(sub, {})
+            data = snapshot['subdomains'].get(sub, {})
+            score = compute_temporal_score(data, state)
+            action = decide_action(sub, data.get('impact', 0), state, score)
+            ranking.append((score, sub, state, action))
 
-            score = compute_temporal_score(
-                subdomain_data=sub_data,
-                temporal_state=state
-            )
+    ranking.sort(reverse=True)
 
-            # Decide action (assumindo que tens esta função definida)
-            action = decide_action(
-                subdomain=sub,
-                impact=sub_data.get("impact", 0),
-                temporal_state=state,
-                temporal_score=score
-            )
+    # ───────── Check if there is any actionable item ─────────
+    has_actionable = any(action != "IGNORE" for _, _, _, action in ranking)
 
-            temporal_rank.append({
-                "subdomain": sub,
-                "state": state,
-                "impact": sub_data.get("impact", 0),
-                "score": score,
-                "action": action
-            })
+    # ───────── Temporal Risk View Output ─────────
+    print("\n──────────────────────────────────────────────────────────────────────")
+    print("[🧠] Temporal Risk View – Top Targets")
+    print("──────────────────────────────────────────────────────────────────────")
 
-    # Ordena pelo score
-    temporal_rank.sort(key=lambda x: x["score"], reverse=True)
-
-    # ───────── Temporal Risk View ─────────
-    removed = temporal_states.get("DORMANT", [])
-
-    if not temporal_rank:
-        print("\n──────────────────────────────────────────────────────────────────────")
-        print("[🧠] Temporal Risk View – Top Targets")
-        print("──────────────────────────────────────────────────────────────────────")
+    if not has_actionable:
         print("✓ No actionable temporal risk detected")
         print("\nReason:")
         print(" • No NEW subdomains with impact")
@@ -122,257 +210,63 @@ def run_temporal_intelligence(scan_dir):
         print(" • All changes classified as LOW or DORMANT")
         print("──────────────────────────────────────────────────────────────────────")
     else:
-        # Passa também a lista de removidos
-        #print_top_temporal(temporal_rank, removed_list=removed, limit=20)
-        print("")
+        print_top_temporal(ranking)
 
-    # ───────── Reações automáticas ─────────
-    output_dir = os.path.join(scan_dir, "reactions")
+    # ───────── Reactions ─────────
+    output_dir = os.path.join(ctx.scan_dir, "reactions")
     os.makedirs(output_dir, exist_ok=True)
 
-    for entry in temporal_rank:
-        if entry["action"] != "IGNORE":
-            react(entry, output_dir)
-
-    # ───────── Temporal Change Log ─────────
-    print_top_temporal(temporal_rank, removed_list=removed, limit=20)
-    print("\n[IA] Snapshot saved (temporal memory updated)")
-
-
-# ----------------------------------------------------------------------------------------------------------
-def run_ia_training(target):
-    base_dir = f"results/{target}"
-    if not os.path.isdir(base_dir):
-        return
-
-    dates = []
-    for d in os.listdir(base_dir):
-        try:
-            datetime.strptime(d, "%Y-%m-%d")
-            dates.append(d)
-        except ValueError:
-            pass
-
-    if not dates:
-        return
-
-    latest_date = sorted(dates)[-1]
-    subdomains_file = os.path.join(base_dir, latest_date, "subdomains.txt")
-    if not os.path.isfile(subdomains_file):
-        return
-
-    with open(subdomains_file) as f:
-        found_subdomains = [l.strip() for l in f if l.strip()]
-
-    if len(found_subdomains) < 2:
-        print("[IA] Not enough data to generate patterns")
-        return
-
-    print(f"[IA] Training with {len(found_subdomains)} subdomains")
-
-    ia = IASubdomainGenerator(limit=1000)
-    ia_candidates = ia.generate(found_subdomains)
-    enrich_wordlist_from_ia(ia_candidates)
+    for score, sub, state, action in ranking:
+        if action != 'IGNORE':
+            react({
+                'subdomain': sub,
+                'state': state,
+                'score': score,
+                'action': action
+            }, output_dir)
 
 
-# ----------------------------------------------------------------------------------------------------------
-def data_results():
-    main_work_subdirs()
-    print(G + "────────────────────────────────────────────────────────────" + W)
-def override(func):
-    class OverrideAction(argparse.Action):
-        def __call__(self, parser, namespace, values, option_string):
-            func()
-            parser.exit()
-    return OverrideAction
+# --------------------------------------------------------------------------------------------------
+# Main Orchestrator
+# --------------------------------------------------------------------------------------------------
+def start(ctx: ScanContext) -> None:
+    bscan_whois_look(ctx.target)
+
+    if ctx.bruteforce:
+        return run_bruteforce(ctx)
+
+    if ctx.savemap:
+        return run_map(ctx)
+
+    run_enumeration(ctx)
+    run_intelligence(ctx)
 
 
-# ----------------------------------------------------------------------------------------------------------
-# parse the arguments
-def parse_args():
-    Examples = (Y + '''
-────────────────────────────────────────────────────────────
- Available Modules:
-────────────────────────────────────────────────────────────
-  • certspotter     • hackertarget   • ssl           • threatcrowd
-  • alienvault      • threatminer    • omnisint      • sublist3r
-
-────────────────────────────────────────────────────────────
- Examples of Usage:
-────────────────────────────────────────────────────────────
-  ▶ Enumerate all modules (except bruteforce):
-      python3 {0} -d google.com
-
-  ▶ Use a specific module (e.g., ssl):
-      python3 {0} -d google.com --enum ssl
-
-  ▶ Bruteforce subdomains using wordlists:
-      python3 {0} -d google.com --bruteforce
-      python3 {0} -d google.com -b
-
-  ▶ View saved results:
-      python3 {0} -r
-
-  ▶ Generate network graph (with ASN clusters):
-      python3 {0} -d google.com -m
-
-────────────────────────────────────────────────────────────
- Donations are welcome ♥
- Help improve features, updates, and support:
- → https://github.com/skynet0x01/tugarecon
-────────────────────────────────────────────────────────────
-'''.format(sys.argv[0]) + W)
-
-    parser = argparse.ArgumentParser(
-        epilog=Examples,
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
-    parser._optionals.title = "OPTIONS"
-
-    parser.add_argument(
-        '-d', '--domain', required=True,
-        help='Domain to enumerate (e.g., example.com)'
-    )
-
-    parser.add_argument(
-        '-r', '--results', nargs=0,
-        action=override(data_results),
-        help='Show previously saved results for domains'
-    )
-
-    parser.add_argument(
-        '-e', '--enum', nargs='*',
-        help='[Optional] Select specific modules for enumeration (e.g., ssl, certspotter)'
-    )
-
-    parser.add_argument(
-        '-b', '--bruteforce', action='store_true',
-        help='Enable brute force subdomain discovery using wordlists'
-    )
-
-    parser.add_argument(
-        '-t', '--threads', metavar='', type=int, default=250,
-        help='Number of concurrent threads to use (default: 250)'
-    )
-
-    parser.add_argument(
-        '-m', '--map', action='store_true',
-        help='Generate network map with ASN clusters and grouped device icons'
-    )
-    return parser.parse_args()
-
-
-# ----------------------------------------------------------------------------------------------------------
-# parse host from scheme, to use for certificate transparency abuse, validate domain
-def parse_url(url):
-    try:
-        host = urllib3.util.url.parse_url(url).host
-        response = requests.get('http://' + host)
-        if (response.status_code == 200):
-            print('Target ONLINE... Lets go!')
-        else:
-            print('[*] Invalid domain, try again...')
-    except Exception as e:
-        print('[*] Network unstable... !? ')
-    except KeyboardInterrupt:
-        print("\nTugaRecon interrupted by user\n")
-        print(G + "────────────────────────────────────────────────────────────" + W)
-        quit()
-        #sys.exit(1)
-    return host
-
-
-# ----------------------------------------------------------------------------------------------------------
-def start_tugarecon(args, target, enum, threads, bruteforce, savemap, results):
-
-    # ───────── BRUTEFORCE ─────────
-    if bruteforce:
-        print("\nWait for results...! (It might take a while)")
-        print(G + "────────────────────────────────────────────────────────────\n" + W)
-
-        if hasattr(args, "semantic_results") and args.semantic_results:
-            args.semantic_hints = generate_hints(args.semantic_results)
-            print(f"[IA] Generated {len(args.semantic_hints)} semantic hints")
-        else:
-            args.semantic_hints = []
-
-        TugaBruteForce(options=args).run()
-        sys.exit()
-
-    # ───────── MAP ─────────
-    if savemap:
-        tuga_map(target)
-        sys.exit()
-
-    # ───────── ENUMERATION ─────────
-    try:
-        supported_engines = {
-            'certspotter': tuga_certspotter.Certspotter,
-            'ssl': tuga_crt.CRT,
-            'hackertarget': tuga_hackertarget.Hackertarget,
-            'threatcrowd': tuga_threatcrowd.Threatcrowd,
-            'alienvault': tuga_alienvault.Alienvault,
-            'threatminer': tuga_threatminer.Threatminer,
-            'omnisint': tuga_omnisint.Omnisint,
-            'sublist3r': tuga_sublist3r.Sublist3r,
-            'dnsdumpster': tuga_dnsdumpster.DNSDUMPSTER
-        }
-
-        chosenEnums = (
-            list(supported_engines.values())
-            if enum is None
-            else [supported_engines[e.lower()] for e in enum if e.lower() in supported_engines]
-        )
-
-        start_time = time.time()
-        queries(target)
-
-        print("Running free OSINT engines...\n")
-        bar = IncrementalBar('Processing', max=len(chosenEnums))
-
-        for engine in chosenEnums:
-            engine(target)
-            bar.next()
-
-        bar.finish()
-        print(G + "\n────────────────────────────────────────────────────────────\n" + W)
-
-        DeleteDuplicate(target)
-        ReadFile(target, start_time)
-
-        # ───────── INTELLIGENCE ─────────
-        scan_dir = f"results/{target}/{datetime.now().date()}"
-
-        try:
-            run_temporal_intelligence(scan_dir)
-        except Exception as e:
-            print(f"[IA] Snapshot failed: {e}")
-
-        run_ia_training(target)
-
-    except KeyboardInterrupt:
-        print(G + "────────────────────────────────────────────────────────────" + W)
-        print("\nTugaRecon interrupted by user\n")
-        sys.exit()
-
-# ----------------------------------------------------------------------------------------------------------
-def menu_tugarecon():
+# --------------------------------------------------------------------------------------------------
+def main() -> None:
     banner()
-    args = parse_args()  # args = parser.parse_args()
-    target = parse_url(args.domain)
-    DNS_Record_Types(target)
-    bscan_whois_look(target)
-    enum = args.enum
-    bruteforce = args.bruteforce
-    threads = args.threads
-    results = args.results
-    savemap = args.map
-    start_tugarecon(args, target, enum, threads, bruteforce, savemap, results)
+    args = parse_args()
+
+    if args.debug:
+        log.setLevel(logging.DEBUG)
+
+    main_work_subdirs()
+
+    ctx = ScanContext(
+        target=args.domain,
+        enum=args.enum,
+        bruteforce=args.bruteforce,
+        threads=args.threads,
+        savemap=args.map,
+        args=args
+    )
+
+    try:
+        start(ctx)
+    except KeyboardInterrupt:
+        print(G + "\nTugaRecon interrupted by user" + W)
+        sys.exit(130)
 
 
-# ----------------------------------------------------------------------------------------------------------
-if __name__ == "__main__":
-    menu_tugarecon()
-
-
-# ----------------------------------------------------------------------------------------------------------
+if __name__ == '__main__':
+    main()

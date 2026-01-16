@@ -1,30 +1,12 @@
-#!/usr/bin/python3
-# TugaRecon, tribute to Portuguese explorers reminding glorious past of this country
-# Bug Bounty Recon, search for subdomains and save in to a file
-# Coded By skynet0x01 2020-2026
-
-# This file is part of TugaRecon, developed by skynet0x01 in 2020-2025.
-#
-# Copyright (C) 2026 skynet0x01
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <https://www.gnu.org/licenses/>.
-#
+# --------------------------------------------------------------------------------------------------
+# TugaRecon
+# Author: Skynet0x01 2020-2026
+# GitHub: https://github.com/skynet0x01/tugarecon
+# License: GNU GPLv3
 # Patent Restriction Notice:
 # No patents may be claimed or enforced on this software or any derivative.
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
-
-# import go here
-# ----------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
 import dns.resolver  # dnspython
 import whois
 # Import internal
@@ -67,25 +49,40 @@ def DNS_Record_Types(target):
     print(G + "────────────────────────────────────────────────────────────" + W)
 # ----------------------------------------------------------------------------------------------------------
 def bscan_whois_look(target):
+    print(G + "\n[+] WHOIS Lookup..." + W)
+    print(G + "────────────────────────────────────────────────────────────\n" + W)
     try:
-        dict = []
+        records = []
+
         domain = whois.query(target)
+
         data = domain.__dict__
-        dict.append(data)
+        records.append(data)
         print("Domain expiration: ", domain.expiration_date)
         print(G + "────────────────────────────────────────────────────────────\n" + W)
-        for dict_line in dict:
-            for k, v in dict_line.items():
-                print(k + ": " + v)
+        for records_line in records:
+            for k, v in domain.__dict__.items():
+                print(B + f"{k}:" + W)
+
+                if isinstance(v, list):
+                    for item in v:
+                        print(f"  - {item}")
+                else:
+                    print(f"  {v}")
+
+                print("")
+
+
         print(G + "────────────────────────────────────────────────────────────\n" + W)
         print("")
+
     except KeyboardInterrupt:
         print("\nTugaRecon interrupted by user\n")
         quit()
+
     except Exception as e:
-        pass
-    
-    
+        print(R + f"[WHOIS] Failed for {target}: {e}" + W)
+
 # ----------------------------------------------------------------------------------------------------------
 @staticmethod
 def is_intranet(ip):

@@ -59,7 +59,7 @@ Instead of relying only on static wordlists, it analyzes discovered subdomains a
 # Initial scan (learning phase)
 python3 tugarecon.py -d example.com
 
-# Brute-force using enriched intelligence
+# Brute-force using enriched Intelligence
 python3 tugarecon.py -d example.com -b
 ```
 
