@@ -240,6 +240,10 @@ Cybersecurity Researcher & Tool Developer
 
 GNU GPLv3
 
+Patent Restriction Notice:
+No patents may be claimed or enforced on this software or any derivative.
+Any patent claims result in automatic termination of license rights.
+
 ---
 
 > **TugaRecon is not just a scanner.  
