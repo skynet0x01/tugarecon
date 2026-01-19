@@ -3,6 +3,11 @@
 # Author: Skynet0x01 2020-2026
 # GitHub: https://github.com/skynet0x01/tugarecon
 # License: GNU GPLv3
+#
+# IASubdomainGenerator is responsible for generating new subdomain candidates
+# based on learned patterns and controlled heuristics.
+# It does not perform validation, scanning, or scoring.
+#
 # Patent Restriction Notice:
 # No patents may be claimed or enforced on this software or any derivative.
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
@@ -43,4 +48,8 @@ class IASubdomainGenerator:
 
         # Limitar e ordenar (determinístico)
         final = sorted(candidates)
+
+        # NOTE: limit is applied globally to keep generation deterministic.
+        # If needed, this can later be split per-source (tokens / bigrams).
+
         return final[:self.limit]

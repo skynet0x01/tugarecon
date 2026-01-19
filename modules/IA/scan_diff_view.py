@@ -2,11 +2,18 @@
 # TugaRecon
 # Author: Skynet0x01 2020-2026
 # GitHub: https://github.com/skynet0x01/tugarecon
+#
+# This module is responsible for rendering human-readable scan differences
+# between executions, focusing on MEDIUM+ priority assets.
+# It does not perform scoring, decision-making, or reactions.
+#
 # License: GNU GPLv3
 # Patent Restriction Notice:
 # No patents may be claimed or enforced on this software or any derivative.
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
 # --------------------------------------------------------------------------------------------------
+import copy
+
 from utils.tuga_colors import G, Y, R, W
 
 PRIORITY_ORDER = {
@@ -48,7 +55,8 @@ def print_scan_diff(diff: dict):
 
     # ----------------------------------------------------------------------------------------------------------
     def is_visible(r):
-        return PRIORITY_ORDER.get(r.get("priority", "LOW"), 1) >= MIN_PRIORITY
+        p = normalize_priority(r.get("priority"))
+        return PRIORITY_ORDER.get(p, 1) >= MIN_PRIORITY
 
     new = [r for r in diff.get("new", []) if is_visible(r)]
     updated = [r for r in diff.get("updated", []) if is_visible(r)]
@@ -83,12 +91,16 @@ def print_scan_diff(diff: dict):
 
     # NEW + UPDATED combinados
     combined = []
+
     for r in new:
-        r["_change"] = "NEW"
-        combined.append(r)
+        rr = copy.deepcopy(r)
+        rr["_change"] = "NEW"
+        combined.append(rr)
+
     for r in updated:
-        r["_change"] = "UPDATED"
-        combined.append(r)
+        rr = copy.deepcopy(r)
+        rr["_change"] = "UPDATED"
+        combined.append(rr)
 
     combined = sort_by_priority_then_impact(combined)
 

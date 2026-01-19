@@ -1,35 +1,52 @@
-# --------------------------------------------------------------------------------------------------
-# TugaRecon
-# Author: Skynet0x01 2020-2026
-# GitHub: https://github.com/skynet0x01/tugarecon
-# License: GNU GPLv3
-# Patent Restriction Notice:
-# No patents may be claimed or enforced on this software or any derivative.
-# Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
-# --------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------
+# decide_action.py
+# Author: Skynet0x01
+# Description:
+#   Este módulo unifica a lógica de decisão de ações de scan e reacção.
+#   Considera impacto, estado temporal e tags semânticas (ex: SCADA/ICS).
+#   Retorna tupla (scan_action, reaction_action)
+# ----------------------------------------------------------------------------------------------------------
 
-def decide_action(subdomain, impact, temporal_state, temporal_score):
+from modules.IA.heuristics import SCADA_TOKENS
+
+def decide_action(subdomain: str, impact: int, temporal_state: str, temporal_score: int, tags: set[str] = set()):
     """
-    Decide ação operacional com base no estado temporal e impacto
+    Decide ações de scan e reacção para um subdomínio.
+
+    Parâmetros:
+    - subdomain: nome do subdomínio
+    - impact: pontuação de impacto (0-100)
+    - temporal_state: NEW, ESCALATED, FLAPPING, STABLE, DORMANT
+    - temporal_score: pontuação temporal (opcional)
+    - tags: conjunto de tags semânticas (ex: ICS/SCADA)
+
+    Retorna:
+    - (scan_action: str, reaction_action: str)
     """
 
+    # ICS/SCADA override: sempre executar scan profundo e reacções completas
+    if tags & SCADA_TOKENS:
+        return "DEEP_SCAN", "HTTPX"
+
+    # Estados temporais
     if temporal_state == "ESCALATED":
-        return "PRIORITY_RESCAN"
+        return "PRIORITY_RESCAN", "HTTPX"
 
     if temporal_state == "NEW":
         if impact >= 20:
-            return "DEEP_SCAN"
-        return "WATCH"
+            return "DEEP_SCAN", "HTTP"
+        return "WATCH", "WATCH"
 
     if temporal_state == "FLAPPING":
-        return "WATCH"
+        return "WATCH", "WATCH"
 
     if temporal_state == "STABLE":
         if impact >= 50:
-            return "WATCH"
-        return "IGNORE"
+            return "WATCH", "WATCH"
+        return "IGNORE", "IGNORE"
 
     if temporal_state == "DORMANT":
-        return "IGNORE"
+        return "IGNORE", "IGNORE"
 
-    return "IGNORE"
+    # Default fallback
+    return "IGNORE", "IGNORE"

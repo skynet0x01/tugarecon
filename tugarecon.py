@@ -29,11 +29,14 @@ from datetime import datetime
 from dataclasses import dataclass, field
 
 from utils.tuga_banner import banner
-from utils.tuga_colors import G, W
+from utils.tuga_colors import G, W, R
 from utils.tuga_dns import bscan_whois_look
 from utils.tuga_results import main_work_subdirs
 from utils.tuga_save import ReadFile, DeleteDuplicate
 from modules.IA.trainer import run_ia_training
+
+# 🔹 unified intelligence engine
+from modules.Intelligence.unified_engine import process_entry
 
 # --------------------------------------------------------------------------------------------------
 # Logging
@@ -42,7 +45,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='[%(levelname)s] %(message)s'
 )
-log = logging.getLogger(" tugarecon")
+log = logging.getLogger("tugarecon")
 
 
 # --------------------------------------------------------------------------------------------------
@@ -73,12 +76,19 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    parser.add_argument('-d', '--domain', required=True, help='Target domain')
+    parser.add_argument('-d', '--domain', help='Target domain')
     parser.add_argument('-e', '--enum', nargs='*', help='Select OSINT modules')
     parser.add_argument('-b', '--bruteforce', action='store_true', help='Enable bruteforce')
     parser.add_argument('-t', '--threads', type=int, default=250)
     parser.add_argument('-m', '--map', action='store_true', help='Generate network map')
     parser.add_argument('--debug', action='store_true', help='Debug mode')
+
+    # NEW: read-only / results mode
+    parser.add_argument(
+        "-r", "--results",
+        action="store_true",
+        help="Show previously saved scan results and exit"
+    )
 
     return parser.parse_args()
 
@@ -87,14 +97,14 @@ def parse_args() -> argparse.Namespace:
 # Pipelines
 # --------------------------------------------------------------------------------------------------
 def run_bruteforce(ctx: ScanContext) -> None:
-    log.info(" Running brute force module")
+    log.info("Running brute force module")
 
     from modules.Brute_Force.tuga_bruteforce import TugaBruteForce
     from modules.IA.bruteforce_hint import generate_hints
 
     if hasattr(ctx.args, "semantic_results") and ctx.args.semantic_results:
         ctx.semantic_hints = generate_hints(ctx.args.semantic_results)
-        log.info(f" Generated {len(ctx.semantic_hints)} IA hints")
+        log.info(f"Generated {len(ctx.semantic_hints)} IA hints")
 
     options = {
         "target": ctx.target,
@@ -106,13 +116,13 @@ def run_bruteforce(ctx: ScanContext) -> None:
 
 
 def run_map(ctx: ScanContext) -> None:
-    log.info(" Generating network map")
+    log.info("Generating network map")
     from modules.Map.tuga_network_map import tuga_map
     tuga_map(ctx.target)
 
 
 def run_enumeration(ctx: ScanContext) -> None:
-    log.info(" Starting OSINT enumeration")
+    log.info("Starting OSINT enumeration")
 
     from progress.bar import IncrementalBar
     from modules.OSINT.tuga_modules import queries
@@ -159,71 +169,81 @@ def run_enumeration(ctx: ScanContext) -> None:
     # IA learning from OSINT results
     run_ia_training(ctx.target)
 
+
+# --------------------------------------------------------------------------------------------------
+# Intelligence / Temporal Engine
+# --------------------------------------------------------------------------------------------------
 def run_intelligence(ctx: ScanContext) -> None:
-    log.info(" Running temporal intelligence")
+    log.info("Running temporal intelligence")
 
     from utils.temporal_analysis import analyze_temporal_state
     from utils.temporal_score import compute_temporal_score
     from utils.temporal_view import print_top_temporal
-    from modules.Intelligence.snapshot import load_previous_snapshot, build_snapshot, save_snapshot
-    from modules.Intelligence.decision_engine import decide_action
-    from modules.Intelligence.reaction_engine import react
+    from modules.Intelligence.snapshot import (
+        load_previous_snapshot,
+        build_snapshot,
+        save_snapshot,
+    )
 
     semantic_file = os.path.join(ctx.scan_dir, "semantic_results.json")
     if not os.path.isfile(semantic_file):
-        log.warning("Semantic results not found, skipping IA")
+        log.warning("Semantic results not found, skipping intelligence module")
         return
 
+    # Load previous snapshot
     previous = load_previous_snapshot(ctx.scan_dir)
 
+    # Load current semantic results
     with open(semantic_file, "r") as f:
         results = json.load(f)
 
+    # Build and persist snapshot
     snapshot = build_snapshot(results, previous)
     save_snapshot(ctx.scan_dir, snapshot)
 
+    # Analyze temporal state
     states = analyze_temporal_state(snapshot, previous)
+
     ranking = []
+
+    output_dir = os.path.join(ctx.scan_dir, "reactions")
+    os.makedirs(output_dir, exist_ok=True)
 
     for state, subs in states.items():
         for sub in subs:
-            data = snapshot['subdomains'].get(sub, {})
-            score = compute_temporal_score(data, state)
-            action = decide_action(sub, data.get('impact', 0), state, score)
-            ranking.append((score, sub, state, action))
+            data = snapshot["subdomains"].get(sub, {})
+
+            temporal_score = compute_temporal_score(data, state)
+
+            # 🔹 Unified entry model
+            entry = {
+                "subdomain": sub,
+                "state": state,
+                "temporal_score": temporal_score,
+                "impact": data.get("impact", 0),
+                "impact_score": data.get("impact", 0),
+                "tags": data.get("tags", []),
+            }
+
+            process_entry(entry, output_dir)
+
+            ranking.append(
+                (temporal_score, sub, state, entry.get("action", "IGNORE"))
+            )
 
     ranking.sort(reverse=True)
 
-    # ───────── Check if there is any actionable item ─────────
     has_actionable = any(action != "IGNORE" for _, _, _, action in ranking)
 
-    # ───────── Temporal Risk View Output ─────────
     print("\n──────────────────────────────────────────────────────────────────────")
     print("[🧠] Temporal Risk View – Top Targets")
     print("──────────────────────────────────────────────────────────────────────")
 
     if not has_actionable:
         print("✓ No actionable temporal risk detected")
-        print("\nReason:")
-        print(" • No NEW subdomains with impact")
-        print(" • No ESCALATED subdomains")
-        print(" • All changes classified as LOW or DORMANT")
         print("──────────────────────────────────────────────────────────────────────")
     else:
         print_top_temporal(ranking)
-
-    # ───────── Reactions ─────────
-    output_dir = os.path.join(ctx.scan_dir, "reactions")
-    os.makedirs(output_dir, exist_ok=True)
-
-    for score, sub, state, action in ranking:
-        if action != 'IGNORE':
-            react({
-                'subdomain': sub,
-                'state': state,
-                'score': score,
-                'action': action
-            }, output_dir)
 
 
 # --------------------------------------------------------------------------------------------------
@@ -250,7 +270,24 @@ def main() -> None:
     if args.debug:
         log.setLevel(logging.DEBUG)
 
-    main_work_subdirs()
+    if args.results:
+        main_work_subdirs()  # ou a função real que já tens
+        return
+    #main_work_subdirs()
+
+    # ─────────────────────────────────────────────────────────
+    # RESULTS-ONLY MODE
+    # ─────────────────────────────────────────────────────────
+    if args.results:
+        log.info(" Results-only mode enabled")
+        return
+
+    # ─────────────────────────────────────────────────────────
+    # NORMAL SCAN MODE
+    # ─────────────────────────────────────────────────────────
+    if not args.domain:
+        print(R + "[!] You must specify a domain unless using -r/--results" + W)
+        sys.exit(1)
 
     ctx = ScanContext(
         target=args.domain,
@@ -268,5 +305,7 @@ def main() -> None:
         sys.exit(130)
 
 
+
 if __name__ == '__main__':
     main()
+

@@ -12,6 +12,12 @@ import re
 
 
 class PatternModel:
+    """
+    Lightweight statistical pattern extractor for subdomain names.
+    This is NOT a predictive model, only a frequency-based learner.
+    Used exclusively for candidate generation.
+    """
+
     def __init__(self):
         self.tokens = Counter()
         self.bigrams = Counter()

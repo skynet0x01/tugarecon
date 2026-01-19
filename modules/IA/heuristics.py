@@ -14,7 +14,6 @@
 # -------------------------------------------------------------------
 # Domain knowledge: environments, versions and qualifiers
 # -------------------------------------------------------------------
-
 """
 Heuristic token expansion engine
 Extended with SCADA / ICS and vertical-specific intelligence.
@@ -191,3 +190,4 @@ def expand(token: str) -> list[str]:
             expansions.add(f"{token}-{suffix}")
 
     return sorted(expansions)
+
