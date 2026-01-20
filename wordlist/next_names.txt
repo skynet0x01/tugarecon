@@ -11,6 +11,8 @@ adminht
 adserver
 affiliate
 affiliates
+admin-service-obc-prod
+test-service-commons-prod
 agent
 agents
 alfa
@@ -33,6 +35,7 @@ at
 atlas
 au
 audio
+automation
 auth
 authbs
 authvip
