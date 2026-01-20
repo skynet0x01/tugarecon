@@ -81,6 +81,7 @@ www
 earthdatacloud
 gcn
 intsvc
+ds-obc-dewa-prod-aks
 sit
 amesaero
 argocd
@@ -98,6 +99,7 @@ ppe
 redmond
 teams
 tx
+signify-connector-obci-prod
 visualstudio
 biz
 bk
@@ -150,6 +152,7 @@ redes
 sggtw
 sgt
 smartgrids
+socketserver
 agile
 bo
 comunidade
@@ -457,3 +460,18 @@ co
 akamai
 apigateway
 origin
+108
+66
+afd
+feedproxy
+ghs
+limited
+proxy
+pub
+rate
+ae
+aks
+dewa
+obc
+obemdewauat
+service

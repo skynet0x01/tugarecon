@@ -1,5 +1,5 @@
 # --------------------------------------------------------------------------------------------------
-# TugaRecon
+# TugaRecon – Brute-force Module
 # Author: Skynet0x01 2020-2026
 # GitHub: https://github.com/skynet0x01/tugarecon
 # License: GNU GPLv3
