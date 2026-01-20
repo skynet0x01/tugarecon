@@ -29,7 +29,7 @@ from datetime import datetime
 from dataclasses import dataclass, field
 
 from utils.tuga_banner import banner
-from utils.tuga_colors import G, W, R
+from utils.tuga_colors import G, W, R, Y
 from utils.tuga_dns import bscan_whois_look
 from utils.tuga_results import main_work_subdirs
 from utils.tuga_save import ReadFile, DeleteDuplicate
@@ -72,7 +72,36 @@ class ScanContext:
 # CLI
 # --------------------------------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
+    Examples = (Y + '''
+    ────────────────────────────────────────────────────────────
+     Available Modules:
+    ────────────────────────────────────────────────────────────
+      • OSINT      • Brute-Force      • IA      • Intelligence
+      • Network-map                   • And much more...
+    ────────────────────────────────────────────────────────────
+     Examples of Usage:
+    ────────────────────────────────────────────────────────────
+      ▶ Enumerate all modules (except bruteforce):
+          python3 tugarecon.py -d google.com
+
+      ▶ Bruteforce subdomains using wordlists:
+          python3 tugarecon.py -d google.com -b
+
+      ▶ View saved results:
+          python3 tugarecon.py -r
+
+      ▶ Generate network graph (with ASN clusters):
+          python3 tugarecon.py -d google.com -m
+
+    ────────────────────────────────────────────────────────────
+     Donations are welcome ♥
+     Help improve features, updates, and support:
+     → https://github.com/skynet0x01/tugarecon
+    ────────────────────────────────────────────────────────────
+    '''.format(sys.argv[0]) + W)
+
     parser = argparse.ArgumentParser(
+        epilog=Examples,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 

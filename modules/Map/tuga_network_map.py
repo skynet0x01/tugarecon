@@ -1,5 +1,5 @@
 # --------------------------------------------------------------------------------------------------
-# TugaRecon – Network Map Module (v3)
+# TugaRecon – Network Map Module (v4)
 # Author: Skynet0x01 2020-2026
 # GitHub: https://github.com/skynet0x01/tugarecon
 # License: GNU GPLv3
@@ -73,8 +73,6 @@ async def resolve_all_ips(domains, concurrency=200):
             ip = await resolve_ip(d)
             if ip:
                 ip_map[d] = ip
-            else:
-                pass  # silent
 
     tasks = [worker(d) for d in domains]
     await asyncio.gather(*tasks, return_exceptions=True)
@@ -95,11 +93,11 @@ def classify_node(sub):
     else: return '💻','#f2f2f2'
 
 
-def shorten_label(text,max_len=30):
-    if len(text)<=max_len: return text
+def shorten_label(text, max_len=30):
+    if len(text) <= max_len:
+        return text
     parts = text.split('.')
-    return '\n'.join(['.'.join(parts[i:i+2]) for i in range(0,len(parts),2)])
-
+    return '\n'.join(['.'.join(parts[i:i+2]) for i in range(0, len(parts), 2)])
 
 # --------------------------------------------------------------------------------------------------
 # Shared hosting detection
@@ -110,24 +108,31 @@ def compute_ip_density(ip_map):
         density[ip].append(host)
     return density
 
-
 # --------------------------------------------------------------------------------------------------
 # Build graph
 
 def build_graph(subs_ips, host_sources=None, cert_map=None):
-    if cert_map is None: cert_map = {}
+    if cert_map is None:
+        cert_map = {}
+
     graph = pydot.Dot(graph_type='digraph', rankdir='LR')
     clusters = {}
     network_summary = {}
 
     ip_density = compute_ip_density(subs_ips)
 
-    for host, ip in subs_ips.items():
+    for host, ip in sorted(subs_ips.items()):
         info = tuga_asn.get_network_info(ip)
-        asn = info.get('asn','Unknown')
-        asn_id = re.sub(r'[^0-9A-Za-z_]','_',asn)
+        asn = info.get('asn') or 'Unknown ASN'
+        asn_id = re.sub(r'[^0-9A-Za-z_]', '_', asn)
+
         if asn_id not in clusters:
-            cluster = pydot.Cluster(asn_id, label=f"{asn} ({info.get('country','??')})", style='filled', fillcolor='#f0f0f0')
+            cluster = pydot.Cluster(
+                asn_id,
+                label=f"{asn} ({info.get('country','??')})",
+                style='filled',
+                fillcolor='#f0f0f0'
+            )
             clusters[asn_id] = cluster
             network_summary[asn_id] = {
                 'asn_display': asn,
@@ -138,46 +143,74 @@ def build_graph(subs_ips, host_sources=None, cert_map=None):
                 'ip_count': set()
             }
             graph.add_subgraph(cluster)
+
         cluster = clusters[asn_id]
 
-        emoji,color = classify_node(host)
+        emoji, color = classify_node(host)
 
         # Shared vs Dedicated infra
         if len(ip_density[ip]) == 1:
-            infra_icon = '🏠'  # dedicated
+            infra_icon = '🏠'
             infra_tag = 'dedicated'
+            border_color = '#66cc66'
         elif len(ip_density[ip]) <= 3:
-            infra_icon = '🏢'  # small shared
+            infra_icon = '🏢'
             infra_tag = 'shared-small'
+            border_color = '#ffcc66'
         else:
-            infra_icon = '🏭'  # heavy shared
+            infra_icon = '🏭'
             infra_tag = 'shared-heavy'
+            border_color = '#ff6666'
 
-        node_label = f"{emoji}{infra_icon} {shorten_label(host)}\n[{host_sources.get(host,'unknown')}]"
-        node_id = f"host_{host.replace('.','_')}"
-        node = pydot.Node(node_id, label=node_label, style='filled', fillcolor=color, shape='box')
+        source = host_sources.get(host, 'unknown') if host_sources else 'unknown'
+
+        node_label = f"{emoji}{infra_icon} {shorten_label(host)}\n[{source}]"
+        safe_host_id = re.sub(r'[^0-9A-Za-z_]', '_', host)
+        node_id = f"host_{safe_host_id}"
+
+        node = pydot.Node(
+            node_id,
+            label=node_label,
+            style='filled',
+            fillcolor=color,
+            color=border_color,
+            penwidth='2',
+            shape='box'
+        )
         cluster.add_node(node)
 
         ip_id = f"ip_{ip.replace('.','_')}"
         ip_label = f"{ip}\n({len(ip_density[ip])} hosts)"
         ip_color = 'lightblue' if len(ip_density[ip]) == 1 else '#ffdddd'
-        ip_node = pydot.Node(ip_id, label=ip_label, style='filled', fillcolor=ip_color, shape='ellipse')
+
+        ip_node = pydot.Node(
+            ip_id,
+            label=ip_label,
+            style='filled',
+            fillcolor=ip_color,
+            shape='ellipse'
+        )
         cluster.add_node(ip_node)
         graph.add_edge(pydot.Edge(node, ip_node))
 
         # SAN edges (limited)
-        sans = cert_map.get(host, [])[:MAX_SANS]
+        sans = sorted(cert_map.get(host, []))[:MAX_SANS]
         extra_sans = max(0, len(cert_map.get(host, [])) - MAX_SANS)
 
         for san in sans:
             if san != host:
-                san_id = f"san_{san.replace('.','_')}"
-                san_node = pydot.Node(san_id, label=f"🔖 {shorten_label(san)}", style='rounded')
+                safe_san_id = re.sub(r'[^0-9A-Za-z_]', '_', san)
+                san_id = f"san_{safe_san_id}"
+                san_node = pydot.Node(
+                    san_id,
+                    label=f"🔖 {shorten_label(san)}",
+                    style='rounded'
+                )
                 cluster.add_node(san_node)
-                graph.add_edge(pydot.Edge(node,san_node,style='dashed'))
+                graph.add_edge(pydot.Edge(node, san_node, style='dashed'))
 
         if extra_sans > 0:
-            more_id = f"more_{host.replace('.','_')}"
+            more_id = f"more_{safe_host_id}"
             more_node = pydot.Node(more_id, label=f"+{extra_sans} SANs", shape='plaintext')
             cluster.add_node(more_node)
             graph.add_edge(pydot.Edge(node, more_node, style='dotted'))
@@ -186,9 +219,9 @@ def build_graph(subs_ips, host_sources=None, cert_map=None):
         network_summary[asn_id]['cidrs'].add(info.get('cidr','Unknown'))
         network_summary[asn_id]['orgs'].add(info.get('org','Unknown Org'))
         network_summary[asn_id]['hosts'].append({
-            'host':host,
-            'ip':ip,
-            'source':host_sources.get(host,'unknown'),
+            'host': host,
+            'ip': ip,
+            'source': source,
             'infra': infra_tag
         })
         network_summary[asn_id]['ip_count'].add(ip)
@@ -219,7 +252,8 @@ def export_graph(graph, path):
 def export_network_summary(network_summary, path):
     os.makedirs(path, exist_ok=True)
     safe_summary = {}
-    for k,v in network_summary.items():
+
+    for k, v in network_summary.items():
         safe_summary[k] = {
             'asn_display': v['asn_display'],
             'country': v['country'],
@@ -232,12 +266,18 @@ def export_network_summary(network_summary, path):
 
     # TXT
     with open(os.path.join(path,'network_info.txt'),'w') as f:
-        for asn,data in safe_summary.items():
-            f.write(f"ASN: {data['asn_display']}\nCountry: {data['country']}\nHosts: {data['host_total']}  IPs: {data['ip_total']}\nOrgs: {', '.join(data['orgs'])}\nCIDRs: {', '.join(data['cidrs'])}\n")
+        for asn, data in safe_summary.items():
+            f.write(
+                f"ASN: {data['asn_display']}\n"
+                f"Country: {data['country']}\n"
+                f"Hosts: {data['host_total']}  IPs: {data['ip_total']}\n"
+                f"Orgs: {', '.join(data['orgs'])}\n"
+                f"CIDRs: {', '.join(data['cidrs'])}\n"
+            )
             for h in data['hosts']:
                 f.write(f"  - {h['host']} -> {h['ip']} ({h['source']}, {h['infra']})\n")
             f.write("\n")
-        f.write(FOOTER_TEXT+'\n')
+        f.write(FOOTER_TEXT + '\n')
 
     # JSON
     with open(os.path.join(path,'network_info.json'),'w') as f:
@@ -247,10 +287,18 @@ def export_network_summary(network_summary, path):
     with open(os.path.join(path,'network_info.csv'),'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['asn','country','orgs','cidrs','host','ip','source','infra'])
-        for asn,data in safe_summary.items():
+        for asn, data in safe_summary.items():
             for h in data['hosts']:
-                writer.writerow([data['asn_display'], data['country'], ';'.join(data['orgs']), ';'.join(data['cidrs']),
-                                 h['host'], h['ip'], h['source'], h['infra']])
+                writer.writerow([
+                    data['asn_display'],
+                    data['country'],
+                    ';'.join(data['orgs']),
+                    ';'.join(data['cidrs']),
+                    h['host'],
+                    h['ip'],
+                    h['source'],
+                    h['infra']
+                ])
         writer.writerow([f"# {FOOTER_TEXT}"])
 
     print(f"[+] Network info exported: TXT/JSON/CSV")
@@ -262,13 +310,15 @@ async def main_async(sub_file, brut_file, latest_path, html_export=True):
     host_sources, hosts = merge_sources(sub_file, brut_file)
     print(f"[+] This may take some time… perfect moment for a coffee. ☕")
     print(f"[+] Resolving {len(hosts)} hosts...")
+
     ip_map = await resolve_all_ips(hosts)
     if not ip_map:
-        print(R+"[-] No hosts resolved"+W)
+        print(R + "[-] No hosts resolved" + W)
         return
 
     await tuga_asn.prefetch_network_info(set(ip_map.values()))
     cert_map = await tuga_certs.fetch_certs_for_hosts(list(ip_map.keys()))
+
     graph, network_summary = build_graph(ip_map, host_sources, cert_map)
     export_graph(graph, latest_path)
     export_network_summary(network_summary, latest_path)
@@ -277,52 +327,421 @@ async def main_async(sub_file, brut_file, latest_path, html_export=True):
         try:
             import networkx as nx
             from pyvis.network import Network
+
             G = nx.Graph()
-            for asn,data in network_summary.items():
+            for asn, data in network_summary.items():
                 for h in data['hosts']:
-                    G.add_node(h['host'], title=f"Host: {h['host']}<br>IP: {h['ip']}<br>Infra: {h['infra']}")
-                    G.add_node(h['ip'], title=f"IP: {h['ip']}<br>ASN: {data.get('asn_display','Unknown')}<br>Country: {data.get('country','??')}")
-                    G.add_edge(h['host'],h['ip'])
+                    G.add_node(
+                        h['host'],
+                        title=f"Host: {h['host']}<br>IP: {h['ip']}<br>Infra: {h['infra']}"
+                    )
+                    G.add_node(
+                        h['ip'],
+                        title=f"IP: {h['ip']}<br>ASN: {data.get('asn_display','Unknown')}<br>Country: {data.get('country','??')}"
+                    )
+                    G.add_edge(h['host'], h['ip'])
+
             net = Network(height='1000px', width='100%', notebook=False)
             net.from_nx(G)
-            outpath = os.path.join(latest_path,'subdomains_map.html')
+
+            outpath = os.path.join(latest_path, 'subdomains_map.html')
             net.write_html(outpath)
-            with open(outpath,'r', encoding='utf-8') as f: html = f.read()
-            html = html.replace('</body>', f'<div style="position:fixed;bottom:8px;left:8px;font-size:12px;opacity:0.8;z-index:9999;">{FOOTER_TEXT}</div></body>')
-            with open(outpath,'w', encoding='utf-8') as f: f.write(html)
+
+            with open(outpath, 'r', encoding='utf-8') as f:
+                html = f.read()
+
+            html = html.replace(
+                '</body>',
+                f'<div style="position:fixed;bottom:8px;left:8px;font-size:12px;opacity:0.8;z-index:9999;">{FOOTER_TEXT}</div></body>'
+            )
+
+            with open(outpath, 'w', encoding='utf-8') as f:
+                f.write(html)
+
             print(f"[+] Interactive map exported: {outpath}")
+
         except Exception as e:
-            print(R+"[-] HTML export failed: "+str(e)+W)
+            print(R + "[-] HTML export failed: " + str(e) + W)
 
 # --------------------------------------------------------------------------------------------------
 
 def get_latest_date_folder(base_path):
     try:
-        folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path,f))]
+        folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
     except Exception:
-        print(R+"Base folder not found: "+base_path+W); sys.exit(1)
+        print(R + "Base folder not found: " + base_path + W)
+        sys.exit(1)
+
     date_folders = []
     for f in folders:
-        try: date_folders.append((datetime.strptime(f,'%Y-%m-%d'),f))
-        except Exception: pass
-    if not date_folders: print(R+"No date folders found"+W); sys.exit(1)
+        try:
+            date_folders.append((datetime.strptime(f, '%Y-%m-%d'), f))
+        except Exception:
+            pass
+
+    if not date_folders:
+        print(R + "No date folders found" + W)
+        sys.exit(1)
+
     date_folders.sort()
-    return os.path.join(base_path,date_folders[-1][1])
+    return os.path.join(base_path, date_folders[-1][1])
 
 # --------------------------------------------------------------------------------------------------
 
 def tuga_map(target, html_export=True):
     base_path = os.path.join('results', target)
     latest_path = get_latest_date_folder(base_path)
-    print(Y+f"Using folder: {latest_path}"+W)
+
+    print(Y + f"Using folder: {latest_path}" + W)
 
     map_path = os.path.join(latest_path, 'map')
     os.makedirs(map_path, exist_ok=True)
 
-    sub_file = os.path.join(latest_path,'osint_subdomains.txt')
-    brut_file = os.path.join(latest_path,'tuga_bruteforce.txt')
+    sub_file = os.path.join(latest_path, 'osint_subdomains.txt')
+    brut_file = os.path.join(latest_path, 'tuga_bruteforce.txt')
 
     if not os.path.isfile(sub_file) and not os.path.isfile(brut_file):
-        print(R+"No subdomains/bruteforce files found"+W); sys.exit(1)
+        print(R + "No subdomains/bruteforce files found" + W)
+        sys.exit(1)
 
     asyncio.run(main_async(sub_file, brut_file, map_path, html_export))
+
+
+
+
+
+
+
+
+
+
+
+#
+# # --------------------------------------------------------------------------------------------------
+# # TugaRecon – Network Map Module (v3)
+# # Author: Skynet0x01 2020-2026
+# # GitHub: https://github.com/skynet0x01/tugarecon
+# # License: GNU GPLv3
+# # Patent Restriction Notice:
+# # No patents may be claimed or enforced on this software or any derivative.
+# # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
+# # --------------------------------------------------------------------------------------------------
+#
+# import os
+# import sys
+# import asyncio
+# import re
+# from datetime import datetime
+# import pydot
+# import json
+# import csv
+# from collections import defaultdict
+#
+# from utils.tuga_colors import R, W, Y
+# from modules.Map import tuga_asn, tuga_certs
+#
+# FOOTER_TEXT = "Map generated by: https://github.com/skynet0x01/tugarecon"
+# MAX_SANS = 6
+#
+# # --------------------------------------------------------------------------------------------------
+# # Read subdomains/bruteforce
+#
+# def read_lines(file_path):
+#     if not os.path.isfile(file_path):
+#         return []
+#     with open(file_path, 'r') as f:
+#         return [line.strip() for line in f if line.strip() and not line.startswith('#')]
+#
+#
+# def merge_sources(sub_file, brut_file=None):
+#     subs = set(read_lines(sub_file))
+#     brut = set(read_lines(brut_file)) if brut_file else set()
+#     all_hosts = subs.union(brut)
+#     host_sources = {}
+#     for h in all_hosts:
+#         if h in subs and h in brut:
+#             host_sources[h] = 'both'
+#         elif h in subs:
+#             host_sources[h] = 'subdomains'
+#         else:
+#             host_sources[h] = 'bruteforce'
+#     return host_sources, list(all_hosts)
+#
+# # --------------------------------------------------------------------------------------------------
+# # Async DNS resolution (prefer IPv4)
+#
+# async def resolve_ip(domain):
+#     loop = asyncio.get_event_loop()
+#     try:
+#         infos = await loop.getaddrinfo(domain, None, family=0)
+#         for info in infos:
+#             ip = info[4][0]
+#             if ':' not in ip:
+#                 return ip
+#         return infos[0][4][0] if infos else None
+#     except Exception:
+#         return None
+#
+#
+# async def resolve_all_ips(domains, concurrency=200):
+#     ip_map = {}
+#     sem = asyncio.Semaphore(concurrency)
+#
+#     async def worker(d):
+#         async with sem:
+#             ip = await resolve_ip(d)
+#             if ip:
+#                 ip_map[d] = ip
+#             else:
+#                 pass  # silent
+#
+#     tasks = [worker(d) for d in domains]
+#     await asyncio.gather(*tasks, return_exceptions=True)
+#     return ip_map
+#
+# # --------------------------------------------------------------------------------------------------
+# # Node classification & labels
+#
+# def classify_node(sub):
+#     sub = sub.lower()
+#     if any(x in sub for x in ['mail','smtp','imap','mx']): return '📧','#ffd699'
+#     elif any(x in sub for x in ['web','www','http','site']): return '🌐','#b3d9ff'
+#     elif any(x in sub for x in ['printer','print']): return '🖨️','#ffcccc'
+#     elif any(x in sub for x in ['router','gateway']): return '📡','#ccffcc'
+#     elif any(x in sub for x in ['nas','file','storage']): return '💾','#e0e0e0'
+#     elif any(x in sub for x in ['cam','camera']): return '📷','#ffe0b3'
+#     elif any(x in sub for x in ['dev','test','lab']): return '🧪','#e6ccff'
+#     else: return '💻','#f2f2f2'
+#
+#
+# def shorten_label(text,max_len=30):
+#     if len(text)<=max_len: return text
+#     parts = text.split('.')
+#     return '\n'.join(['.'.join(parts[i:i+2]) for i in range(0,len(parts),2)])
+#
+#
+# # --------------------------------------------------------------------------------------------------
+# # Shared hosting detection
+#
+# def compute_ip_density(ip_map):
+#     density = defaultdict(list)
+#     for host, ip in ip_map.items():
+#         density[ip].append(host)
+#     return density
+#
+#
+# # --------------------------------------------------------------------------------------------------
+# # Build graph
+#
+# def build_graph(subs_ips, host_sources=None, cert_map=None):
+#     if cert_map is None: cert_map = {}
+#     graph = pydot.Dot(graph_type='digraph', rankdir='LR')
+#     clusters = {}
+#     network_summary = {}
+#
+#     ip_density = compute_ip_density(subs_ips)
+#
+#     for host, ip in subs_ips.items():
+#         info = tuga_asn.get_network_info(ip)
+#         asn = info.get('asn','Unknown')
+#         asn_id = re.sub(r'[^0-9A-Za-z_]','_',asn)
+#         if asn_id not in clusters:
+#             cluster = pydot.Cluster(asn_id, label=f"{asn} ({info.get('country','??')})", style='filled', fillcolor='#f0f0f0')
+#             clusters[asn_id] = cluster
+#             network_summary[asn_id] = {
+#                 'asn_display': asn,
+#                 'country': info.get('country','??'),
+#                 'cidrs': set(),
+#                 'orgs': set(),
+#                 'hosts': [],
+#                 'ip_count': set()
+#             }
+#             graph.add_subgraph(cluster)
+#         cluster = clusters[asn_id]
+#
+#         emoji,color = classify_node(host)
+#
+#         # Shared vs Dedicated infra
+#         if len(ip_density[ip]) == 1:
+#             infra_icon = '🏠'  # dedicated
+#             infra_tag = 'dedicated'
+#         elif len(ip_density[ip]) <= 3:
+#             infra_icon = '🏢'  # small shared
+#             infra_tag = 'shared-small'
+#         else:
+#             infra_icon = '🏭'  # heavy shared
+#             infra_tag = 'shared-heavy'
+#
+#         node_label = f"{emoji}{infra_icon} {shorten_label(host)}\n[{host_sources.get(host,'unknown')}]"
+#         node_id = f"host_{host.replace('.','_')}"
+#         node = pydot.Node(node_id, label=node_label, style='filled', fillcolor=color, shape='box')
+#         cluster.add_node(node)
+#
+#         ip_id = f"ip_{ip.replace('.','_')}"
+#         ip_label = f"{ip}\n({len(ip_density[ip])} hosts)"
+#         ip_color = 'lightblue' if len(ip_density[ip]) == 1 else '#ffdddd'
+#         ip_node = pydot.Node(ip_id, label=ip_label, style='filled', fillcolor=ip_color, shape='ellipse')
+#         cluster.add_node(ip_node)
+#         graph.add_edge(pydot.Edge(node, ip_node))
+#
+#         # SAN edges (limited)
+#         sans = cert_map.get(host, [])[:MAX_SANS]
+#         extra_sans = max(0, len(cert_map.get(host, [])) - MAX_SANS)
+#
+#         for san in sans:
+#             if san != host:
+#                 san_id = f"san_{san.replace('.','_')}"
+#                 san_node = pydot.Node(san_id, label=f"🔖 {shorten_label(san)}", style='rounded')
+#                 cluster.add_node(san_node)
+#                 graph.add_edge(pydot.Edge(node,san_node,style='dashed'))
+#
+#         if extra_sans > 0:
+#             more_id = f"more_{host.replace('.','_')}"
+#             more_node = pydot.Node(more_id, label=f"+{extra_sans} SANs", shape='plaintext')
+#             cluster.add_node(more_node)
+#             graph.add_edge(pydot.Edge(node, more_node, style='dotted'))
+#
+#         # Update summary
+#         network_summary[asn_id]['cidrs'].add(info.get('cidr','Unknown'))
+#         network_summary[asn_id]['orgs'].add(info.get('org','Unknown Org'))
+#         network_summary[asn_id]['hosts'].append({
+#             'host':host,
+#             'ip':ip,
+#             'source':host_sources.get(host,'unknown'),
+#             'infra': infra_tag
+#         })
+#         network_summary[asn_id]['ip_count'].add(ip)
+#
+#     # Footer
+#     footer_node = pydot.Node('footer', label=FOOTER_TEXT, shape='plaintext', fontsize='14')
+#     graph.add_node(footer_node)
+#     footer_cluster = pydot.Cluster('footer_cluster', style='invis')
+#     footer_cluster.add_node(footer_node)
+#     graph.add_subgraph(footer_cluster)
+#
+#     return graph, network_summary
+#
+# # --------------------------------------------------------------------------------------------------
+# # Export functions
+#
+# def export_graph(graph, path):
+#     os.makedirs(path, exist_ok=True)
+#     try:
+#         graph.write_pdf(os.path.join(path,'subdomains_clustered.pdf'))
+#         graph.write_svg(os.path.join(path,'subdomains_clustered.svg'))
+#         graph.write_raw(os.path.join(path,'subdomains_clustered.dot'))
+#         print(f"[+] Graph exported: PDF/SVG/DOT")
+#     except Exception as e:
+#         print(R + f"[!] Failed to export graph: {e}" + W)
+#
+#
+# def export_network_summary(network_summary, path):
+#     os.makedirs(path, exist_ok=True)
+#     safe_summary = {}
+#     for k,v in network_summary.items():
+#         safe_summary[k] = {
+#             'asn_display': v['asn_display'],
+#             'country': v['country'],
+#             'orgs': list(v['orgs']),
+#             'cidrs': list(v['cidrs']),
+#             'hosts': v['hosts'],
+#             'ip_total': len(v['ip_count']),
+#             'host_total': len(v['hosts'])
+#         }
+#
+#     # TXT
+#     with open(os.path.join(path,'network_info.txt'),'w') as f:
+#         for asn,data in safe_summary.items():
+#             f.write(f"ASN: {data['asn_display']}\nCountry: {data['country']}\nHosts: {data['host_total']}  IPs: {data['ip_total']}\nOrgs: {', '.join(data['orgs'])}\nCIDRs: {', '.join(data['cidrs'])}\n")
+#             for h in data['hosts']:
+#                 f.write(f"  - {h['host']} -> {h['ip']} ({h['source']}, {h['infra']})\n")
+#             f.write("\n")
+#         f.write(FOOTER_TEXT+'\n')
+#
+#     # JSON
+#     with open(os.path.join(path,'network_info.json'),'w') as f:
+#         json.dump({'network_summary': safe_summary, '_footer': FOOTER_TEXT}, f, indent=2)
+#
+#     # CSV
+#     with open(os.path.join(path,'network_info.csv'),'w', newline='') as f:
+#         writer = csv.writer(f)
+#         writer.writerow(['asn','country','orgs','cidrs','host','ip','source','infra'])
+#         for asn,data in safe_summary.items():
+#             for h in data['hosts']:
+#                 writer.writerow([data['asn_display'], data['country'], ';'.join(data['orgs']), ';'.join(data['cidrs']),
+#                                  h['host'], h['ip'], h['source'], h['infra']])
+#         writer.writerow([f"# {FOOTER_TEXT}"])
+#
+#     print(f"[+] Network info exported: TXT/JSON/CSV")
+#
+# # --------------------------------------------------------------------------------------------------
+# # Async main workflow
+#
+# async def main_async(sub_file, brut_file, latest_path, html_export=True):
+#     host_sources, hosts = merge_sources(sub_file, brut_file)
+#     print(f"[+] This may take some time… perfect moment for a coffee. ☕")
+#     print(f"[+] Resolving {len(hosts)} hosts...")
+#     ip_map = await resolve_all_ips(hosts)
+#     if not ip_map:
+#         print(R+"[-] No hosts resolved"+W)
+#         return
+#
+#     await tuga_asn.prefetch_network_info(set(ip_map.values()))
+#     cert_map = await tuga_certs.fetch_certs_for_hosts(list(ip_map.keys()))
+#     graph, network_summary = build_graph(ip_map, host_sources, cert_map)
+#     export_graph(graph, latest_path)
+#     export_network_summary(network_summary, latest_path)
+#
+#     if html_export:
+#         try:
+#             import networkx as nx
+#             from pyvis.network import Network
+#             G = nx.Graph()
+#             for asn,data in network_summary.items():
+#                 for h in data['hosts']:
+#                     G.add_node(h['host'], title=f"Host: {h['host']}<br>IP: {h['ip']}<br>Infra: {h['infra']}")
+#                     G.add_node(h['ip'], title=f"IP: {h['ip']}<br>ASN: {data.get('asn_display','Unknown')}<br>Country: {data.get('country','??')}")
+#                     G.add_edge(h['host'],h['ip'])
+#             net = Network(height='1000px', width='100%', notebook=False)
+#             net.from_nx(G)
+#             outpath = os.path.join(latest_path,'subdomains_map.html')
+#             net.write_html(outpath)
+#             with open(outpath,'r', encoding='utf-8') as f: html = f.read()
+#             html = html.replace('</body>', f'<div style="position:fixed;bottom:8px;left:8px;font-size:12px;opacity:0.8;z-index:9999;">{FOOTER_TEXT}</div></body>')
+#             with open(outpath,'w', encoding='utf-8') as f: f.write(html)
+#             print(f"[+] Interactive map exported: {outpath}")
+#         except Exception as e:
+#             print(R+"[-] HTML export failed: "+str(e)+W)
+#
+# # --------------------------------------------------------------------------------------------------
+#
+# def get_latest_date_folder(base_path):
+#     try:
+#         folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path,f))]
+#     except Exception:
+#         print(R+"Base folder not found: "+base_path+W); sys.exit(1)
+#     date_folders = []
+#     for f in folders:
+#         try: date_folders.append((datetime.strptime(f,'%Y-%m-%d'),f))
+#         except Exception: pass
+#     if not date_folders: print(R+"No date folders found"+W); sys.exit(1)
+#     date_folders.sort()
+#     return os.path.join(base_path,date_folders[-1][1])
+#
+# # --------------------------------------------------------------------------------------------------
+#
+# def tuga_map(target, html_export=True):
+#     base_path = os.path.join('results', target)
+#     latest_path = get_latest_date_folder(base_path)
+#     print(Y+f"Using folder: {latest_path}"+W)
+#
+#     map_path = os.path.join(latest_path, 'map')
+#     os.makedirs(map_path, exist_ok=True)
+#
+#     sub_file = os.path.join(latest_path,'osint_subdomains.txt')
+#     brut_file = os.path.join(latest_path,'tuga_bruteforce.txt')
+#
+#     if not os.path.isfile(sub_file) and not os.path.isfile(brut_file):
+#         print(R+"No subdomains/bruteforce files found"+W); sys.exit(1)
+#
+#     asyncio.run(main_async(sub_file, brut_file, map_path, html_export))
