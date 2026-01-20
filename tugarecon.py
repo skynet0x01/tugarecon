@@ -76,6 +76,7 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
+
     parser.add_argument('-d', '--domain', help='Target domain')
     parser.add_argument('-e', '--enum', nargs='*', help='Select OSINT modules')
     parser.add_argument('-b', '--bruteforce', action='store_true', help='Enable bruteforce')
@@ -136,6 +137,8 @@ def run_enumeration(ctx: ScanContext) -> None:
         tuga_alienvault,
         tuga_hackertarget,
         tuga_omnisint,
+        tuga_dnsbufferover,
+        tuga_rapiddns,
     )
 
     engines = {
@@ -148,6 +151,8 @@ def run_enumeration(ctx: ScanContext) -> None:
         'omnisint': tuga_omnisint.Omnisint,
         'sublist3r': tuga_sublist3r.Sublist3r,
         'dnsdumpster': tuga_dnsdumpster.DNSDUMPSTER,
+        'dnsbufferover': tuga_dnsbufferover.DNSBufferOver,
+        'rapiddns': tuga_rapiddns.RapidDNS,
     }
 
     selected = engines.values() if ctx.enum is None else [

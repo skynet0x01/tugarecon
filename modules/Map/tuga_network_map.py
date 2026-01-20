@@ -64,8 +64,8 @@ async def resolve_all_ips(domains, concurrency=200):
             if ip:
                 ip_map[d] = ip
             else:
-                #print(R + f"[-] Failed to resolve: {d}" + W)
-                pass
+                print(R + f"[-] Failed to resolve: {d}" + W)
+                #pass
 
     tasks = [worker(d) for d in domains]
     await asyncio.gather(*tasks, return_exceptions=True)
