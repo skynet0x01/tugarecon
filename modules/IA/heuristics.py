@@ -8,20 +8,14 @@
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
 # --------------------------------------------------------------------------------------------------
 
-# Conhecimento operacional comum (heurísticas)
-# Isto NÃO aprende: isto codifica hábitos reais de infra
-
-# -------------------------------------------------------------------
-# Domain knowledge: environments, versions and qualifiers
-# -------------------------------------------------------------------
 """
 Heuristic token expansion engine
-Extended with SCADA / ICS and vertical-specific intelligence.
+Extended with multi-sector intelligence.
 
 This module is intentionally conservative:
 - No combinatorial explosions
 - Deterministic output
-- Sector-aware heuristics (Energy, Water, Manufacturing)
+- Sector-aware heuristics (IT, Finance, Health, Telco, Gov, Edu, OT)
 - Designed for enterprise and academic reconnaissance
 """
 
@@ -52,7 +46,7 @@ QUALIFIERS = [
 ]
 
 # -------------------------------------------------------------------
-# Semantic categories (IT)
+# Semantic categories (IT / Enterprise)
 # -------------------------------------------------------------------
 
 API_LIKE_TOKENS = {
@@ -99,10 +93,6 @@ SCADA_REMOTE_TOKENS = {
     "support-ics", "portal-ot",
 }
 
-# -------------------------------------------------------------------
-# SCADA – Vertical-specific domains
-# -------------------------------------------------------------------
-
 SCADA_ENERGY_TOKENS = {
     "grid", "substation", "solar", "wind",
     "meter", "smartgrid", "transformer",
@@ -128,66 +118,185 @@ SCADA_TOKENS = (
 )
 
 # -------------------------------------------------------------------
+# FINANCE / BANKING
+# -------------------------------------------------------------------
+
+FINANCE_TOKENS = {
+    "corebank", "banking", "core-banking",
+    "swift", "sepa", "ach",
+    "atm", "pos", "terminal",
+    "payments", "pay", "billing", "invoice",
+    "card", "cards", "visa", "mastercard",
+    "fraud", "aml", "kyc",
+    "treasury", "trading", "broker",
+    "risk", "compliance",
+    "ledger", "accounting", "accounts",
+}
+
+# -------------------------------------------------------------------
+# HEALTH
+# -------------------------------------------------------------------
+
+HEALTH_TOKENS = {
+    "his", "ris", "pacs",
+    "ehr", "emr",
+    "hl7", "fhir", "dicom",
+    "radiology", "lab", "lis",
+    "pharmacy", "prescription",
+    "patient", "clinical",
+    "imaging", "scan",
+    "billing-health",
+}
+
+# -------------------------------------------------------------------
+# TELCO
+# -------------------------------------------------------------------
+
+TELCO_TOKENS = {
+    "core-net", "bss", "oss",
+    "hlr", "hss", "ims",
+    "msc", "sgw", "pgw",
+    "cdr", "billing-telco",
+    "provisioning", "radius",
+    "voip", "sip",
+    "lte", "5g", "nr",
+}
+
+# -------------------------------------------------------------------
+# GOVERNMENT
+# -------------------------------------------------------------------
+
+GOV_TOKENS = {
+    "citizen", "portal-cidadao",
+    "tax", "financas",
+    "justice", "court",
+    "police", "psp", "gnr",
+    "customs", "immigration",
+    "eproc", "procurement",
+    "registry", "civil",
+    "election", "voting",
+}
+
+# -------------------------------------------------------------------
+# EDUCATION
+# -------------------------------------------------------------------
+
+EDU_TOKENS = {
+    "campus", "student", "students",
+    "teacher", "staff",
+    "moodle", "lms",
+    "exam", "grades",
+    "library", "repo",
+    "admissions", "enroll",
+    "alumni",
+}
+
+# -------------------------------------------------------------------
+# E-COMMERCE / RETAIL
+# -------------------------------------------------------------------
+
+ECOMMERCE_TOKENS = {
+    "shop", "store",
+    "cart", "checkout",
+    "orders", "order",
+    "catalog", "inventory",
+    "warehouse", "fulfillment",
+    "payment", "gateway",
+    "customer", "crm-retail",
+    "returns", "refund",
+}
+
+# -------------------------------------------------------------------
 # Expansion engine
 # -------------------------------------------------------------------
 
 def expand(token: str) -> list[str]:
-    """
-    Generate realistic subdomain expansions for a token.
-
-    Rules:
-    - Environments always apply
-    - Versions only for API-like tokens
-    - Management systems get admin/internal bias
-    - SCADA tokens follow OT-safe patterns
-    - Vertical-specific rules enhance realism
-    """
     token = token.lower()
     expansions: set[str] = set()
 
-    # 1. Base environment expansion
+    # Base environments
     for env in ENVIRONMENTS:
         expansions.add(f"{token}-{env}")
 
-    # 2. API-like versioning
+    # API-like versioning
     if token in API_LIKE_TOKENS:
         for version in VERSIONS:
             expansions.add(f"{token}-{version}")
             for env in ENVIRONMENTS:
                 expansions.add(f"{token}-{version}-{env}")
 
-    # 3. Generic qualifiers
+    # Generic qualifiers
     for qualifier in QUALIFIERS:
         expansions.add(f"{token}-{qualifier}")
 
-    # 4. Management systems heuristic
+    # Management heuristic
     if token in MANAGEMENT_TOKENS:
         for env in ("dev", "qa", "uat", "prod"):
             expansions.add(f"{token}-{env}")
         for qualifier in ("admin", "internal", "corp"):
             expansions.add(f"{token}-{qualifier}")
 
-    # 5. Generic SCADA / OT heuristic
+    # SCADA / OT heuristic
     if token in SCADA_TOKENS:
         for env in ("prod", "uat", "qa"):
             expansions.add(f"{token}-{env}")
         for qualifier in ("control", "operator", "internal"):
             expansions.add(f"{token}-{qualifier}")
 
-    # 6. Energy sector heuristic
     if token in SCADA_ENERGY_TOKENS:
         for suffix in ("grid", "substation", "control"):
             expansions.add(f"{token}-{suffix}")
 
-    # 7. Water sector heuristic
     if token in SCADA_WATER_TOKENS:
         for suffix in ("plant", "control", "monitor"):
             expansions.add(f"{token}-{suffix}")
 
-    # 8. Manufacturing heuristic
     if token in SCADA_MANUFACTURING_TOKENS:
         for suffix in ("line", "cell", "control", "mes"):
             expansions.add(f"{token}-{suffix}")
 
+    # Finance
+    if token in FINANCE_TOKENS:
+        for env in ("prod", "uat", "qa", "dr"):
+            expansions.add(f"{token}-{env}")
+        for q in ("secure", "internal", "core"):
+            expansions.add(f"{token}-{q}")
+
+    # Health
+    if token in HEALTH_TOKENS:
+        for env in ("prod", "test", "dr"):
+            expansions.add(f"{token}-{env}")
+        for q in ("internal", "secure", "clinical"):
+            expansions.add(f"{token}-{q}")
+
+    # Telco
+    if token in TELCO_TOKENS:
+        for env in ("prod", "lab", "test"):
+            expansions.add(f"{token}-{env}")
+        for q in ("internal", "net", "core"):
+            expansions.add(f"{token}-{q}")
+
+    # Government
+    if token in GOV_TOKENS:
+        for env in ("prod", "uat", "dr"):
+            expansions.add(f"{token}-{env}")
+        for q in ("public", "internal", "secure"):
+            expansions.add(f"{token}-{q}")
+
+    # Education
+    if token in EDU_TOKENS:
+        for env in ("prod", "test"):
+            expansions.add(f"{token}-{env}")
+        for q in ("internal", "academic"):
+            expansions.add(f"{token}-{q}")
+
+    # E-commerce
+    if token in ECOMMERCE_TOKENS:
+        for env in ("prod", "staging", "test"):
+            expansions.add(f"{token}-{env}")
+        for q in ("secure", "internal", "backend"):
+            expansions.add(f"{token}-{q}")
+
     return sorted(expansions)
+
 
