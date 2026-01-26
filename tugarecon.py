@@ -16,6 +16,8 @@ import logging
 import json
 from datetime import datetime
 from dataclasses import dataclass, field
+from pathlib import Path
+
 
 from utils.tuga_banner import banner
 from utils.tuga_colors import G, W, R, Y
@@ -99,6 +101,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('-m', '--map', action='store_true', help='Generate network map')
     parser.add_argument('--debug', action='store_true', help='Debug mode')
     parser.add_argument("-r", "--results", action="store_true", help="Show previously saved scan results and exit")
+    #parser.add_argument("--report", action="store_true", help="Generate intelligence report after scan")
+    #parser.add_argument("--pdf", action="store_true", help="Generate report in PDF format")
 
     return parser.parse_args()
 
@@ -223,27 +227,6 @@ def run_context(ctx: ScanContext) -> None:
     )
 
     context.run()
-# def run_context(ctx: ScanContext) -> None:
-#     log.info("Building scan context")
-#
-#     services_file = os.path.join(ctx.scan_dir, "probe", "services.json")
-#     if not os.path.isfile(services_file):
-#         log.warning("services.json not found, skipping context module")
-#         return
-#
-#     # corrigido: passar o ficheiro de bruteforce real
-#     bruteforce_file = os.path.join(ctx.scan_dir, "tuga_bruteforce.txt")
-#     output_dir = os.path.join(ctx.scan_dir, "context")
-#
-#     context = TugaContext(
-#         bruteforce_file=bruteforce_file,
-#         services_file=services_file,
-#         output_dir=output_dir
-#     )
-#
-#     context.run()
-
-
 # --------------------------------------------------------------------------------------------------
 def run_attack_surface(ctx: ScanContext) -> None:
     log.info("Building attack surface")
@@ -362,6 +345,19 @@ def main() -> None:
         print(G + "\nTugaRecon interrupted by user" + W)
         sys.exit(130)
 
+    # --------------------------------------------------------------------------------------------------
+    # Relatórios automáticos (Markdown + PDF)
+    # --------------------------------------------------------------------------------------------------
+    from utils.tugarecon_report import generate_report
+
+    report_dir = Path(ctx.scan_dir) / "report"
+    report_dir.mkdir(parents=True, exist_ok=True)  # garante apenas uma pasta
+
+    # Chama função de geração de relatório diretamente
+    md_file, pdf_file = generate_report(report_dir, generate_pdf=True)
+
+    print(f"[📄] Markdown report generated: {md_file}")
+    print(f"[📕] PDF report generated: {pdf_file}")
 
 if __name__ == '__main__':
     main()

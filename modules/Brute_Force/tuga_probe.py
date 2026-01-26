@@ -15,6 +15,7 @@ import json
 import time
 import logging
 
+from modules.Intelligence.probe_connector import convert_services_to_semantic
 from utils.tuga_colors import G, Y, R, W
 
 logging.getLogger("httpx").disabled = True
@@ -154,10 +155,22 @@ class TugaServiceProbe:
 
         self.save_results()
 
+        # ─────────────────────────────────────────────────────────────
+        # 🔗 Semantic connector (Probe ➜ Intelligence Layer)
+        # ─────────────────────────────────────────────────────────────
+        #semantic_path = os.path.join(self.output_dir, "semantic_results.json")
+        semantic_path = os.path.join(os.path.dirname(self.output_dir), "semantic_results.json")
+        services_path = os.path.join(self.output_dir, "services.json")
+
+        try:
+            convert_services_to_semantic(services_path, semantic_path)
+            print(G + "[+] Semantic entries generated" + W)
+        except Exception as e:
+            print(R + f"[!] Failed to generate semantic entries: {e}" + W)
+
         print(G + f"\n[+] Probe completed in {time.time() - start:.2f}s" + W)
         print(G + f"[+] Alive hosts: {len(self.web_hosts)} | Dead hosts: {len(self.dead_hosts)}" + W)
         print(G + f"[+] Results saved in: {self.output_dir}" + W)
-
 
 # # --------------------------------------------------------------------------------------------------
 # # TugaRecon – Service Probe Module (Refactored)
