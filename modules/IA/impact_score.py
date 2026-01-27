@@ -65,7 +65,12 @@ def compute_impact_score(semantic: dict) -> dict:
     Enriched with sector, infra, ICS/SCADA, and monitoring.
     """
     score = 0
-    tags = set(semantic.get("tags", []))
+
+    raw_tags = semantic.get("tags", [])
+    if not isinstance(raw_tags, (list, set)):
+        raw_tags = []
+
+    tags = set(raw_tags)
     subdomain = semantic.get("subdomain", "")
     services = semantic.get("services", [])
 
@@ -83,6 +88,9 @@ def compute_impact_score(semantic: dict) -> dict:
     if "internal" in tags: score += 25; reasons.append("internal exposure")
     if "intranet" in tags: score += 20; reasons.append("intranet access")
 
+    if score == 0 and tags:
+        reasons.append("tags detected but none mapped to scoring rules")
+
     # Sensitive services
     if "vpn" in tags: score += 35; reasons.append("VPN gateway")
     if "ssh" in tags: score += 30; reasons.append("SSH service")
@@ -99,6 +107,11 @@ def compute_impact_score(semantic: dict) -> dict:
     if "monitoring" in tags: score += 20; reasons.append("monitoring interface")
     if "cloud" in tags: score += 15; reasons.append("cloud infrastructure")
     if "internal" in tags: score += 20; reasons.append("internal system")
+
+    if "gateway" in tags: score += 20; reasons.append("network gateway")
+    if "infra" in tags: score += 15; reasons.append("infrastructure component")
+    if "edge" in tags: score += 10; reasons.append("edge service")
+    if "telecom" in tags: score += 20; reasons.append("telecom service")
 
     # Business-critical
     if "mail" in tags or "smtp" in tags or "imap" in tags: score += 25; reasons.append("mail service")
@@ -144,7 +157,12 @@ def compute_impact_score(semantic: dict) -> dict:
     semantic["impact_score"] = score
     semantic["priority"] = priority
     semantic["impact_reason"] = ", ".join(dict.fromkeys(reasons)) if reasons else "low exposure"
-    semantic["tags"] = list(tags)
+    if not tags:
+        semantic["impact_reason"] = "no tags available for scoring"
+    #semantic["tags"] = list(tags)
+    semantic["tags"] = sorted(tags)
     semantic["sector"] = sector
+
+    #print("[DEBUG SCORE] tags before scoring:", tags)
 
     return semantic

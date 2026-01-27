@@ -41,7 +41,9 @@ def show_semantic(base_dir):
         return
 
     for entry in data:
-        impact = entry.get("impact", 0)
+        #impact = entry.get("impact", 0)
+        impact = entry.get("impact_score", 0)
+
         if impact >= 70:
             print(f"[{impact}] {entry.get('subdomain')}  → {entry.get('tags')}")
 

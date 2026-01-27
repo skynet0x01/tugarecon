@@ -59,8 +59,8 @@ def print_semantic_results_grouped(results):
 
     for r in results:
         priority = r.get("priority", "LOW")
-        impact = r.get("impact", 0)
-
+        #impact = r.get("impact", 0)
+        impact = r.get("impact_score") or r.get("impact") or 0
         r["_priority"] = priority
         r["_impact"] = impact
 

@@ -156,6 +156,7 @@ def ReadFile(target, start_time):
 
     for s in lines:
         semantic = classify(s)
+        #print("[DEBUG]", semantic)
         scored = compute_impact_score(semantic)
         results.append(scored)
 

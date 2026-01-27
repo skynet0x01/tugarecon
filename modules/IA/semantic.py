@@ -102,6 +102,8 @@ def classify(subdomain: str) -> dict:
     subdomain = subdomain.strip().lower()
     tokens = re.split(r"[.-]", subdomain)
 
+    full = subdomain.lower() # NEW
+
     tags = set()
     reasons = []
 
@@ -127,10 +129,39 @@ def classify(subdomain: str) -> dict:
         tags.add(env)
         reasons.append(f"{env} environment")
 
+    # -------------------------
+    # Substring semantic enrichment
+    # -------------------------
+    if any(k in full for k in ["gateway", "proxy", "ingress"]):
+        tags.add("gateway")
+        reasons.append("network gateway")
+
+    if any(k in full for k in ["akamai", "cdn", "fastly", "cloudfront"]):
+        tags.add("cdn")
+        tags.add("edge")
+        reasons.append("edge/CDN infrastructure")
+
+    if any(k in full for k in ["delivery", "route", "lb", "balancer"]):
+        tags.add("loadbalancer")
+        tags.add("infra")
+        reasons.append("traffic delivery infrastructure")
+
+    if any(k in full for k in ["cloud", "aws", "azure", "gcp"]):
+        tags.add("cloud")
+        reasons.append("cloud infrastructure")
+
+    if any(k in full for k in ["monitor", "grafana", "kibana", "sentry", "prometheus"]):
+        tags.add("monitoring")
+        reasons.append("monitoring system")
+
+    if any(k in full for k in ["voice", "sip", "voip", "telecom"]):
+        tags.add("telecom")
+        reasons.append("telecommunications service")
+
     risk = "LOW"
     if "admin" in tags and ("prod" in tags or "production" in tags):
         risk = "HIGH"
-    elif "admin" in tags or "auth" in tags or "internal" in tags:
+    elif {"admin", "auth", "internal", "gateway", "cloud"} & tags:
         risk = "MEDIUM"
 
     return {

@@ -80,16 +80,18 @@ def react(entry: dict, output_dir: str):
                 f.write(traceback.format_exc() + "\n")
 
 # --------------------------------------------------------------------------------------------------
-def decide_action(entry: dict) -> str:
+def decide_action(entry: dict) -> dict:
     """
-    Decide which reaction to trigger based on:
-    - Semantic tags (SCADA / IT / infra / business)
-    - Impact score
-    - Temporal state
-    - ICS override rules
-    """
+        Decide which reaction to trigger based on:
+        - Semantic tags (SCADA / IT / infra / business)
+        - Impact score
+        - Temporal state
+        - ICS override rules
+        """
     # Ensure semantic scoring is computed
-    entry = compute_impact_score(entry)
+    #entry = compute_impact_score(entry)
+    if "impact_score" not in entry:
+        entry = compute_impact_score(entry)
 
     score = entry.get("impact_score", 0)
     tags = set(entry.get("tags", []))
@@ -97,44 +99,53 @@ def decide_action(entry: dict) -> str:
 
     # ICS/SCADA override: always deep HTTPX + TLS + headers
     if tags & SCADA_TOKENS:
-        return "HTTPX"
+        entry["action"] = "HTTPX"
+        return entry
 
     # High escalation events
     if temporal_state == "ESCALATED":
-        return "HTTPX"
+        entry["action"] = "HTTPX"
+        return entry
 
     # New assets with medium+ impact
     if temporal_state == "NEW":
         if score >= 20:
-            return "DEEP_HTTP_PROBE"
-        return "WATCH"
+            entry["action"] = "DEEP_HTTP_PROBE"
+        else:
+            entry["action"] = "WATCH"
+        return entry
 
     # Flapping assets
     if temporal_state == "FLAPPING":
-        return "WATCH"
+        entry["action"] = "WATCH"
+        return entry
 
     # Stable assets with high impact may still require monitoring
     if temporal_state == "STABLE":
         if score >= 50:
-            return "WATCH"
-        return "IGNORE"
+            entry["action"] = "WATCH"
+        else:
+            entry["action"] = "IGNORE"
+        return entry
 
     # Dormant or low-risk
     if temporal_state == "DORMANT":
-        return "IGNORE"
+        entry["action"] = "IGNORE"
+        return entry
 
-    # Default fallback
-    return "IGNORE"
+    entry["action"] = "IGNORE"
+    return entry
 
 # --------------------------------------------------------------------------------------------------
 def process_entry(entry: dict, output_dir: str):
     """
-    Convenience function:
-    - Decide the action
-    - Set it in the entry
-    - Execute reactions
-    """
-    entry["action"] = decide_action(entry)
+       Convenience function:
+       - Decide the action
+       - Set it in the entry
+       - Execute reactions
+       """
+    entry = decide_action(entry)
     react(entry, output_dir)
     return entry
+
 

@@ -49,7 +49,8 @@ def print_top_temporal(temporal_rank, removed_list=None, limit=20):
 
         state = entry.get("state", "")
         score = entry.get("score", 0)
-        impact = entry.get("impact", 0)
+        #impact = entry.get("impact", 0)
+        impact = entry.get("impact_score", 0)
         sub = entry.get("subdomain", "")
         action = entry.get("action", "")
 
