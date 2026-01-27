@@ -29,6 +29,46 @@ TELCO_TOKENS = {"bss", "oss", "ims", "hlr", "5g", "lte"}
 GOV_TOKENS = {"citizen", "justice", "tax", "financas", "registry"}
 ECOMMERCE_TOKENS = {"checkout", "payment", "orders", "cart"}
 
+# Data & Storage
+DATABASE_TOKENS = {
+    "db", "database", "sql", "nosql", "rds", "aurora", "postgres", "postgresql",
+    "mysql", "mariadb", "mongo", "mongodb", "redis", "cassandra", "dynamo",
+    "elasticsearch", "elastic", "opensearch", "neo4j", "influx", "timeseries",
+    "bigquery", "snowflake", "redshift", "clickhouse", "vertica", "cockroach"
+}
+
+STORAGE_TOKENS = {
+    "storage", "bucket", "s3", "blob", "objectstore", "filestore", "efs", "nfs",
+    "nas", "san", "backup", "snapshots", "archive", "vault"
+}
+
+# Cloud & Infra
+CLOUD_INFRA_TOKENS = {
+    "iam", "kms", "secrets", "secretsmanager", "vault", "keyvault",
+    "loadbalancer", "lb", "elb", "alb", "nlb", "proxy", "reverseproxy",
+    "gateway", "apigateway", "firewall", "waf", "bastion", "jump", "jumphost",
+    "vpn", "wireguard", "openvpn", "zerotrust", "ztna"
+}
+
+ORCHESTRATION_TOKENS = {
+    "k8s", "kubernetes", "eks", "aks", "gke",
+    "docker", "container", "containerd", "pod", "namespace",
+    "helm", "argo", "flux", "istio", "linkerd", "mesh"
+}
+
+CI_CD_TOKENS = {
+    "ci", "cd", "pipeline", "jenkins", "gitlab", "github", "actions",
+    "bitbucket", "bamboo", "teamcity", "circleci", "drone"
+}
+
+# Enterprise systems
+ENTERPRISE_TOKENS = {
+    "sap", "oracle", "peoplesoft", "workday", "dynamics", "navision",
+    "crm", "erp", "billing", "invoicing", "finance", "payments",
+    "treasury", "accounting", "hr", "payroll", "identity", "sso", "oauth"
+}
+
+
 # --------------------------------------------------------------------------------------------------
 def enrich_tags(subdomain: str, services: list) -> set:
     """
@@ -77,6 +117,18 @@ def compute_impact_score(semantic: dict) -> dict:
     # Enrich tags automatically
     tags |= enrich_tags(subdomain, services)
 
+    # Token inference from subdomain name
+    for token_set, tag in [
+        (DATABASE_TOKENS, "db"),
+        (STORAGE_TOKENS, "storage"),
+        (CLOUD_INFRA_TOKENS, "infra"),
+        (ORCHESTRATION_TOKENS, "orchestration"),
+        (CI_CD_TOKENS, "cicd"),
+        (ENTERPRISE_TOKENS, "enterprise"),
+    ]:
+        if any(t in subdomain.lower() for t in token_set):
+            tags.add(tag)
+
     reasons = []
 
     # 🔥 IT attack surfaces
@@ -107,6 +159,9 @@ def compute_impact_score(semantic: dict) -> dict:
     if "monitoring" in tags: score += 20; reasons.append("monitoring interface")
     if "cloud" in tags: score += 15; reasons.append("cloud infrastructure")
     if "internal" in tags: score += 20; reasons.append("internal system")
+    if "infra" in tags: score += 25; reasons.append("core infrastructure component")
+    if "orchestration" in tags: score += 30; reasons.append("container orchestration platform")
+    if "cicd" in tags: score += 30; reasons.append("CI/CD pipeline infrastructure")
 
     if "gateway" in tags: score += 20; reasons.append("network gateway")
     if "infra" in tags: score += 15; reasons.append("infrastructure component")
@@ -122,6 +177,13 @@ def compute_impact_score(semantic: dict) -> dict:
     if "prod" in tags or "production" in tags: score += 30; reasons.append("production environment")
     elif "staging" in tags: score += 15; reasons.append("pre-production environment")
     elif "dev" in tags: score += 5; reasons.append("non-production environment")
+
+    # Database
+    if "db" in tags: score += 40; reasons.append("critical database system")
+    if "storage" in tags: score += 30; reasons.append("sensitive storage system")
+
+    # Enterprise
+    if "enterprise" in tags: score += 35; reasons.append("enterprise core system")
 
     # Sector-based weighting
     sector = "IT"
@@ -143,6 +205,7 @@ def compute_impact_score(semantic: dict) -> dict:
     # Lower-risk / noise reduction
     if "static" in tags or "cdn" in tags: score -= 10; reasons.append("static content")
     if "assets" in tags or "images" in tags: score -= 15; reasons.append("static assets")
+    if "blog" in tags or "docs" in tags: score -= 10; reasons.append("informational service")
 
     # Clamp score
     score = max(0, min(score, 100))
