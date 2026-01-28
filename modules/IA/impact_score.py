@@ -7,6 +7,59 @@
 # No patents may be claimed or enforced on this software or any derivative.
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
 # --------------------------------------------------------------------------------------------------
+INFRASTRUCTURE_PATTERNS = {
+    # Identity & Secrets
+    "identity": {
+        "patterns": ["auth", "sso", "iam", "login", "oauth", "oidc", "keycloak"],
+        "tags": {"auth", "identity", "critical"}
+    },
+    "secrets": {
+        "patterns": ["vault", "kms", "secrets", "keyvault", "keystore"],
+        "tags": {"secrets", "infra", "critical"}
+    },
+
+    # Databases & Data
+    "database": {
+        "patterns": ["db", "database", "sql", "rds", "aurora", "postgres", "mysql", "mongo", "redis"],
+        "tags": {"db", "data", "critical"}
+    },
+
+    # Storage
+    "storage": {
+        "patterns": ["s3", "bucket", "storage", "blob", "efs", "nfs", "backup", "archive"],
+        "tags": {"storage", "data"}
+    },
+
+    # Network & Edge
+    "network": {
+        "patterns": ["gateway", "apigateway", "proxy", "lb", "loadbalancer", "edge", "waf"],
+        "tags": {"network", "infra"}
+    },
+
+    # Containers & Orchestration
+    "orchestration": {
+        "patterns": ["k8s", "kubernetes", "eks", "aks", "gke", "cluster", "istio"],
+        "tags": {"orchestration", "infra"}
+    },
+
+    # CI/CD
+    "cicd": {
+        "patterns": ["ci", "cd", "pipeline", "jenkins", "gitlab", "actions"],
+        "tags": {"cicd", "infra"}
+    },
+
+    # Monitoring & Ops
+    "observability": {
+        "patterns": ["grafana", "prometheus", "kibana", "sentry", "monitor"],
+        "tags": {"monitoring", "ops"}
+    },
+
+    # Admin & Control
+    "admin": {
+        "patterns": ["admin", "root", "control", "master", "console"],
+        "tags": {"admin", "critical"}
+    }
+}
 
 SCADA_TOKENS = {
     "plc", "rtu", "ied", "hmi", "pac", "dcu", "mtu",
@@ -99,6 +152,19 @@ def enrich_tags(subdomain: str, services: list) -> set:
     return tags
 
 # --------------------------------------------------------------------------------------------------
+def infer_infrastructure_role(subdomain: str) -> set:
+    tags = set()
+    s = subdomain.lower()
+
+    for role, cfg in INFRASTRUCTURE_PATTERNS.items():
+        if any(p in s for p in cfg["patterns"]):
+            tags |= cfg["tags"]
+            tags.add(role)
+
+    return tags
+
+
+# --------------------------------------------------------------------------------------------------
 def compute_impact_score(semantic: dict) -> dict:
     """
     Compute numeric impact score from semantic classification.
@@ -116,6 +182,7 @@ def compute_impact_score(semantic: dict) -> dict:
 
     # Enrich tags automatically
     tags |= enrich_tags(subdomain, services)
+    tags |= infer_infrastructure_role(subdomain)
 
     # Token inference from subdomain name
     for token_set, tag in [
@@ -201,6 +268,16 @@ def compute_impact_score(semantic: dict) -> dict:
         if "prod" in tags or "production" in tags: ics_score += 40; reasons.append("SCADA in production")
         elif "dev" in tags or "test" in tags: ics_score += 10; reasons.append("SCADA in non-production")
         score += ics_score
+
+    # Infrastructure roles
+    if "identity" in tags: score += 40; reasons.append("identity and access management")
+    if "secrets" in tags: score += 45; reasons.append("secrets management system")
+    if "database" in tags: score += 40; reasons.append("core database infrastructure")
+    if "storage" in tags: score += 30; reasons.append("persistent data storage")
+    if "network" in tags: score += 25; reasons.append("network control plane")
+    if "orchestration" in tags: score += 35; reasons.append("container orchestration layer")
+    if "cicd" in tags: score += 30; reasons.append("CI/CD infrastructure")
+    if "admin" in tags: score += 40; reasons.append("administrative control interface")
 
     # Lower-risk / noise reduction
     if "static" in tags or "cdn" in tags: score -= 10; reasons.append("static content")
