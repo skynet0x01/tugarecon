@@ -1,5 +1,6 @@
 # --------------------------------------------------------------------------------------------------
 # TugaRecon - Unified Reaction & Decision Engine
+# File: modules/intelligence/unified_engine.py
 # Author: Skynet0x01 2020-2026
 # GitHub: https://github.com/skynet0x01/tugarecon
 # License: GNU GPLv3
@@ -16,6 +17,10 @@ import traceback
 from modules.Intelligence.reactions.tls_reaction import run_tls_reaction
 from modules.Intelligence.reactions.headers_reaction import run_headers
 from modules.Intelligence.reactions.httpx_reaction import run_httpx
+
+from utils.impact_engine import apply_impact_engine # NEW
+from utils.context_engine import apply_context_adjustment
+
 
 # Import scoring & heuristics
 from modules.IA.impact_score import SCADA_TOKENS, compute_impact_score
@@ -92,6 +97,9 @@ def decide_action(entry: dict) -> dict:
     #entry = compute_impact_score(entry)
     if "impact_score" not in entry:
         entry = compute_impact_score(entry)
+        entry = apply_impact_engine(entry) #
+    # Apply contextual adjustment
+    entry = apply_context_adjustment(entry)
 
     score = entry.get("impact_score", 0)
     tags = set(entry.get("tags", []))

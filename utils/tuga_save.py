@@ -1,5 +1,6 @@
 # --------------------------------------------------------------------------------------------------
 # TugaRecon
+# File: utils/tuga_save.py
 # Author: Skynet0x01 2020-2026
 # GitHub: https://github.com/skynet0x01/tugarecon
 # License: GNU GPLv3
@@ -15,11 +16,15 @@ import datetime
 
 from utils.tuga_colors import G, Y, R, W
 from utils.tuga_functions import print_semantic_results_grouped
+from utils.impact_engine import apply_impact_engine # NEW
+
 from modules.IA.semantic import classify
 from modules.IA.impact_score import compute_impact_score
 from modules.IA.scan_diff_view import print_scan_diff
+
 from utils.tuga_exporters import export_json, export_priority_lists
 from utils.tuga_scan_diff import diff_scans, export_diff, get_previous_scan_date
+from utils.context_engine import apply_context_adjustment
 
 
 # --------------------------------------------------------------------------------------------------
@@ -156,8 +161,11 @@ def ReadFile(target, start_time):
 
     for s in lines:
         semantic = classify(s)
-        #print("[DEBUG]", semantic)
+
         scored = compute_impact_score(semantic)
+        scored = apply_impact_engine(scored)
+        scored = apply_context_adjustment(scored)
+
         results.append(scored)
 
     # Print semantic results

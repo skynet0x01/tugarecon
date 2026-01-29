@@ -1,5 +1,6 @@
 # --------------------------------------------------------------------------------------------------
 # TugaRecon – Service Probe Module (Refactored, Compact Output)
+# File: modules/Brute_force/tuga_probe.py
 # Author: Skynet0x01 2020-2026
 # GitHub: https://github.com/skynet0x01/tugarecon
 # License: GNU GPLv3
