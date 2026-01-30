@@ -9,6 +9,7 @@ import subprocess
 from datetime import datetime
 import json
 import shutil
+import os
 
 # -------------------------------------------------------
 def load_json(path):
@@ -31,6 +32,54 @@ def sanitize_unicode(text: str) -> str:
     for k, v in replacements.items():
         text = text.replace(k, v)
     return text
+
+
+# -------------------------------------------------------
+def render_attack_paths_section(md, base_dir):
+    path = os.path.join(base_dir, "attack_surface", "attack_paths.json")
+
+    if not os.path.exists(path):
+        return
+
+    with open(path, "r", encoding="utf-8") as f:
+        attack_paths = json.load(f)
+
+    if not attack_paths:
+        return
+
+    md.write("## Plausible Attack Paths\n\n")
+    md.write(
+        "The following attack paths represent realistic offensive narratives "
+        "derived from exposed entry points, trust boundary crossings and "
+        "high-impact assets.\n\n"
+    )
+
+    for idx, ap in enumerate(attack_paths, 1):
+        md.write(f"### Attack Path #{idx}\n\n")
+        md.write(" → ".join(ap["path"]) + "\n\n")
+        md.write(f"- Total Cost: {ap['total_cost']}\n")
+        md.write(f"- Final Impact: {ap['final_impact']}\n")
+        md.write(f"- Confidence: {ap['confidence']}\n\n")
+
+# -------------------------------------------------------
+def render_worst_case(md, base_dir):
+    path = os.path.join(base_dir, "attack_surface", "worst_case.json")
+
+    if not os.path.exists(path):
+        return
+
+    with open(path, "r", encoding="utf-8") as f:
+        worst_case = json.load(f)
+
+    md.write("## Worst Case Scenario\n\n")
+    md.write(
+        "This represents the most damaging realistic attack path identified "
+        "during the analysis.\n\n"
+    )
+
+    md.write(" → ".join(worst_case["path"]) + "\n\n")
+    md.write(f"- Estimated Impact: {worst_case['final_impact']}\n")
+    md.write(f"- Confidence: {worst_case['confidence']}\n\n")
 
 # -------------------------------------------------------
 def generate_report(base_dir: Path, generate_pdf=False):
@@ -141,6 +190,12 @@ def generate_report(base_dir: Path, generate_pdf=False):
     # Save Markdown
     md_path = base_dir / "report.md"
     md_path.write_text(sanitize_unicode("\n".join(report)))
+
+    # -------------------------------------------------------
+    # Append Attack Paths & Worst Case (attack_surface)
+    with open(md_path, "a", encoding="utf-8") as md:
+        render_attack_paths_section(md, scan_root)
+        render_worst_case(md, scan_root)
 
     # -------------------------------------------------------
     # Generate PDF

@@ -144,6 +144,7 @@ def DeleteDuplicate(target):
 # --------------------------------------------------------------------------------------------------
 def ReadFile(target, start_time):
     from utils.impact_graph import build_impact_graph, propagate_impact
+    from modules.Intelligence.attack_state import derive_attack_state
 
     date = str(datetime.datetime.now().date())
     base_folder = os.path.join("results", target, date)
@@ -168,12 +169,26 @@ def ReadFile(target, start_time):
         scored = compute_impact_score(semantic)     # → impacto técnico
         scored = apply_impact_engine(scored)        # → heurísticas ofensivas (vpn, auth, admin…)
         scored = apply_context_adjustment(scored)   #  → ambiente, trust boundary, exposição
+        scored = derive_attack_state(scored)        # ← AQUI (novo estado ofensivo)
 
         results.append(scored)
+
+    from utils.tuga_attack_paths import save_attack_paths
+    from utils.tuga_attack_path_summary import generate_attack_path_summary
+    from modules.Intelligence.attack_paths import infer_attack_paths
 
     # Impact graph é global.
     graph = build_impact_graph(results)
     results = propagate_impact(results, graph)
+
+    attack_paths = infer_attack_paths(results, graph)
+
+    # Persistência (dados)
+    save_attack_paths(attack_paths, base_folder)
+    generate_attack_path_summary(attack_paths, base_folder)
+
+    from utils.tuga_worst_case import compute_worst_case
+    worst_case = compute_worst_case(attack_paths)
 
     # Print semantic results
     print_semantic_results_grouped(results)
