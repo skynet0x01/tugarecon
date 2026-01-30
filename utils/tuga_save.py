@@ -143,62 +143,80 @@ def DeleteDuplicate(target):
 
 # --------------------------------------------------------------------------------------------------
 def ReadFile(target, start_time):
+    import os
+    import time
+    import datetime
+
     from utils.impact_graph import build_impact_graph, propagate_impact
     from modules.Intelligence.attack_state import derive_attack_state
+    from modules.Intelligence.attack_paths import infer_attack_paths
+
+    from utils.tuga_attack_paths import save_attack_paths
+    from utils.tuga_attack_path_summary import generate_attack_path_summary
+    from utils.tuga_worst_case import compute_worst_case, save_worst_case
 
     date = str(datetime.datetime.now().date())
     base_folder = os.path.join("results", target, date)
+    attack_surface_dir = os.path.join(base_folder, "attack_surface")
+
     _ensure_folder(base_folder)
+    _ensure_folder(attack_surface_dir)
 
     subdomains_path = os.path.join(base_folder, "osint_subdomains.txt")
     if not os.path.exists(subdomains_path):
         print(R + f"[!] No subdomains file found for {target} on {date}" + W)
         return
 
+    # ------------------------------------------------------------------
     # Read subdomains
-    with open(subdomains_path, "r", encoding="utf-8") as file:
-        lines = [line.strip() for line in file if line.strip()]
+    with open(subdomains_path, "r", encoding="utf-8") as f:
+        subdomains = [line.strip() for line in f if line.strip()]
 
-    # Classify and compute impact scores
     results = []
 
-    # Impact score é local.
-    for s in lines:
-        semantic = classify(s)
+    # ------------------------------------------------------------------
+    # Local semantic + impact evaluation
+    for sub in subdomains:
+        semantic = classify(sub)
 
-        scored = compute_impact_score(semantic)     # → impacto técnico
-        scored = apply_impact_engine(scored)        # → heurísticas ofensivas (vpn, auth, admin…)
-        scored = apply_context_adjustment(scored)   #  → ambiente, trust boundary, exposição
-        scored = derive_attack_state(scored)        # ← AQUI (novo estado ofensivo)
+        scored = compute_impact_score(semantic)      # impacto técnico
+        scored = apply_impact_engine(scored)         # heurísticas ofensivas
+        scored = apply_context_adjustment(scored)    # contexto / exposição
+        scored = derive_attack_state(scored)         # estado ofensivo
 
         results.append(scored)
 
-    from utils.tuga_attack_paths import save_attack_paths
-    from utils.tuga_attack_path_summary import generate_attack_path_summary
-    from modules.Intelligence.attack_paths import infer_attack_paths
-
-    # Impact graph é global.
+    # ------------------------------------------------------------------
+    # Global impact propagation
     graph = build_impact_graph(results)
     results = propagate_impact(results, graph)
 
+    # ------------------------------------------------------------------
+    # Attack paths inference
     attack_paths = infer_attack_paths(results, graph)
 
-    # Persistência (dados)
-    save_attack_paths(attack_paths, base_folder)
-    generate_attack_path_summary(attack_paths, base_folder)
+    # ------------------------------------------------------------------
+    # Persistência: attack paths
+    save_attack_paths(attack_paths, attack_surface_dir)
+    generate_attack_path_summary(attack_paths, attack_surface_dir)
 
-    from utils.tuga_worst_case import compute_worst_case
+    # ------------------------------------------------------------------
+    # Worst case (derivado dos attack paths)
     worst_case = compute_worst_case(attack_paths)
+    save_worst_case(worst_case, attack_surface_dir)
 
-    # Print semantic results
+    # ------------------------------------------------------------------
+    # Output humano (CLI)
     print_semantic_results_grouped(results)
 
-    # Save results
+    # ------------------------------------------------------------------
+    # Persistência: resultados gerais
     write_high_value_targets(results, target)
     export_json(results, target, date)
     export_priority_lists(results, target)
 
-    # Compare with previous scan
+    # ------------------------------------------------------------------
+    # Diff temporal
     today = date
     prev_date = get_previous_scan_date(target, today)
 
@@ -212,6 +230,7 @@ def ReadFile(target, start_time):
     else:
         print(Y + "[Δ] No previous scan found (baseline created)" + W)
 
+    # ------------------------------------------------------------------
     # Summary
     elapsed = time.time() - start_time
     print(Y + f"[**] TugaRecon: Scan completed in {elapsed:.2f} seconds\n" + W)

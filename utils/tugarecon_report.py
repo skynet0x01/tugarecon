@@ -35,51 +35,32 @@ def sanitize_unicode(text: str) -> str:
 
 
 # -------------------------------------------------------
-def render_attack_paths_section(md, base_dir):
-    path = os.path.join(base_dir, "attack_surface", "attack_paths.json")
-
+def render_attack_paths_section(md: list, base_dir):
+    path = os.path.join(base_dir, "attack_paths.json")
     if not os.path.exists(path):
         return
-
     with open(path, "r", encoding="utf-8") as f:
         attack_paths = json.load(f)
-
     if not attack_paths:
         return
-
-    md.write("## Plausible Attack Paths\n\n")
-    md.write(
-        "The following attack paths represent realistic offensive narratives "
-        "derived from exposed entry points, trust boundary crossings and "
-        "high-impact assets.\n\n"
-    )
-
+    md.append("## Plausible Attack Paths\n")
     for idx, ap in enumerate(attack_paths, 1):
-        md.write(f"### Attack Path #{idx}\n\n")
-        md.write(" → ".join(ap["path"]) + "\n\n")
-        md.write(f"- Total Cost: {ap['total_cost']}\n")
-        md.write(f"- Final Impact: {ap['final_impact']}\n")
-        md.write(f"- Confidence: {ap['confidence']}\n\n")
+        md.append(f"### Attack Path #{idx}")
+        md.append(" → ".join(ap["path"]))
+        md.append(f"- Total Cost: {ap['total_cost']}")
+        md.append(f"- Final Impact: {ap['final_impact']}")
+        md.append(f"- Confidence: {ap['confidence']}\n")
 
-# -------------------------------------------------------
-def render_worst_case(md, base_dir):
-    path = os.path.join(base_dir, "attack_surface", "worst_case.json")
-
+def render_worst_case(md: list, base_dir):
+    path = os.path.join(base_dir, "worst_case.json")
     if not os.path.exists(path):
         return
-
     with open(path, "r", encoding="utf-8") as f:
         worst_case = json.load(f)
-
-    md.write("## Worst Case Scenario\n\n")
-    md.write(
-        "This represents the most damaging realistic attack path identified "
-        "during the analysis.\n\n"
-    )
-
-    md.write(" → ".join(worst_case["path"]) + "\n\n")
-    md.write(f"- Estimated Impact: {worst_case['final_impact']}\n")
-    md.write(f"- Confidence: {worst_case['confidence']}\n\n")
+    md.append("## Worst Case Scenario\n")
+    md.append(" → ".join(worst_case["path"]))
+    md.append(f"- Estimated Impact: {worst_case['final_impact']}")
+    md.append(f"- Confidence: {worst_case['confidence']}\n")
 
 # -------------------------------------------------------
 def generate_report(base_dir: Path, generate_pdf=False):
@@ -132,11 +113,9 @@ def generate_report(base_dir: Path, generate_pdf=False):
     if semantic:
         count = 0
         for entry in semantic:
-            # Compatibilidade: impact_score ou impact
             impact = entry.get("impact_score", entry.get("impact", 0))
             if impact < 1:
                 continue
-
             subdomain = entry.get("subdomain", "unknown")
             url = entry.get("url", "N/A")
             status = entry.get("status", "N/A")
@@ -155,6 +134,12 @@ def generate_report(base_dir: Path, generate_pdf=False):
             report.append("_No high impact semantic targets detected._")
     else:
         report.append("_No semantic data available._")
+
+    # -------------------------------------------------------
+    # Render Attack Paths
+    #from tugarecon_report_sections import render_attack_paths_section, render_worst_case
+    render_attack_paths_section(report, scan_root / "attack_surface")
+    render_worst_case(report, scan_root / "attack_surface")
 
     # -------------------------------------------------------
     # Temporal Intelligence
@@ -192,21 +177,13 @@ def generate_report(base_dir: Path, generate_pdf=False):
     md_path.write_text(sanitize_unicode("\n".join(report)))
 
     # -------------------------------------------------------
-    # Append Attack Paths & Worst Case (attack_surface)
-    with open(md_path, "a", encoding="utf-8") as md:
-        render_attack_paths_section(md, scan_root)
-        render_worst_case(md, scan_root)
-
-    # -------------------------------------------------------
     # Generate PDF
     pdf_path = None
     if generate_pdf:
         pdf_path = base_dir / "report.pdf"
-
         if not shutil.which("pandoc"):
             print("[!] Pandoc not found. Install pandoc to generate PDF reports.")
             return md_path, None
-
         try:
             result = subprocess.run(
                 ["pandoc", str(md_path), "-o", str(pdf_path), "--pdf-engine=xelatex"],
