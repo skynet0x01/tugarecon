@@ -143,6 +143,8 @@ def DeleteDuplicate(target):
 
 # --------------------------------------------------------------------------------------------------
 def ReadFile(target, start_time):
+    from utils.impact_graph import build_impact_graph, propagate_impact
+
     date = str(datetime.datetime.now().date())
     base_folder = os.path.join("results", target, date)
     _ensure_folder(base_folder)
@@ -159,14 +161,19 @@ def ReadFile(target, start_time):
     # Classify and compute impact scores
     results = []
 
+    # Impact score é local.
     for s in lines:
         semantic = classify(s)
 
-        scored = compute_impact_score(semantic)
-        scored = apply_impact_engine(scored)
-        scored = apply_context_adjustment(scored)
+        scored = compute_impact_score(semantic)     # → impacto técnico
+        scored = apply_impact_engine(scored)        # → heurísticas ofensivas (vpn, auth, admin…)
+        scored = apply_context_adjustment(scored)   #  → ambiente, trust boundary, exposição
 
         results.append(scored)
+
+    # Impact graph é global.
+    graph = build_impact_graph(results)
+    results = propagate_impact(results, graph)
 
     # Print semantic results
     print_semantic_results_grouped(results)
@@ -184,7 +191,9 @@ def ReadFile(target, start_time):
         diff = diff_scans(target, prev_date, today)
         export_diff(diff, target, today)
         print_scan_diff(diff)
+        print("")
         print(G + f"[Δ] Diff generated against {prev_date}" + W)
+        print("")
     else:
         print(Y + "[Δ] No previous scan found (baseline created)" + W)
 
