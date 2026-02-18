@@ -261,7 +261,7 @@ class TugaServiceProbe:
             3. Guarda resultados
             4. Converte para camada semântica (Intelligence layer)
 
-        
+
         """
 
         print(Y + "[*] Loading hosts..." + W)
