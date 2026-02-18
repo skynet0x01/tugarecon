@@ -253,7 +253,7 @@ class TugaServiceProbe:
     # --------------------------------------------------------------------------------------------------
     def run(self):
         """
-        Método orquestrador.
+
 
         Ordem:
             1. Carrega hosts
@@ -261,7 +261,7 @@ class TugaServiceProbe:
             3. Guarda resultados
             4. Converte para camada semântica (Intelligence layer)
 
-        Este método é a única interface pública do módulo.
+        
         """
 
         print(Y + "[*] Loading hosts..." + W)

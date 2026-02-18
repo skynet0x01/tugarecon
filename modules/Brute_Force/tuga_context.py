@@ -276,7 +276,6 @@ class TugaContext:
     # --------------------------------------------------------------------------------------------------
     def run(self):
         """
-        Método orquestrador.
 
         Ordem:
             1. Carrega subdomínios
@@ -284,7 +283,7 @@ class TugaContext:
             3. Constrói contexto
             4. Guarda resultados
 
-        Este é o único método que deve ser chamado externamente.
+
         """
 
         print(Y + "[*] Loading subdomains..." + W)
