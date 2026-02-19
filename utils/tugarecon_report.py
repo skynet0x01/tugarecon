@@ -17,7 +17,9 @@ def load_json(path):
         with open(path) as f:
             return json.load(f)
     except Exception as e:
-        print(f"[!] Failed to load JSON {path}: {e}")
+        print(f"[Δ] No previous scan history found ({path}).")
+        print("    This appears to be the first recorded execution for this target.\n")
+        #print(f"[!] Failed to load JSON {path}: {e}")
         return None
 
 # -------------------------------------------------------
