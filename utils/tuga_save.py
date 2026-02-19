@@ -207,6 +207,7 @@ def ReadFile(target, start_time):
 
     date = str(datetime.datetime.now().date())
     base_folder = os.path.join("results", target, date)
+
     attack_surface_dir = os.path.join(base_folder)
 
     _ensure_folder(base_folder)

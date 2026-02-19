@@ -107,7 +107,6 @@ casa
 dynip
 mail
 mapas
-medicosdeportugal
 pt
 sapo
 saude
@@ -370,9 +369,6 @@ aspmx
 frame
 assets
 vehicle
-caixadirecta
-hubcolinadocastelo
-hubcolinadocasteloqual
 lifelungs
 lisboa
 pedala
@@ -443,7 +439,6 @@ gridview
 apiportal
 dcco
 gestor
-provedordocliente
 adwords
 docs
 orkut
@@ -455,7 +450,6 @@ onecert
 saprise
 support
 geocloud
-iluminacaopublica
 jump
 100
 101
@@ -506,12 +500,8 @@ spms
 xhost
 zhost
 adfs
-arquivohistorico
 bv
 ceom
-descobreoteupercurso
-escnaval
-marinha
 messenger
 ship
 virtual
@@ -521,8 +511,6 @@ edpon
 email
 image
 learning
-autarquia
-7maravilhas
 blog
 blogs
 rr
@@ -557,18 +545,13 @@ correio
 crbt
 days
 autodiscover
-azores
-consuladoportugal
 dgarq
 dglab
-embaixadaportugal
-justica
 mai
 mne
 net
 rnsi
 sip
-academiaportuguesadahistoria
 act
 agricultura
 ama
@@ -593,3 +576,5 @@ wcne
 complaintsenergyquality
 auto
 usw
+auth
+tcs
