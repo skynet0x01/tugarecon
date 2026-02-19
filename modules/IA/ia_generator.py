@@ -15,6 +15,8 @@
 # --------------------------------------------------------------------------------------------------
 from modules.IA.pattern_model import PatternModel
 from modules.IA.heuristics import expand
+from modules.IA.token_memory import get_token_weight
+
 
 class IASubdomainGenerator:
     def __init__(self, limit: int = 500):
@@ -31,11 +33,32 @@ class IASubdomainGenerator:
         candidates = set()
 
         # Tokens frequentes
-        for token in self.model.top_tokens(10):
+        # for token in self.model.top_tokens(10):
+        #     token = token.strip().lower()
+        #     if not token:
+        #         continue
+        #
+        #     candidates.add(token)
+        #
+        #     for expanded in expand(token):
+        #         candidates.add(expanded)
+
+        # Tokens frequentes + memória inteligente
+        ranked_tokens = []
+
+        for token in self.model.top_tokens(30):  # buscamos mais, vamos filtrar depois
             token = token.strip().lower()
             if not token:
                 continue
 
+            weight = get_token_weight(token)
+            ranked_tokens.append((token, weight))
+
+        # ordenar por peso aprendido (descendente)
+        ranked_tokens.sort(key=lambda x: x[1], reverse=True)
+
+        # usar apenas os 10 melhores após ranking
+        for token, _ in ranked_tokens[:10]:
             candidates.add(token)
 
             for expanded in expand(token):

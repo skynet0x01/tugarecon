@@ -8,6 +8,8 @@
 # No patents may be claimed or enforced on this software or any derivative.
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
 # --------------------------------------------------------------------------------------------------
+from modules.IA.token_memory import update_token_stats
+
 INFRASTRUCTURE_PATTERNS = {
     # Identity & Secrets
     "identity": {
@@ -303,6 +305,20 @@ def compute_impact_score(semantic: dict) -> dict:
     #semantic["tags"] = list(tags)
     semantic["tags"] = sorted(tags)
     semantic["sector"] = sector
+
+    # ----------------------------------------------------------------------------------------------
+    # 🧠 Atualização de memória estatística global
+    # Guardamos os tokens inferidos e prioridade para aprendizagem futura
+    try:
+        update_token_stats(
+            tokens=list(tags),
+            severity=priority.lower(),
+            domain=subdomain
+        )
+    except Exception:
+        # Nunca deixar memória quebrar scoring principal
+        pass
+
 
     #print("[DEBUG SCORE] tags before scoring:", tags)
 
