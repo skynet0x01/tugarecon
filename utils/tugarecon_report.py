@@ -1,5 +1,5 @@
 # --------------------------------------------------------------------------------------------------
-# TugaRecon – Intelligence Report Generator (Corrected)
+# TugaRecon – Intelligence Report Generator
 # Author: Skynet0x01 2020-2026
 # License: GNU GPLv3
 # --------------------------------------------------------------------------------------------------

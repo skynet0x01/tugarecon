@@ -2,6 +2,7 @@
 # TugaRecon
 # Author: Skynet0x01 2020-2026
 # GitHub: https://github.com/skynet0x01/tugarecon
+# Module: modules/IA/ia_wordlist.py
 # License: GNU GPLv3
 # Module: modules/IA/ia_wordlist.py
 # Patent Restriction Notice:
