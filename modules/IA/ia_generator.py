@@ -53,6 +53,13 @@ class IASubdomainGenerator:
                 combined = base_weight * expansion_weight
                 candidate_scores[expanded] = combined
 
+                # evita que um token expandido com score mais baixo
+                # sobrescreva um score melhor já existente
+                candidate_scores[expanded] = max(
+                    candidate_scores.get(expanded, 0),
+                    combined
+                )
+
         # -----------------------------
         # 2️⃣ Bigramas com score próprio
         # -----------------------------
