@@ -3,6 +3,7 @@
 # Author: Skynet0x01 2020-2026
 # GitHub: https://github.com/skynet0x01/tugarecon
 # License: GNU GPLv3
+# Model: models/IA/heuristics.py
 # Patent Restriction Notice:
 # No patents may be claimed or enforced on this software or any derivative.
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
@@ -209,94 +210,163 @@ ECOMMERCE_TOKENS = {
 # -------------------------------------------------------------------
 # Expansion engine
 # -------------------------------------------------------------------
+def expand_weighted(token: str) -> list[tuple[str, float]]:
+    """
+    Expande um token e associa um peso heurístico (0.0 – 1.0).
 
-def expand(token: str) -> list[str]:
+    Filosofia:
+    - Peso alto → altamente provável em ambientes reais
+    - Peso médio → comum mas dependente de maturidade da organização
+    - Peso baixo → plausível mas menos frequente
+    - Determinístico
+    """
+
     token = token.lower()
-    expansions: set[str] = set()
+    expansions: dict[str, float] = {}
 
-    # Base environments
+    def add(candidate: str, weight: float):
+        # Mantém sempre o maior peso caso exista duplicação
+        if candidate not in expansions or expansions[candidate] < weight:
+            expansions[candidate] = weight
+
+    # ------------------------------------------------------------------
+    # 1. Ambientes universais
+    # ------------------------------------------------------------------
+
     for env in ENVIRONMENTS:
-        expansions.add(f"{token}-{env}")
+        if env in ("prod", "production"):
+            add(f"{token}-{env}", 0.95)
+        elif env in ("dev", "test", "qa", "uat"):
+            add(f"{token}-{env}", 0.85)
+        else:
+            add(f"{token}-{env}", 0.70)
 
-    # API-like versioning
+    # ------------------------------------------------------------------
+    # 2. Qualificadores globais
+    # ------------------------------------------------------------------
+
+    for qualifier in QUALIFIERS:
+        if qualifier in ("internal", "admin", "secure"):
+            add(f"{token}-{qualifier}", 0.80)
+        else:
+            add(f"{token}-{qualifier}", 0.65)
+
+    # ------------------------------------------------------------------
+    # 3. API / Versionamento
+    # ------------------------------------------------------------------
+
     if token in API_LIKE_TOKENS:
         for version in VERSIONS:
-            expansions.add(f"{token}-{version}")
+            add(f"{token}-{version}", 0.88)
+
             for env in ENVIRONMENTS:
-                expansions.add(f"{token}-{version}-{env}")
+                if env in ("prod", "production"):
+                    add(f"{token}-{version}-{env}", 0.82)
+                else:
+                    add(f"{token}-{version}-{env}", 0.72)
 
-    # Generic qualifiers
-    for qualifier in QUALIFIERS:
-        expansions.add(f"{token}-{qualifier}")
+    # ------------------------------------------------------------------
+    # 4. Management / Admin Systems
+    # ------------------------------------------------------------------
 
-    # Management heuristic
     if token in MANAGEMENT_TOKENS:
         for env in ("dev", "qa", "uat", "prod"):
-            expansions.add(f"{token}-{env}")
-        for qualifier in ("admin", "internal", "corp"):
-            expansions.add(f"{token}-{qualifier}")
+            add(f"{token}-{env}", 0.92)
 
-    # SCADA / OT heuristic
+        for q in ("admin", "internal", "corp", "secure"):
+            add(f"{token}-{q}", 0.90)
+
+    # ------------------------------------------------------------------
+    # 5. SCADA / OT (aqui o risco real começa)
+    # ------------------------------------------------------------------
+
     if token in SCADA_TOKENS:
         for env in ("prod", "uat", "qa"):
-            expansions.add(f"{token}-{env}")
-        for qualifier in ("control", "operator", "internal"):
-            expansions.add(f"{token}-{qualifier}")
+            add(f"{token}-{env}", 0.93)
+
+        for q in ("control", "operator", "internal", "eng"):
+            add(f"{token}-{q}", 0.91)
 
     if token in SCADA_ENERGY_TOKENS:
-        for suffix in ("grid", "substation", "control"):
-            expansions.add(f"{token}-{suffix}")
+        for suffix in ("grid", "substation", "control", "dispatch"):
+            add(f"{token}-{suffix}", 0.89)
 
     if token in SCADA_WATER_TOKENS:
-        for suffix in ("plant", "control", "monitor"):
-            expansions.add(f"{token}-{suffix}")
+        for suffix in ("plant", "control", "monitor", "treatment"):
+            add(f"{token}-{suffix}", 0.88)
 
     if token in SCADA_MANUFACTURING_TOKENS:
-        for suffix in ("line", "cell", "control", "mes"):
-            expansions.add(f"{token}-{suffix}")
+        for suffix in ("line", "cell", "control", "mes", "robot"):
+            add(f"{token}-{suffix}", 0.87)
 
-    # Finance
+    # ------------------------------------------------------------------
+    # 6. Finance (muito padronizado)
+    # ------------------------------------------------------------------
+
     if token in FINANCE_TOKENS:
         for env in ("prod", "uat", "qa", "dr"):
-            expansions.add(f"{token}-{env}")
-        for q in ("secure", "internal", "core"):
-            expansions.add(f"{token}-{q}")
+            add(f"{token}-{env}", 0.94)
 
-    # Health
+        for q in ("secure", "internal", "core", "settlement"):
+            add(f"{token}-{q}", 0.91)
+
+    # ------------------------------------------------------------------
+    # 7. Health
+    # ------------------------------------------------------------------
+
     if token in HEALTH_TOKENS:
         for env in ("prod", "test", "dr"):
-            expansions.add(f"{token}-{env}")
-        for q in ("internal", "secure", "clinical"):
-            expansions.add(f"{token}-{q}")
+            add(f"{token}-{env}", 0.93)
 
-    # Telco
+        for q in ("internal", "secure", "clinical", "patient"):
+            add(f"{token}-{q}", 0.90)
+
+    # ------------------------------------------------------------------
+    # 8. Telco
+    # ------------------------------------------------------------------
+
     if token in TELCO_TOKENS:
         for env in ("prod", "lab", "test"):
-            expansions.add(f"{token}-{env}")
-        for q in ("internal", "net", "core"):
-            expansions.add(f"{token}-{q}")
+            add(f"{token}-{env}", 0.92)
 
-    # Government
+        for q in ("internal", "net", "core", "edge"):
+            add(f"{token}-{q}", 0.89)
+
+    # ------------------------------------------------------------------
+    # 9. Government
+    # ------------------------------------------------------------------
+
     if token in GOV_TOKENS:
         for env in ("prod", "uat", "dr"):
-            expansions.add(f"{token}-{env}")
-        for q in ("public", "internal", "secure"):
-            expansions.add(f"{token}-{q}")
+            add(f"{token}-{env}", 0.94)
 
-    # Education
+        for q in ("public", "internal", "secure", "gov"):
+            add(f"{token}-{q}", 0.91)
+
+    # ------------------------------------------------------------------
+    # 10. Education
+    # ------------------------------------------------------------------
+
     if token in EDU_TOKENS:
         for env in ("prod", "test"):
-            expansions.add(f"{token}-{env}")
-        for q in ("internal", "academic"):
-            expansions.add(f"{token}-{q}")
+            add(f"{token}-{env}", 0.85)
 
-    # E-commerce
+        for q in ("internal", "academic", "campus"):
+            add(f"{token}-{q}", 0.83)
+
+    # ------------------------------------------------------------------
+    # 11. E-commerce
+    # ------------------------------------------------------------------
+
     if token in ECOMMERCE_TOKENS:
         for env in ("prod", "staging", "test"):
-            expansions.add(f"{token}-{env}")
-        for q in ("secure", "internal", "backend"):
-            expansions.add(f"{token}-{q}")
+            add(f"{token}-{env}", 0.90)
 
-    return sorted(expansions)
+        for q in ("secure", "internal", "backend", "payments"):
+            add(f"{token}-{q}", 0.88)
 
+    # ------------------------------------------------------------------
+    # Output determinístico ordenado por peso descendente
+    # ------------------------------------------------------------------
 
+    return sorted(expansions.items(), key=lambda x: x[1], reverse=True)

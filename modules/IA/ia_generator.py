@@ -14,7 +14,7 @@
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
 # --------------------------------------------------------------------------------------------------
 from modules.IA.pattern_model import PatternModel
-from modules.IA.heuristics import expand
+from modules.IA.heuristics import expand_weighted
 from modules.IA.token_memory import get_token_weight
 
 
@@ -24,56 +24,54 @@ class IASubdomainGenerator:
         self.limit = limit
 
     def generate(self, known_subdomains: list[str]) -> list[str]:
-        """
-        Recebe subdomínios SEM o domínio (ex: 'api-prod')
-        Retorna apenas nomes de subdomínio (sem '.example.com')
-        """
         self.model.train(known_subdomains)
 
-        candidates = set()
+        candidate_scores = {}
 
-        # Tokens frequentes
-        # for token in self.model.top_tokens(10):
-        #     token = token.strip().lower()
-        #     if not token:
-        #         continue
-        #
-        #     candidates.add(token)
-        #
-        #     for expanded in expand(token):
-        #         candidates.add(expanded)
-
-        # Tokens frequentes + memória inteligente
+        # -----------------------------
+        # 1️⃣ Tokens frequentes + peso aprendido
+        # -----------------------------
         ranked_tokens = []
 
-        for token in self.model.top_tokens(30):  # buscamos mais, vamos filtrar depois
+        for token in self.model.top_tokens(30):
             token = token.strip().lower()
             if not token:
                 continue
 
-            weight = get_token_weight(token)
-            ranked_tokens.append((token, weight))
+            base_weight = get_token_weight(token)
+            ranked_tokens.append((token, base_weight))
 
         # ordenar por peso aprendido (descendente)
         ranked_tokens.sort(key=lambda x: x[1], reverse=True)
 
         # usar apenas os 10 melhores após ranking
-        for token, _ in ranked_tokens[:10]:
-            candidates.add(token)
+        for token, base_weight in ranked_tokens[:10]:
+            candidate_scores[token] = base_weight
 
-            for expanded in expand(token):
-                candidates.add(expanded)
+            # expansões com peso
+            for expanded, expansion_weight in expand_weighted(token):
+                combined = base_weight * expansion_weight
+                candidate_scores[expanded] = combined
 
-        # Bigramas (ordem importa)
+        # -----------------------------
+        # 2️⃣ Bigramas com score próprio
+        # -----------------------------
         for a, b in self.model.top_bigrams(10):
             a, b = a.lower(), b.lower()
-            candidates.add(f"{a}-{b}")
-            candidates.add(f"{b}-{a}")
 
-        # Limitar e ordenar (determinístico)
-        final = sorted(candidates)
+            # peso baseado na soma dos tokens
+            weight_a = get_token_weight(a)
+            weight_b = get_token_weight(b)
 
-        # NOTE: limit is applied globally to keep generation deterministic.
-        # If needed, this can later be split per-source (tokens / bigrams).
+            combined_score = (weight_a + weight_b) / 2
 
-        return final[:self.limit]
+            candidate_scores[f"{a}-{b}"] = combined_score
+            candidate_scores[f"{b}-{a}"] = combined_score * 0.95  # ligeira penalização reverso
+
+        # -----------------------------
+        # 3️⃣ Ordenar por score descendente
+        # -----------------------------
+        final = sorted(candidate_scores.items(), key=lambda x: x[1], reverse=True)
+
+        return [name for name, _ in final[:self.limit]]
+
