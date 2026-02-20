@@ -14,7 +14,6 @@ import sys
 import time
 import argparse
 import logging
-import json
 from datetime import datetime
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -31,14 +30,18 @@ from modules.Intelligence.unified_engine import process_entry
 from modules.Intelligence.tuga_attack_surface import TugaAttackSurface
 
 # --------------------------------------------------------------------------------------------------
-# Logging
+# Logging global da aplicação
 # --------------------------------------------------------------------------------------------------
+# Define formato simples e nível default INFO
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 log = logging.getLogger(" tugarecon")
 
 
 # --------------------------------------------------------------------------------------------------
 # Scan Context
+# --------------------------------------------------------------------------------------------------
+# Estrutura que mantém o estado da execução.
+# Evita passar múltiplos parâmetros entre funções.
 # --------------------------------------------------------------------------------------------------
 @dataclass
 class ScanContext:
@@ -58,7 +61,7 @@ class ScanContext:
 
 
 # --------------------------------------------------------------------------------------------------
-# CLI
+# CLI Argument Parsing
 # --------------------------------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     Examples = (Y + '''
@@ -108,7 +111,8 @@ def parse_args() -> argparse.Namespace:
 
 
 # --------------------------------------------------------------------------------------------------
-# Pipelines
+# PIPELINES
+# Cada função abaixo executa uma fase do scan.
 # --------------------------------------------------------------------------------------------------
 def run_bruteforce(ctx: ScanContext) -> None:
     log.info(" Running brute force module")
@@ -131,6 +135,9 @@ def run_map(ctx: ScanContext) -> None:
 
 
 def run_enumeration(ctx: ScanContext) -> None:
+    """
+        Executa todos os módulos OSINT configurados.
+    """
     log.info(" Starting OSINT enumeration")
 
     from progress.bar import IncrementalBar
@@ -141,6 +148,7 @@ def run_enumeration(ctx: ScanContext) -> None:
         tuga_omnisint, tuga_dnsbufferover, tuga_rapiddns,
     )
 
+    # Mapeamento nome → classe engine
     engines = {
         'certspotter': tuga_certspotter.Certspotter,
         'ssl': tuga_crt.CRT,
@@ -250,29 +258,51 @@ def run_attack_surface(ctx: ScanContext) -> None:
 
 # --------------------------------------------------------------------------------------------------
 def run_intelligence(ctx: ScanContext) -> None:
-    print("")
-    log.info(" Running temporal intelligence")
+    import os
+    import json
+    import datetime
 
     from utils.temporal_analysis import analyze_temporal_state
     from utils.temporal_score import compute_temporal_score
     from utils.temporal_view import print_top_temporal
-    from modules.Intelligence.snapshot import load_previous_snapshot, build_snapshot, save_snapshot
+    from modules.Intelligence.snapshot import (
+        load_previous_snapshot,
+        build_snapshot,
+        save_snapshot
+    )
+
+    print("")
+    log.info("Running temporal intelligence analysis (processing historical deltas, please wait)...")
+    #log.info(f"Temporal intelligence: analysing {len(snapshot.get('subdomains', {}))} subdomains...")
 
     semantic_file = os.path.join(ctx.scan_dir, "semantic_results.json")
     if not os.path.isfile(semantic_file):
-        log.warning(" Semantic results not found, skipping intelligence module")
+        log.warning("Semantic results not found, skipping intelligence module")
         return
 
     previous = load_previous_snapshot(ctx.scan_dir)
+
     with open(semantic_file, "r") as f:
         results = json.load(f)
 
     snapshot = build_snapshot(results, previous)
     save_snapshot(ctx.scan_dir, snapshot)
 
-    states = analyze_temporal_state(snapshot, previous)
-    ranking = []
+    # Normaliza possíveis datas ISO completas para apenas YYYY-MM-DD
+    for sub, data in snapshot.get("subdomains", {}).items():
+        last_seen = data.get("last_seen")
+        if isinstance(last_seen, str):
+            try:
+                # Aceita ISO completo (com T, microssegundos, etc)
+                parsed = datetime.datetime.fromisoformat(last_seen)
+                data["last_seen"] = parsed.date().isoformat()
+            except ValueError:
+                # Mantém valor original se não for ISO válido
+                pass
 
+    states = analyze_temporal_state(snapshot, previous)
+
+    ranking = []
     output_dir = os.path.join(ctx.scan_dir, "reactions")
     os.makedirs(output_dir, exist_ok=True)
 
@@ -280,14 +310,35 @@ def run_intelligence(ctx: ScanContext) -> None:
         for sub in subs:
             data = snapshot["subdomains"].get(sub, {})
             temporal_score = compute_temporal_score(data, state)
-            entry = {"subdomain": sub, "state": state, "temporal_score": temporal_score,
-                     "impact": data.get("impact", 0), "impact_score": data.get("impact", 0),
-                     "tags": data.get("tags", [])}
-            process_entry(entry, output_dir)
-            ranking.append((temporal_score, sub, state, entry.get("action", "IGNORE")))
 
-    ranking.sort(reverse=True)
-    has_actionable = any(action != "IGNORE" for _, _, _, action in ranking)
+            # Define ação
+            if data.get("impact_score", 0) > 0 or state == "NEW":
+                action = "REVIEW"
+            else:
+                action = "IGNORE"
+
+            entry = {
+                "subdomain": sub,
+                "state": state,
+                "temporal_score": temporal_score,
+                "impact_score": data.get("impact_score", 0),
+                "tags": data.get("tags", []),
+                "action": action
+            }
+
+            process_entry(entry, output_dir)
+
+            ranking.append({
+                "subdomain": sub,
+                "state": state,
+                "score": temporal_score,
+                "impact": data.get("impact_score", 0),
+                "action": action
+            })
+
+    ranking.sort(key=lambda x: x["score"], reverse=True)
+
+    has_actionable = any(entry["action"] != "IGNORE" for entry in ranking)
 
     print("\n──────────────────────────────────────────────────────────────────────")
     print("[🧠] Temporal Risk View – Top Targets")
@@ -295,15 +346,23 @@ def run_intelligence(ctx: ScanContext) -> None:
 
     if not has_actionable:
         print("✓ No actionable temporal risk detected")
-        print("──────────────────────────────────────────────────────────────────────")
     else:
         print_top_temporal(ranking)
 
+    print("──────────────────────────────────────────────────────────────────────")
 
 # --------------------------------------------------------------------------------------------------
+# START PIPELINE
+# --------------------------------------------------------------------------------------------------
 def start(ctx: ScanContext) -> None:
+    """
+        Define ordem de execução dos módulos.
+    """
+
+    # Informação WHOIS inicial
     bscan_whois_look(ctx.target)
 
+    # Fluxo exclusivo bruteforce
     if ctx.bruteforce:
         run_bruteforce(ctx)
         run_probe(ctx)
@@ -311,9 +370,11 @@ def start(ctx: ScanContext) -> None:
         run_attack_surface(ctx)
         return
 
+    # Apenas o mapa
     if ctx.savemap:
         return run_map(ctx)
 
+    # Fluxo completo
     run_enumeration(ctx)
     run_probe(ctx)
     run_context(ctx)
@@ -321,6 +382,8 @@ def start(ctx: ScanContext) -> None:
     run_intelligence(ctx)
 
 
+# --------------------------------------------------------------------------------------------------
+# MAIN ENTRYPOINT
 # --------------------------------------------------------------------------------------------------
 def main() -> None:
     banner()

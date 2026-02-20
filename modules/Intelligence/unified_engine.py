@@ -23,7 +23,8 @@ from utils.context_engine import apply_context_adjustment
 
 
 # Import scoring & heuristics
-from modules.IA.impact_score import SCADA_TOKENS, compute_impact_score
+from modules.IA.impact_score import compute_impact_score
+from modules.IA.heuristics import SCADA_TOKENS
 
 # --------------------------------------------------------------------------------------------------
 # Map of reaction names to functions
