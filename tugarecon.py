@@ -223,7 +223,7 @@ def run_context(ctx: ScanContext) -> None:
         log.info(" Using brute-force subdomains for context, (processing brute force list, please wait)...")
     elif os.path.isfile(osintfile):
         subdomains_file = osintfile
-        log.info("Using OSINT subdomains for context")
+        log.info(" Using OSINT subdomains for context")
         print("")
     else:
         print("")
