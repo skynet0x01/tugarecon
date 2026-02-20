@@ -298,7 +298,35 @@ DEEPSEC_TOKENS = {
 
     # Crypto / Secure Comms
     "crypto", "encryption", "cipher", "aes", "rsa", "elliptic", "keyexchange",
-    "securechannel", "vpn", "tor", "onion", "mixnet", "obfuscation", "steganography"
+    "securechannel", "vpn", "tor", "onion", "mixnet", "obfuscation", "steganography",
+
+    # Agências
+    "nsa", "cia", "fbi", "gchq", "dhs", "dod", "disa", "afp", "mi6", "mossad",
+
+    # Comandos / unidades ciber
+    "cybercom", "secops", "infosec", "cybersecurity", "red-team", "blue-team",
+    "cyber-intel", "opsec", "sigint", "comsec", "intel", "intel-analysis",
+
+    # Operações / programas
+    "surveillance", "monitoring", "classified", "topsecret", "secureops",
+    "recon", "cyber-mission", "vulnerability", "exploit-lab", "honeypot",
+    "threat-hunting", "malware-analysis", "incident-response", "ir", "forensics",
+
+    # Sistemas / frameworks
+    "splunk", "palantir", "arcgis", "maltego", "misp", "siem", "elk", "elk-stack",
+    "fireeye", "crowdstrike", "darktrace", "carbon-black", "osquery", "zeek",
+
+    # Comms / encrypted
+    "vpn-secure", "secure-channel", "crypto", "tls", "ssh", "pgp", "end-to-end",
+    "encrypted", "secure-mail", "secure-api", "sso-secure",
+
+    # Sensitive services / endpoints
+    "ops-center", "control-room", "mission-center", "intel-portal", "dashboard-sec",
+    "portal-secure", "admin-secure", "audit-trail", "access-control", "identity-mgmt",
+
+    # Generic security / monitoring
+    "sensor", "endpoint", "agent", "collector", "logger", "alert", "incident",
+    "threat", "risk", "compliance", "audit", "reporting", "monitoring",
 }
 # -------------------------------------------------------------------
 # EDUCATION

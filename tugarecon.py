@@ -272,12 +272,12 @@ def run_intelligence(ctx: ScanContext) -> None:
     )
 
     print("")
-    log.info("Running temporal intelligence analysis (processing historical deltas, please wait)...")
+    log.info(" Running temporal intelligence analysis (processing historical deltas, please wait)...")
     #log.info(f"Temporal intelligence: analysing {len(snapshot.get('subdomains', {}))} subdomains...")
 
     semantic_file = os.path.join(ctx.scan_dir, "semantic_results.json")
     if not os.path.isfile(semantic_file):
-        log.warning("Semantic results not found, skipping intelligence module")
+        log.warning(" Semantic results not found, skipping intelligence module")
         return
 
     previous = load_previous_snapshot(ctx.scan_dir)
