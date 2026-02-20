@@ -2,6 +2,7 @@
 # TugaRecon
 # Author: Skynet0x01 2020-2026
 # GitHub: https://github.com/skynet0x01/tugarecon
+# Module: utils/snapshot.py
 # License: GNU GPLv3
 # Patent Restriction Notice:
 # No patents may be claimed or enforced on this software or any derivative.
