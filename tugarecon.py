@@ -260,7 +260,7 @@ def run_attack_surface(ctx: ScanContext) -> None:
 def run_intelligence(ctx: ScanContext) -> None:
     import os
     import json
-    import datetime
+    from concurrent.futures import ThreadPoolExecutor, as_completed
 
     from utils.temporal_analysis import analyze_temporal_state
     from utils.temporal_score import compute_temporal_score
@@ -273,7 +273,6 @@ def run_intelligence(ctx: ScanContext) -> None:
 
     print("")
     log.info(" Running temporal intelligence analysis (processing historical deltas, please wait)...")
-    #log.info(f"Temporal intelligence: analysing {len(snapshot.get('subdomains', {}))} subdomains...")
 
     semantic_file = os.path.join(ctx.scan_dir, "semantic_results.json")
     if not os.path.isfile(semantic_file):
@@ -288,16 +287,14 @@ def run_intelligence(ctx: ScanContext) -> None:
     snapshot = build_snapshot(results, previous)
     save_snapshot(ctx.scan_dir, snapshot)
 
-    # Normaliza possíveis datas ISO completas para apenas YYYY-MM-DD
+    # Normalizar last_seen para YYYY-MM-DD
     for sub, data in snapshot.get("subdomains", {}).items():
         last_seen = data.get("last_seen")
         if isinstance(last_seen, str):
             try:
-                # Aceita ISO completo (com T, microssegundos, etc)
-                parsed = datetime.datetime.fromisoformat(last_seen)
+                parsed = datetime.fromisoformat(last_seen)
                 data["last_seen"] = parsed.date().isoformat()
             except ValueError:
-                # Mantém valor original se não for ISO válido
                 pass
 
     states = analyze_temporal_state(snapshot, previous)
@@ -306,35 +303,44 @@ def run_intelligence(ctx: ScanContext) -> None:
     output_dir = os.path.join(ctx.scan_dir, "reactions")
     os.makedirs(output_dir, exist_ok=True)
 
-    for state, subs in states.items():
-        for sub in subs:
-            data = snapshot["subdomains"].get(sub, {})
-            temporal_score = compute_temporal_score(data, state)
+    def process_sub(state, sub):
+        data = snapshot["subdomains"].get(sub, {})
+        temporal_score = compute_temporal_score(data, state)
 
-            # Define ação
-            if data.get("impact_score", 0) > 0 or state == "NEW":
-                action = "REVIEW"
-            else:
-                action = "IGNORE"
+        if data.get("impact_score", 0) > 0 or state == "NEW":
+            action = "REVIEW"
+        else:
+            action = "IGNORE"
 
-            entry = {
-                "subdomain": sub,
-                "state": state,
-                "temporal_score": temporal_score,
-                "impact_score": data.get("impact_score", 0),
-                "tags": data.get("tags", []),
-                "action": action
-            }
+        entry = {
+            "subdomain": sub,
+            "state": state,
+            "temporal_score": temporal_score,
+            "impact_score": data.get("impact_score", 0),
+            "tags": data.get("tags", []),
+            "action": action
+        }
 
-            process_entry(entry, output_dir)
+        process_entry(entry, output_dir)
 
-            ranking.append({
-                "subdomain": sub,
-                "state": state,
-                "score": temporal_score,
-                "impact": data.get("impact_score", 0),
-                "action": action
-            })
+        return {
+            "subdomain": sub,
+            "state": state,
+            "score": temporal_score,
+            "impact": data.get("impact_score", 0),
+            "action": action
+        }
+
+    futures = []
+
+    # Ajuste do max_workers conforme a máquina (16 é equilibrado para I/O)
+    with ThreadPoolExecutor(max_workers=16) as executor:
+        for state, subs in states.items():
+            for sub in subs:
+                futures.append(executor.submit(process_sub, state, sub))
+
+        for future in as_completed(futures):
+            ranking.append(future.result())
 
     ranking.sort(key=lambda x: x["score"], reverse=True)
 
