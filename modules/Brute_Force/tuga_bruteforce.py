@@ -169,8 +169,8 @@ class TugaBruteForce:
         for server in shuffled:
             r = dns.resolver.Resolver(configure=False)
             r.nameservers = [server]
-            r.lifetime = 1.5
-            r.timeout = 1.5
+            r.lifetime = 1.0    # Default 1.5
+            r.timeout = 1.2     # Default 1.5
 
             # Estatísticas básicas
             r.stats = {"timeouts": 0, "success": 0}
