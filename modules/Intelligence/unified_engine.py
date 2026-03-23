@@ -1,5 +1,5 @@
 # --------------------------------------------------------------------------------------------------
-# TugaRecon - Unified Reaction & Decision Engine
+# TugaRecon - Unified Reaction & Decision Engine (GovSec / RedTeam version)
 # File: modules/intelligence/unified_engine.py
 # Author: Skynet0x01 2020-2026
 # GitHub: https://github.com/skynet0x01/tugarecon
@@ -8,14 +8,6 @@
 # No patents may be claimed or enforced on this software or any derivative.
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
 # --------------------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------------------
-# TugaRecon - Unified Reaction & Decision Engine (GovSec / RedTeam version)
-# File: modules/intelligence/unified_engine.py
-# Author: Skynet0x01 2020-2026
-# GitHub: https://github.com/skynet0x01/tugarecon
-# License: GNU GPLv3
-# --------------------------------------------------------------------------------------------------
-
 import os
 import json
 import traceback

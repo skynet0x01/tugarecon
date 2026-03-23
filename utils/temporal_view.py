@@ -4,8 +4,11 @@
 # GitHub: https://github.com/skynet0x01/tugarecon
 # Module: utils/temporal_view.py
 # License: GNU GPLv3
+# License: GNU GPLv3
+# Patent Restriction Notice:
+# No patents may be claimed or enforced on this software or any derivative.
+# Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
 # --------------------------------------------------------------------------------------------------
-
 from utils.tuga_colors import G, Y, R, B, W
 
 

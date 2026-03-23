@@ -9,23 +9,31 @@
 # Any patent claims will result in automatic termination of license rights under the GNU GPLv3.
 # --------------------------------------------------------------------------------------------------
 
-import os
-import sys
-import time
-import argparse
-import logging
+import os              # Fornece funções para interagir com o sistema operativo (ficheiros, diretórios, variáveis de ambiente, etc.)
+import sys             # Permite interagir com o interpretador Python (argumentos da linha de comandos, saída do programa, etc.)
+import time            # Funções relacionadas com tempo (pausas com sleep, medir tempo de execução, timestamps simples)
+import argparse        # Facilita a criação de interfaces de linha de comandos (parse de argumentos tipo --input, --output, etc.)
+import logging         # Sistema de logging para registar eventos, erros e informação (debug, info, warning, error)
+
+# Permite trabalhar com datas e horas (obter data atual, formatar timestamps, etc.)
 from datetime import datetime
+
+# dataclass: cria classes mais simples para armazenar dados (menos código boilerplate)
+# field: permite configurar campos da dataclass (valores default, listas, etc.)
 from dataclasses import dataclass, field
+
+# Forma moderna e mais limpa de trabalhar com caminhos de ficheiros e diretórios (substitui muitas vezes o os.path)
 from pathlib import Path
 
-
-from utils.tuga_banner import banner
 from utils.tuga_colors import G, W, R, Y
 from utils.tuga_dns import bscan_whois_look
 from utils.tuga_results import main_work_subdirs
 from utils.tuga_save import ReadFile, DeleteDuplicate
+
 from modules.IA.trainer import run_ia_training
+
 from modules.Brute_Force.tuga_probe import TugaServiceProbe
+
 from modules.Intelligence.unified_engine import process_entry
 from modules.Intelligence.tuga_attack_surface import TugaAttackSurface
 
@@ -115,7 +123,10 @@ def parse_args() -> argparse.Namespace:
 # Cada função abaixo executa uma fase do scan.
 # --------------------------------------------------------------------------------------------------
 def run_bruteforce(ctx: ScanContext) -> None:
-    log.info(" Running brute force module")
+    log.info(
+        " Running brute force module")
+    log.info(
+        " Brute force in progress... this may take some time (large wordlists and DNS latency can impact speed)")
 
     from modules.Brute_Force.tuga_bruteforce import TugaBruteForce
     from modules.IA.bruteforce_hint import generate_hints
@@ -392,6 +403,8 @@ def start(ctx: ScanContext) -> None:
 # MAIN ENTRYPOINT
 # --------------------------------------------------------------------------------------------------
 def main() -> None:
+    from utils.tuga_banner import banner
+
     banner()
     args = parse_args()
 
