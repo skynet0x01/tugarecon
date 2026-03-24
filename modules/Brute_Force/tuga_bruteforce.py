@@ -5,7 +5,6 @@
 #   - Mostrar resultados IMEDIATAMENTE (sem delay inicial)
 #   - Manter alta performance
 #   - Adicionar CORES no output
-#   - Código explicado para LEIGOS
 # ----------------------------------------------------------------------------------------------------------
 
 # ==========================================
