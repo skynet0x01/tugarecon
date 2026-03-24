@@ -126,7 +126,7 @@ def run_bruteforce(ctx: ScanContext) -> None:
     log.info(
         " Running brute force module")
     log.info(
-        " Brute force in progress... this may take some time (large wordlists and DNS latency can impact speed)")
+        " Brute force in progress... this may take some time! ")
 
     from modules.Brute_Force.tuga_bruteforce import TugaBruteForce
     from modules.IA.bruteforce_hint import generate_hints

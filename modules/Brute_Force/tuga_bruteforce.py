@@ -1,353 +1,286 @@
 # ----------------------------------------------------------------------------------------------------------
-# TugaRecon – DNS Bruteforce Engine (v2.0 Hardened+)
-#
-# Este módulo faz:
-#   - Descoberta de subdomínios por brute force
-#   - Usa múltiplos DNS para evitar bloqueios
-#   - Deteta wildcard DNS (muito importante)
-#   - Usa multiprocessing para ser rápido
-#
+# TugaRecon – DNS Bruteforce Engine (v3.1 ULTRA FAST + OUTPUT IMEDIATO + CORES)
+# ----------------------------------------------------------------------------------------------------------
+# OBJETIVO:
+#   - Mostrar resultados IMEDIATAMENTE (sem delay inicial)
+#   - Manter alta performance
+#   - Adicionar CORES no output
+#   - Código explicado para LEIGOS
 # ----------------------------------------------------------------------------------------------------------
 
-import datetime                  # Datas (para organizar resultados)
-import sys                       # Permite terminar o programa
-import queue                     # Filas (Queue)
-import os                        # Sistema operativo (ficheiros, paths)
-import time                      # Tempo (medir execução)
-import random                    # Randomização (ESSENCIAL para DNS)
-import dns.resolver              # Biblioteca para resolver DNS
+# ==========================================
+# IMPORTS (Explicação simples)
+# ==========================================
 
-from uuid import uuid4           # Gerar nomes aleatórios (wildcard test)
-from multiprocessing import Queue, Process, freeze_support, Value, Lock
+import dns.resolver              # Faz pedidos DNS (descobre IPs de domínios)
+import threading                 # Permite várias tarefas ao mesmo tempo (threads)
+import time                      # Medir tempo de execução
+import os                        # Trabalhar com ficheiros e pastas
+import random                    # Randomizar DNS (evitar bloqueios)
+from uuid import uuid4           # Criar domínios falsos (detetar wildcard)
+from concurrent.futures import ThreadPoolExecutor  # Motor de paralelismo
+
 from utils.tuga_colors import G, Y, R, W  # Cores para output
 
+# ==========================================
+# CLASSE PRINCIPAL
+# ==========================================
 
 class TugaBruteForce:
 
-    # ------------------------------------------------------------------------------------------------------
-    # INICIALIZAÇÃO
-    # ------------------------------------------------------------------------------------------------------
-
     def __init__(self, options: dict):
 
-        freeze_support()  # Necessário para multiprocessing em alguns sistemas
+        # -------------------------
+        # CONFIG
+        # -------------------------
 
-        self.options = options
-        self.target = options.get("target")        # domínio alvo (ex: tesla.com)
-        self.workers = options.get("threads", 50)  # número de processos
+        self.target = options.get("target")
+        self.threads = options.get("threads", 100)
 
-        # Caminhos das wordlists
         self.first_wordlist = "wordlist/first_names.txt"
         self.second_wordlist = "wordlist/next_names.txt"
 
         self.start = time.time()
 
-        # Fila partilhada entre processos
-        self.first_sub_names = Queue()
+        # -------------------------
+        # CACHE GLOBAL (EVITA REPETIÇÕES)
+        # -------------------------
 
-        # Contador global de resultados
-        self.subdomains_count = Value('i', 0)
+        self.cache = {}
+        self.cache_lock = threading.Lock()
 
-        # Locks para evitar conflitos
-        self.file_lock = Lock()
+        # -------------------------
+        # CONTADOR GLOBAL
+        # -------------------------
 
-        # Palavras vindas de OSINT (se existirem)
-        self.semantic_hints = options.get("semantic_hints", [])
+        self.count = 0
+        self.count_lock = threading.Lock()
 
-        # Carregar dados
-        self.load_first_sub_names()
-        self.second_sub_names = self.load_second_sub_names()
+        # -------------------------
+        # LOAD WORDLISTS
+        # -------------------------
 
+        self.first_subs = self.load_list(self.first_wordlist)
+        self.second_subs = self.load_list(self.second_wordlist)
+
+        # -------------------------
         # DNS
-        self.dns_servers = self.load_dns_servers("dnslist/dns_servers.txt")
-        self.online_dns_servers = self.get_online_dns_servers()
+        # -------------------------
 
-        # Pasta de resultados
-        self.date = str(datetime.datetime.now().date())
-        self.folder = os.path.join(os.getcwd(), "results", self.target, self.date)
-        os.makedirs(self.folder, exist_ok=True)
-        self.outfile_path = os.path.join(self.folder, "tuga_bruteforce.txt")
+        self.dns_servers = self.load_dns("dnslist/dns_servers.txt")
+        self.resolvers = self.create_resolvers()
 
-        # Cache local (cada processo terá a sua)
-        self.local_dns_cache = {}
+        # -------------------------
+        # WILDCARD
+        # -------------------------
 
-        # Criar resolvers e detetar wildcard
-        self.resolvers = self.create_resolver_pool()
         self.wildcard_ips = self.detect_wildcard()
 
-    # ------------------------------------------------------------------------------------------------------
-    # WORDLISTS
-    # ------------------------------------------------------------------------------------------------------
+        # -------------------------
+        # OUTPUT FILE
+        # -------------------------
 
-    def load_first_sub_names(self):
-        """
-        Carrega:
-            - palavras OSINT
-            - wordlist principal
+        self.outfile = "results.txt"
 
-        Evita duplicados
-        """
-        seen = set()
+    # ==========================================
+    # LOAD LISTA
+    # ==========================================
 
-        # 1. Palavras vindas de OSINT
-        for hint in self.semantic_hints:
-            if hint not in seen:
-                self.first_sub_names.put(hint)
-                seen.add(hint)
-
-        # 2. Wordlist principal
-        if not os.path.exists(self.first_wordlist):
-            return
-
-        with open(self.first_wordlist, 'r') as f:
-            for line in f:
-                word = line.strip()
-                if word and word not in seen:
-                    self.first_sub_names.put(word)
-                    seen.add(word)
-
-    # ------------------------------------------------------------------------------------------------------
-
-    def load_second_sub_names(self):
-        """
-        Segunda wordlist (ex: dev.api.site.com)
-        """
-        if not os.path.exists(self.second_wordlist):
+    def load_list(self, path):
+        if not os.path.exists(path):
             return []
 
-        with open(self.second_wordlist) as f:
+        with open(path) as f:
             return [l.strip() for l in f if l.strip()]
 
-    # ------------------------------------------------------------------------------------------------------
-    # DNS
-    # ------------------------------------------------------------------------------------------------------
+    # ==========================================
+    # LOAD DNS
+    # ==========================================
 
-    def load_dns_servers(self, filepath):
-        """
-        Lê ficheiro dns_servers.txt
-        """
-        servers = []
+    def load_dns(self, path):
+        with open(path) as f:
+            return [l.strip() for l in f if l.strip() and not l.startswith("#")]
 
-        with open(filepath, 'r') as f:
-            for line in f:
-                line = line.strip()
-                if line and not line.startswith("#"):
-                    servers.append(line)
+    # ==========================================
+    # CRIAR RESOLVERS
+    # ==========================================
 
-        return servers
-
-    # ------------------------------------------------------------------------------------------------------
-
-    def get_online_dns_servers(self, test_domain="google.com"):
-        """
-        Testa quais DNS estão a funcionar
-        """
-        online = []
-
-        for server in self.dns_servers:
-            resolver = dns.resolver.Resolver()
-            resolver.nameservers = [server]
-
-            try:
-                resolver.resolve(test_domain, "A")
-                online.append(server)
-            except Exception:
-                continue
-
-        return online if online else self.dns_servers
-
-    # ------------------------------------------------------------------------------------------------------
-
-    def create_resolver_pool(self):
-        """
-        Cria resolvers com ORDEM ALEATÓRIA
-        """
+    def create_resolvers(self):
         resolvers = []
 
-        shuffled = random.sample(self.online_dns_servers, len(self.online_dns_servers))
+        # RANDOMIZA LISTA (IMPORTANTE PARA EVASÃO)
+        random.shuffle(self.dns_servers)
 
-        for server in shuffled:
+        for server in self.dns_servers:
             r = dns.resolver.Resolver(configure=False)
             r.nameservers = [server]
-            r.lifetime = 1.0    # Default 1.5
-            r.timeout = 1.2     # Default 1.5
 
-            # Estatísticas básicas
-            r.stats = {"timeouts": 0, "success": 0}
+            # TIMEOUT AGRESSIVO = MAIS RÁPIDO
+            r.timeout = 0.8
+            r.lifetime = 0.8
 
             resolvers.append(r)
 
         return resolvers
 
-    # ------------------------------------------------------------------------------------------------------
-    # RESOLUÇÃO DNS INTELIGENTE
-    # ------------------------------------------------------------------------------------------------------
+    # ==========================================
+    # RESOLVER DOMÍNIO
+    # ==========================================
 
-    def resolve_fast(self, domain, resolvers):
-        """
-        Resolve domínio usando múltiplos DNS
-        """
+    def resolve(self, domain):
 
-        # Se já foi resolvido antes → usa cache
-        if domain in self.local_dns_cache:
-            return self.local_dns_cache[domain]
+        # CACHE
+        with self.cache_lock:
+            if domain in self.cache:
+                return self.cache[domain]
 
-        # Randomiza ordem (muito importante)
-        random_resolvers = random.sample(resolvers, len(resolvers))
+        # RANDOMIZA RESOLVERS (MUITO IMPORTANTE)
+        resolvers = self.resolvers.copy()
+        random.shuffle(resolvers)
 
-        nx_hits = 0  # contador de NXDOMAIN
+        nx = 0
 
-        for resolver in random_resolvers:
+        for i, resolver in enumerate(resolvers):
+
+            # NÃO TESTAR TODOS (GANHO DE VELOCIDADE)
+            if i >= 3:
+                break
 
             try:
                 answer = resolver.resolve(domain, "A")
                 ips = [r.to_text() for r in answer]
 
-                resolver.stats["success"] += 1
-
-                # Evita wildcard
+                # EVITAR WILDCARD
                 if self.wildcard_ips and set(ips) == self.wildcard_ips:
                     return None
 
-                self.local_dns_cache[domain] = ips
+                with self.cache_lock:
+                    self.cache[domain] = ips
+
                 return ips
 
-            except dns.resolver.Timeout:
-                resolver.stats["timeouts"] += 1
-                continue
-
             except dns.resolver.NXDOMAIN:
-                nx_hits += 1
-
-                # Só aceitar NXDOMAIN após 2 confirmações
-                if nx_hits >= 2:
-                    self.local_dns_cache[domain] = None
+                nx += 1
+                if nx >= 2:
+                    with self.cache_lock:
+                        self.cache[domain] = None
                     return None
-
-                continue
 
             except Exception:
                 continue
 
-        self.local_dns_cache[domain] = None
+        with self.cache_lock:
+            self.cache[domain] = None
+
         return None
 
-    # ------------------------------------------------------------------------------------------------------
-    # WILDCARD DETECTION
-    # ------------------------------------------------------------------------------------------------------
+    # ==========================================
+    # DETETAR WILDCARD
+    # ==========================================
 
     def detect_wildcard(self):
-        """
-        Testa se o domínio responde sempre com o mesmo IP (wildcard)
-        """
-        test_ips_sets = []
+        results = []
 
         for _ in range(3):
-            test_domain = f"{uuid4().hex}.{self.target}"
+            test = f"{uuid4().hex}.{self.target}"
 
             for resolver in self.resolvers:
                 try:
-                    answer = resolver.resolve(test_domain, "A")
+                    answer = resolver.resolve(test, "A")
                     ips = {r.to_text() for r in answer}
-                    test_ips_sets.append(ips)
+                    results.append(ips)
                     break
-                except Exception:
+                except:
                     continue
 
-        if len(test_ips_sets) >= 2 and all(s == test_ips_sets[0] for s in test_ips_sets):
-            return test_ips_sets[0]
+        if len(results) >= 2 and all(r == results[0] for r in results):
+            print(Y + "[!] Wildcard detectado" + W)
+            return results[0]
 
         return set()
 
-    # ------------------------------------------------------------------------------------------------------
-    # OUTPUT
-    # ------------------------------------------------------------------------------------------------------
+    # ==========================================
+    # OUTPUT (IMEDIATO)
+    # ==========================================
 
-    def handle_valid_subdomain(self, domain, ips):
+    def save(self, domain, ips):
 
-        with self.subdomains_count.get_lock():
-            self.subdomains_count.value += 1
-            count = self.subdomains_count.value
+        with self.count_lock:
+            self.count += 1
+            c = self.count
 
-        with self.file_lock:
-            with open(self.outfile_path, 'a') as f:
-                f.write(f"{domain}\t{','.join(ips)}\n")
+        # PRINT IMEDIATO (SEM LOCK = MAIS RÁPIDO)
+        print(f"{G}[*] {c}:{W} {domain.ljust(50)} {', '.join(ips)}")
 
-        print(f"{G}[*] {count}:{W} {domain.ljust(50)} {', '.join(ips)}")
+        # FILE LOCK
+        with open(self.outfile, "a") as f:
+            f.write(f"{domain}\t{','.join(ips)}\n")
 
-    # ------------------------------------------------------------------------------------------------------
-    # WORKER
-    # ------------------------------------------------------------------------------------------------------
+    # ==========================================
+    # SCAN PRIMEIRO NÍVEL
+    # ==========================================
 
-    def scan_subdomains(self):
+    def scan_first(self, sub):
 
-        # Cada processo cria o seu próprio pool
-        resolvers = self.create_resolver_pool()
+        domain = f"{sub}.{self.target}"
 
-        try:
-            while True:
+        ips = self.resolve(domain)
 
-                try:
-                    first = self.first_sub_names.get(timeout=0.2)
-                except queue.Empty:
-                    break
+        if ips:
+            self.save(domain, ips)
 
-                sub1 = f"{first}.{self.target}"
+        # IMPORTANTE: segundo nível NÃO BLOQUEIA
+        for s in self.second_subs:
+            self.executor.submit(self.scan_second, s, domain)
 
-                ips = self.resolve_fast(sub1, resolvers)
+    # ==========================================
+    # SCAN SEGUNDO NÍVEL
+    # ==========================================
 
-                if ips:
-                    self.handle_valid_subdomain(sub1, ips)
+    def scan_second(self, sub, parent):
 
-                    # Segundo nível
-                    for second in self.second_sub_names:
-                        sub2 = f"{second}.{sub1}"
+        domain = f"{sub}.{parent}"
 
-                        ips2 = self.resolve_fast(sub2, resolvers)
+        ips = self.resolve(domain)
 
-                        if ips2:
-                            self.handle_valid_subdomain(sub2, ips2)
+        if ips:
+            self.save(domain, ips)
 
-        except Exception:
-            pass
-
-    # ------------------------------------------------------------------------------------------------------
-    # PROCESSOS
-    # ------------------------------------------------------------------------------------------------------
-
-    def start_process(self):
-
-        processes = []
-
-        try:
-            for _ in range(self.workers):
-                p = Process(target=self.scan_subdomains)
-                p.start()
-                processes.append(p)
-
-            for p in processes:
-                p.join()
-
-        except KeyboardInterrupt:
-            print(R + "\n[!] Interrompido pelo utilizador" + W)
-            for p in processes:
-                if p.is_alive():
-                    p.terminate()
-            sys.exit(1)
-
-    # ------------------------------------------------------------------------------------------------------
+    # ==========================================
     # RUN
-    # ------------------------------------------------------------------------------------------------------
+    # ==========================================
 
     def run(self):
 
-        try:
-            self.start_process()
-        finally:
-            print(Y + f"\n[*] Total encontrado: {self.subdomains_count.value}" + W)
-            print(Y + f"[**] Tempo: {time.time() - self.start:.2f}s" + W)
-            print(G + f"[+] Resultados: {self.folder}" + W)
-            sys.exit(0)
+        print(G + "[+] Scan ultra-rápido iniciado..." + W)
+
+        # UM ÚNICO EXECUTOR GLOBAL (SEM BLOQUEIOS)
+        self.executor = ThreadPoolExecutor(max_workers=self.threads)
+
+        # DISPARA TODAS AS TASKS IMEDIATAMENTE
+        for sub in self.first_subs:
+            self.executor.submit(self.scan_first, sub)
+
+        # ESPERA TERMINAR
+        self.executor.shutdown(wait=True)
+
+        print(Y + f"\n[*] Total encontrado: {self.count}" + W)
+        print(Y + f"[**] Tempo: {time.time() - self.start:.2f}s" + W)
+
+# ----------------------------------------------------------------------------------------------------------
+# USO
+# ----------------------------------------------------------------------------------------------------------
+
+# options = {
+#     "target": "tesla.com",
+#     "threads": 150
+# }
+
+# scanner = TugaBruteForce(options)
+# scanner.run()
+
+
+
 # # ----------------------------------------------------------------------------------------------------------
 # # TugaRecon – DNS Bruteforce Engine
 # #
